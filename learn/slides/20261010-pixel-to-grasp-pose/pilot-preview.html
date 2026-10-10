@@ -14,28 +14,26 @@
   --err:#c92a2a;     /* error / trap */
   --table:#d6cfc2;   /* table surface */
   --obj:#e9e3d6;     /* object */
-  --amber:#b7791f;   /* camera z axis (Figure 2 only) */
-  --amber:#b7791f;   /* camera z axis (Figure 2 only) */
-  --amber:#b7791f;   /* camera z axis (Figure 2 only) */
+  --amber:#b7791f;   /* camera z axis (Figures 2-3) */
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --paper:#14171d; --card:#1c2028; --ink:#e8eaee; --muted:#9aa1ad; --faint:#4a505c;
     --line:#343a46; --ray:#6ea0ff; --hl:#ff9a5c; --cam:#4fd1c0; --base:#b794f6;
-    --err:#ff7b7b; --table:#3a362e; --obj:#4a4538; --amber:#f0b44c; --amber:#f0b44c; --amber:#f0b44c;
+    --err:#ff7b7b; --table:#3a362e; --obj:#4a4538; --amber:#f0b44c;
   }
 }
 :root[data-theme="dark"]{
   --paper:#14171d; --card:#1c2028; --ink:#e8eaee; --muted:#9aa1ad; --faint:#4a505c;
   --line:#343a46; --ray:#6ea0ff; --hl:#ff9a5c; --cam:#4fd1c0; --base:#b794f6;
-  --err:#ff7b7b; --table:#3a362e; --obj:#4a4538; --amber:#f0b44c; --amber:#f0b44c; --amber:#f0b44c;
+  --err:#ff7b7b; --table:#3a362e; --obj:#4a4538; --amber:#f0b44c;
 }
 html,body{margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);
   font-family:-apple-system,"Hiragino Sans","Yu Gothic","Noto Sans CJK JP","Noto Sans JP",system-ui,sans-serif;
   line-height:1.6}
 figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box}
-.fig .eyebrow{font-size:12px;letter-spacing:.08em;color:var(--muted);margin:0 0 4px}
+.fig .eyebrow{font-size:12px;letter-spacing:.04em;text-transform:none;color:var(--muted);margin:0 0 4px}
 .fig h2{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif CJK JP","Noto Serif JP",Georgia,serif;
   font-size:22px;line-height:1.35;margin:0 0 6px;font-weight:700;color:var(--ink)}
 .fig .sub{font-style:italic;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
@@ -58,18 +56,18 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 .fig svg .mid{text-anchor:middle}
 .fig svg .end{text-anchor:end}
 
-main{max-width:720px;margin:0 auto;padding:16px;line-height:1.85;font-size:17px;color:var(--ink)} h2{margin-top:2.2em;font-size:21px}</style></head><body><main><h1>試作：VLM の点から土台の 3D 座標へ（1〜5 章）</h1><h2>はじめに</h2><p>「近づくまでは motion planning、掴むところはポリシー」という構成では、motion planning に渡す 3 次元の目標を、VLM の出力から作る必要がある。IK は分かっていても、その入力になる姿勢の作り方が抜けている。だから画像の 1 点から、ロボットの土台を基準にした座標まで、計算を 1 段ずつ運ぶ。</p><p>その答えは VLM の中ではなく、カメラの幾何にある。扱うのは RGB-D カメラ 1 台と VLM の 2D 出力という、よくある構成だけだ。画像の数え方から座標変換まで、前提を省かずに説明する。</p><h2>1. 画像は画素のマス目で、VLM の答えは割合だ</h2><p>VLM が返す [y, x] = [750, 625] という 2 つの数は、画像のどこを指すのか、このままでは分からない。画素の番号でもメートルでもないからだ。まず画像が何でできているかから確かめる。</p><p>画像は、小さな正方形のマス目が並んだ格子だ。この 1 つ 1 つを「画素（pixel）」と呼ぶ。この記事のカメラの画像は、横に 640 個、縦に 480 個並んでいる。各画素には住所があり、u は「左の端から何個目か」、v は「上の端から何個目か」を表す数だ。この (u, v) を「画素座標」と呼ぶ。</p><figure class="fig" id="fig-1">
+main{max-width:720px;margin:0 auto;padding:16px;line-height:1.85;font-size:17px;color:var(--ink)} h2{margin-top:2.2em;font-size:21px}</style></head><body><main><h1>試作：VLM の点から土台の 3D 座標へ（1〜5 章）</h1><h2>はじめに</h2><p>「近づくまでは motion planning、掴むところはポリシー」という構成では、motion planning に渡す 3 次元の目標を、VLM の出力から作る必要がある。IK は使えても、その入力になる座標の作り方が抜けている。この記事は、その作り方を 1 つの例で追う。</p><p>例の場面はこうだ。机の上に高さ 5 cm の箱が 1 つある。机の 0.8 m 真上に、真下を向いた RGB-D カメラが 1 台ある。RGB-D カメラは、色の画像と「各画素までの距離」の画像を同時に撮るカメラだ。色の画像を見せて「箱を掴む場所を指せ」と VLM に頼むと、画像上の 1 点が返る。</p><p>計算は 5 段だ。<br>1. VLM の答え（割合）を、画素の住所に直す。<br>2. 画素から、カメラを出る 1 本の線を決める。<br>3. 深度で、線の上の 1 点を決める。<br>4. その点を、カメラ基準の数字から、ロボットの土台（base）基準の数字に直す。<br>5. 4 で使う変換の表を、どう測るかを調べる。<br>6. 向きを決め、物体の手前で止まる位置（pre-grasp）を作る。<br>7. どの段でどれだけ誤差が出るかを見る。</p><p>1〜5 で位置（3 つの数）ができ、6 で motion planning に渡せる姿勢になる。</p><h2>1. 画像は画素のマス目で、VLM の答えは割合だ</h2><p>箱を VLM に指させると、[y, x] = [750, 625] という 2 つの数が返る。この数は画素の番号でもメートルでもないので、画像のどこを指すのか、このままでは分からない。まず画像が何でできているかを確かめる。</p><p>画像は、画素という小さな正方形が、横に 640 個、縦に 480 個並んだ格子だ。画素の住所は、左端から何個進んだ位置か（u）と、上端から何個進んだ位置か（v）で表す。左端の画素は 0 個進んだ位置なので u = 0 で、横 640 個の最後は u = 639 になる。v も上から同じように数えるので、右下は (639, 479) だ。この (u, v) を「画素座標」と呼ぶ。</p><figure class="fig" id="fig-1">
   <p class="eyebrow">TOY · 画像 640×480 画素 · VLM の答え [y, x] = [750, 625]</p>
   <h2>画像は画素のマス目で、VLM の答えは画像の大きさに対する割合だ</h2>
   <p class="sub">u = x/1000 × 640,&nbsp; v = y/1000 × 480</p>
 
-<svg viewBox="0 0 720 716" role="img" aria-labelledby="f1t f1d" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 720 738" role="img" aria-labelledby="f1t f1d" xmlns="http://www.w3.org/2000/svg">
 <title id="f1t">画素のマス目と、VLM の割合から画素の住所への変換</title>
 <desc id="f1d">画像は横 640、縦 480 画素のマス目で、左上が (0, 0)、右下が (639, 479)。VLM の答え [y, x] = [750, 625] は 0 から 1000 の物差し上の値で、625 ÷ 1000 × 640 = 400、750 ÷ 1000 × 480 = 360 となり、画素 (400, 360) に戻る。</desc>
 <!-- numbers (toy.md rung 1): [y,x]=[750,625], 640x480, centre (320,240), (u,v)=(400,360), 0.625*640=400, 0.75*480=360, wrong order -> (480,300) -->
 <defs><marker id="a1ray" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ray)"/></marker><marker id="a1hl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--hl)"/></marker><marker id="a1mu" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker></defs>
-<rect x="8" y="8" width="704" height="574" rx="8" style="fill:var(--card);stroke:var(--line)"/>
-<text class="s b mu end" x="664" y="24">VLM の物差し 0 … 1000</text>
+<rect x="8" y="8" width="704" height="596" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+<text class="s b mu end" x="664" y="24">VLM の x（0–1000）</text>
 <line x1="212" y1="62" x2="664" y2="62" style="stroke:var(--ink);stroke-width:2"/>
 <line x1="212" y1="54" x2="212" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
 <text class="m s mu mid" x="212" y="46">0</text>
@@ -83,7 +81,7 @@ main{max-width:720px;margin:0 auto;padding:16px;line-height:1.85;font-size:17px;
 <text class="m s mu mid" x="551" y="46">750</text>
 <line x1="664" y1="54" x2="664" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
 <text class="m s mu mid" x="664" y="46">1000</text>
-<text class="s b mu" x="212" y="118">画像の物差し 0 … 640 画素</text>
+<text class="s b mu" x="212" y="118">画像の u（0–640 画素）</text>
 <line x1="212" y1="128" x2="664" y2="128" style="stroke:var(--ink);stroke-width:2"/>
 <line x1="212" y1="128" x2="212" y2="136" style="stroke:var(--ink);stroke-width:1.5"/>
 <text class="m s mu mid" x="212" y="156">0</text>
@@ -122,7 +120,7 @@ main{max-width:720px;margin:0 auto;padding:16px;line-height:1.85;font-size:17px;
 <line x1="190" y1="200" x2="190" y2="541" style="stroke:var(--ray);stroke-width:2.5" marker-end="url(#a1ray)"/>
 <text class="s b ray" transform="translate(234 234) rotate(90)" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">v：上から何画素目 ↓</text>
 <text class="s ray" transform="translate(258 234) rotate(90)" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">下へ行くほど v は大きい</text>
-<text class="s b mu mid" x="64" y="190">VLM</text><text class="s b mu mid" x="138" y="190">画像</text>
+<text class="s b mu mid" x="64" y="168">VLM の y</text><text class="s b mu mid" x="64" y="186">（0–1000）</text><text class="s b mu mid" x="138" y="168">画像の v</text><text class="s b mu mid" x="138" y="186">（画素）</text>
 <line x1="64" y1="200" x2="64" y2="539" style="stroke:var(--ink);stroke-width:2"/>
 <line x1="136" y1="200" x2="136" y2="539" style="stroke:var(--ink);stroke-width:2"/>
 <line x1="56" y1="200" x2="64" y2="200" style="stroke:var(--ink);stroke-width:1.5"/>
@@ -158,76 +156,98 @@ main{max-width:720px;margin:0 auto;padding:16px;line-height:1.85;font-size:17px;
 <circle cx="494.5" cy="454.25" r="9" style="fill:var(--hl);stroke:var(--card);stroke-width:2.5"/>
 <text class="m s b hl end" x="480.5" y="448.25" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">(u, v) = (400, 360)</text>
 <text class="s b hl end" x="480.5" y="430.25" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">VLM の点</text>
+<g>
+<rect x="466" y="208" width="196" height="138" rx="6" style="fill:var(--card);stroke:var(--hl);stroke-width:1.5"/>
+<text class="s b mu" x="476" y="228">拡大：実際の画素 4 個</text>
+<rect x="476" y="238" width="88" height="48" style="fill:var(--paper);stroke:var(--ink);stroke-width:1.5"/>
+<rect x="564" y="238" width="88" height="48" style="fill:var(--paper);stroke:var(--ink);stroke-width:1.5"/>
+<rect x="476" y="286" width="88" height="48" style="fill:var(--paper);stroke:var(--ink);stroke-width:1.5"/>
+<rect x="564" y="286" width="88" height="48" style="fill:var(--hl);fill-opacity:.22;stroke:var(--hl);stroke-width:2.5"/>
+<text class="m mid mu" x="520" y="268" style="font-size:12px">(399, 359)</text>
+<text class="m mid mu" x="608" y="268" style="font-size:12px">(400, 359)</text>
+<text class="m mid mu" x="520" y="316" style="font-size:12px">(399, 360)</text>
+<text class="m mid hl b" x="608" y="316" style="font-size:12px">(400, 360)</text>
+</g>
+<text class="s b" x="212" y="562">図では 80×80 画素を 1 マスにまとめて描いた</text>
+<text class="m s mu" x="212" y="584">配列では image[v][u]（行 = v、列 = u）</text>
+<g transform="translate(0 22)">
 <rect x="8" y="594" width="704" height="114" rx="8" style="fill:var(--card);stroke:var(--hl);stroke-width:2"/>
 <text class="m hl b" x="22" y="624" style="font-size:16px">625 ÷ 1000 = 0.625（幅の 62.5 %）→ 0.625 × 640 = 400</text>
 <text class="m hl b" x="22" y="654" style="font-size:16px">750 ÷ 1000 = 0.75 → 0.75 × 480 = 360</text>
 <rect x="22" y="676" width="25.6818" height="25.6818" style="fill:none;stroke:var(--ink);stroke-width:1.5"/>
 <text class="s mu" x="57.6818" y="692">1 マス = 80 画素（640 ÷ 8 = 80、480 ÷ 6 = 80）。この図は 8×6 マス</text>
+</g>
 </svg>
   <figcaption>VLM は縮めた画像を見るので、画素の番号ではなく割合で答える。割合に幅と高さを掛けると住所に戻る。</figcaption>
-</figure><p>図 1 の左上の角が (0, 0) で、右下の角が (639, 479) だ。中心は (320, 240) になる。注意するのは v で、学校のグラフと違って下に向かって増える。だから画像の下の方にある点ほど、v は大きい。</p><p>VLM はこの 640×480 の格子を、そのままは見ない。モデルは画像を縮めたり、正方形に切り分けたりしてから読む。たとえば Molmo は 336×336 の切片にして見る。そのためモデルが数える画素の番号は、私たちの番号と合わない。</p><p>だから VLM は、画素の番号ではなく「画像の大きさに対する割合」で答える。Gemini は「幅を 1000 としたら 625 番目」という形で、これを「正規化座標」と呼ぶ。1000 で割ると、625 ÷ 1000 = 0.625 で、幅全体を 1 としたときの位置になる。これに私たちの幅 640 を掛けると、0.625 × 640 = 400 で、私たちの u になる。縦も同じで、750 ÷ 1000 × 480 = 360 が v だ。図 1 の 2 本の物差しの 625 と 400 が、同じ位置に揃っている。</p><p>[750, 625] の順番は [y, x] で、y が縦（v）、x が横（u）にあたる。つまり (u, v) = (400, 360) だ。ただし割合で答える理由は、モデルの見え方からの推測である。各社は形式を書いているが、理由までは書いていない。</p><p>形式はモデルごとに違う。Gemini は [y, x] を 0–1000、Molmo は x, y を 0–100、RoboPoint は x, y を 0–1 で返す。Gemini の答えを [x, y] と読み違えると (480, 300) になる。これも画像の中の有効な画素なので、エラーは出ずに、本来の点から 125 mm ずれた場所を指す。</p><h2>2. 画素の住所は 1 本の光線を決める</h2><p>画素 (400, 360) は、画像の上の位置でしかない。机の上のどこにあるのか、カメラから見てどの向きなのかは、まだ分からない。この向きを決めるのが、カメラの 2 種類の数だ。</p><p>1 つ目は cx と cy で、カメラのちょうど正面に写る画素の住所を表す。この toy では画像の中心の (320, 240) だ。ここから見た位置が要るので、u − cx = 400 − 320 = 80 と、v − cy = 360 − 240 = 120 を求める。80 は「正面から右へ何画素ずれているか」、120 は「正面から下へ何画素ずれているか」を表す。</p><p>2 つ目は fx で、「カメラの中心の 600 画素ぶん前に、画像のスクリーンが立っている」と考えたときの 600 だ。fx はカメラごとに決まる数で、カメラのキャリブレーション（測定）で求め、カメラの SDK が教えてくれる。単位は画素の個数である。スクリーンの大きさは画素で測り、世界はメートルで測るので、両方に共通するのは比だけだ。</p><figure class="fig" id="fig-2">
-  <p class="eyebrow">TOY · 640×480 · fx = fy = 600 PX · 深度 0.75 M</p>
+</figure><p>配列に入れた画像では、v が行、u が列になる。画素 (u, v) の値は image[v][u] と、v を先に書いて読む。添字の順が (u, v) と逆なので、実装で最初に踏む罠だ。</p><p>VLM は、画素の番号ではなく、画像の大きさに対する割合で答える。VLM は画像を縮めたり切り分けたりして読み、縮め方はモデルごとに違う。画素の番号で答えると、元の画像に戻すのにそのモデルの縮め方が要る。割合は、どう縮めても同じ値のままだ。各社は理由まで書いていないので、これは推測だが、1000 は左端から右端までを測る物差しの長さにすぎない。この形式は Google のモデル Gemini の資料に書かれている。</p><p>割合には、画像の幅と高さを掛けて戻す。625 ÷ 1000 × 640 = 400、750 ÷ 1000 × 480 = 360 なので、(u, v) = (400, 360) だ。[y, x] の順で、y が縦、x が横にあたる。</p><p>形式はモデルごとに違う。Gemini は [y, x] を 0–1000、Molmo は x, y を 0–100 で返す。Gemini の答えを [x, y] と読むと (480, 300) になる。有効な画素なのでエラーは出ず、100 画素ずれた場所を指す。0.75 m 先ではおよそ 125 mm にあたる（理由は 3 章）。</p><h2>2. 画素の住所は 1 本の光線を決める</h2><p>画素 (400, 360) は画像上の位置でしかなく、机の上のどこかは決まらない。カメラは、レンズの 1 点を通った光で像を作る。この点を「カメラの中心」と呼ぶ。1 画素が決めるのは、カメラの中心を出る 1 本の線の向きだけで、その向きを数にするのにカメラの 4 つの数を使う。</p><p>1 つ目は cx と cy だ。カメラがまっすぐ向いている方向を「光軸」と呼び、光軸が当たる画素の住所が (cx, cy) で、この例では (320, 240) だ。向きは光軸からのずれで決まるので、u − cx = 400 − 320 = 80（右へ 80 画素）、v − cy = 360 − 240 = 120（下へ 120 画素）を求める。</p><p>2 つ目は fx と fy だ。fx は、カメラの中心から画像の面までの距離を、画素の幅を 1 として数えた値で、この例では 600 だ。縦の同じ数が fy で、これも 600 になる（普通は fx とほぼ等しい）。この値は出荷時の測定（カメラキャリブレーション）で決まり、SDK から読める。5 章のハンドアイキャリブレーションとは別の測定だ。</p><figure class="fig" id="fig-2">
+  <p class="eyebrow">TOY · 640×480 · fx = fy = 600 px · 深度 0.75 m</p>
   <h2>1 画素は 1 本の光線になり、深度がその上の 1 点を決める</h2>
   <p class="sub">X = (u − cx)·Z / fx,&nbsp; Y = (v − cy)·Z / fy</p>
 
-<svg viewBox="0 0 720 706" role="img" aria-labelledby="f2t f2d" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 720 964" role="img" aria-labelledby="f2t f2d" xmlns="http://www.w3.org/2000/svg">
 <title id="f2t">画素から光線、深度で点</title>
 <desc id="f2d">VLM の [y, x] = [750, 625] は画素 (400, 360) で、中心から右へ 80、下へ 120 画素。80 : 600 = X : 0.75 m から X = 0.10 m、同様に Y = 0.15 m で、カメラから見た点は (0.10, 0.15, 0.75) m。</desc>
 <!-- panel 1 (image) moved to Figure 1; numbers (toy.md rung 1-2): [750,625], 640x480, (320,240), (400,360), +80, +120, f=600, Z=0.75, X=0.10, Y=0.15, faint Z=0.30/X=0.04, Z=0.60/X=0.08 (X=Z*80/600) -->
 <defs><marker id="a2ray" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ray)"/></marker><marker id="a2hl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--hl)"/></marker><marker id="a2cam" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--cam)"/></marker><marker id="a2amb" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--amber)"/></marker><marker id="a2base" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--base)"/></marker><marker id="a2mu" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker><marker id="a2ink" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ink)"/></marker></defs>
-<g transform="translate(0 -234)">
-<rect x="8" y="242" width="704" height="598" rx="8" style="fill:var(--card);stroke:var(--line)"/>
-<text class="b" x="22" y="270">横から見た図（x–z 面）: x は右、z は前方 = 下</text>
-<text class="cam b mid" x="200" y="302">カメラ中心（ピンホール）</text>
-<polygon points="200,322 200,472 220,472" style="fill:var(--ray);opacity:.16"/>
-<polygon points="200,322 200,772 260,772" style="fill:var(--ray);opacity:.16"/>
-<line x1="200" y1="322" x2="200" y2="772" style="stroke:var(--cam);stroke-width:1.5;stroke-dasharray:6 5"/>
-<text class="s cam end" x="192" y="640">光軸</text>
-<circle cx="200" cy="322" r="7" style="fill:var(--cam)"/>
-<!-- screen -->
-<line x1="130" y1="472" x2="290" y2="472" style="stroke:var(--ink);stroke-width:3.5"/>
-<line x1="200" y1="472" x2="220" y2="472" style="stroke:var(--ray);stroke-width:5"/>
-<circle cx="200" cy="472" r="5" style="fill:var(--cam)"/>
-<text class="s cam end" x="192" y="496">画像中心</text>
-<text class="s ray b" x="232" y="456">画像の中心 (cx) から +80 画素 = 400 − 320</text>
-<text class="mu" x="300" y="478">スクリーン（画像）: 中心から 600 画素前</text>
-<!-- 600 bracket -->
-<line x1="160" y1="324" x2="160" y2="470" style="stroke:var(--muted);stroke-width:1.5" marker-start="url(#a2mu)" marker-end="url(#a2mu)"/>
-<text class="mu mid" transform="translate(150 397) rotate(-90)">600 画素</text>
-<!-- Z bracket -->
-<line x1="100" y1="324" x2="100" y2="770" style="stroke:var(--hl);stroke-width:2" marker-start="url(#a2hl)" marker-end="url(#a2hl)"/>
-<text class="hl b mid" transform="translate(90 548) rotate(-90)">Z = 0.75 m</text>
-<!-- depth plane -->
-<line x1="40" y1="772" x2="700" y2="772" style="stroke:var(--muted);stroke-width:2"/>
-<text class="hl b" x="300" y="764">深度 Z = 0.75 m の面</text>
-<!-- ray -->
-<line x1="200" y1="322" x2="260" y2="772" style="stroke:var(--ray);stroke-width:3"/>
-<circle cx="220" cy="472" r="6.5" style="fill:var(--ray)"/>
-<circle cx="224" cy="502" r="6" style="fill:var(--ray);opacity:.4"/>
-<circle cx="248" cy="682" r="6" style="fill:var(--ray);opacity:.4"/>
-<text class="mu s" x="290" y="507">Z = 0.30 m なら X = 0.04 m</text>
-<text class="mu s" x="290" y="687">Z = 0.60 m なら X = 0.08 m</text>
-<text class="mu b" x="290" y="532">光線だけでは点は決まらない</text>
-<!-- equation card -->
-<rect x="282" y="552" width="418" height="118" rx="8" style="fill:var(--paper);stroke:var(--hl);stroke-width:2"/>
-<text class="s mu" x="298" y="576">2 つの三角形は同じ形（相似）</text>
-<text class="m b hl xl" x="298" y="610">80 : 600 = X : 0.75 m</text>
-<text class="m b hl xl" x="298" y="648" style="font-size:19px">X = 0.75 × 80 / 600 = 0.10 m</text>
-<!-- X segment and point -->
-<line x1="200" y1="772" x2="260" y2="772" style="stroke:var(--hl);stroke-width:5"/>
-<circle cx="260" cy="772" r="9.5" style="fill:var(--hl);stroke:var(--card);stroke-width:2"/>
-<text class="m b hl mid l" x="230" y="800">X = 0.10 m</text>
-<text class="hl b" x="290" y="728">● 深度 0.75 m が決める点</text>
-<text class="s mu" x="22" y="826">スクリーンは画素で、奥行きは m で測る。共通なのは比だけ</text>
-
-<rect x="8" y="852" width="704" height="80" rx="8" style="fill:var(--card);stroke:var(--hl);stroke-width:2"/>
-<text class="m hl b" x="22" y="880" style="font-size:16px">y も同じ: 120 : 600 = Y : 0.75 m → Y = 0.15 m</text>
-<text class="m cam b" x="22" y="914" style="font-size:17px">カメラから見た点 = (0.10, 0.15, 0.75) m</text>
-</g>
+<rect x="8" y="8" width="704" height="948" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+<text class="b" x="22" y="34">横から見た図（x–z 面）。右が x、下が「前方（光軸、Z）」</text>
+<text class="s mu" x="22" y="54">この図の「下」は前方で、図 1 の v（画像の下）とは別の向き</text>
+<!-- ===== upper part: pixels ===== -->
+<text class="s b mu end" x="696" y="140">上：画素 (px) で測る部分</text>
+<polygon points="200,96 200,276 224,276" style="fill:var(--ray);opacity:.16"/>
+<line x1="200" y1="96" x2="200" y2="300" style="stroke:var(--cam);stroke-width:1.5;stroke-dasharray:6 5"/>
+<text class="s cam" x="232" y="176">前方（光軸、Z）↓</text>
+<line x1="200" y1="96" x2="227.2" y2="300" style="stroke:var(--ray);stroke-width:3"/>
+<circle cx="200" cy="96" r="7" style="fill:var(--cam)"/>
+<text class="s cam b" x="216" y="90">カメラの中心（レンズの 1 点。光はすべてここを通る）</text>
+<line x1="130" y1="276" x2="290" y2="276" style="stroke:var(--ink);stroke-width:3.5"/>
+<line x1="200" y1="276" x2="224" y2="276" style="stroke:var(--ray);stroke-width:5"/>
+<circle cx="200" cy="276" r="5" style="fill:var(--cam)"/>
+<circle cx="224" cy="276" r="6.5" style="fill:var(--ray)"/>
+<text class="s cam end" x="192" y="300">画像中心</text>
+<text class="s ray b" x="236" y="262">画像の中心 (cx) から +80 画素 = 400 − 320</text>
+<text class="mu s" x="300" y="281">スクリーン（画像）: 中心から 600 画素前</text>
+<line x1="160" y1="98" x2="160" y2="274" style="stroke:var(--muted);stroke-width:1.5" marker-start="url(#a2mu)" marker-end="url(#a2mu)"/>
+<text class="mu mid" transform="translate(150 186) rotate(-90)">600 画素</text>
+<!-- ===== axis break ===== -->
+<polyline points="8,313 24,323 40,313 56,323 72,313 88,323 104,313 120,323 136,313 152,323 168,313 184,323 200,313 216,323 232,313 248,323 264,313 280,323 296,313 312,323 328,313 344,323 360,313 376,323 392,313 408,323 424,313 440,323 456,313 472,323 488,313 504,323 520,313 536,323 552,313 568,323 584,313 600,323 616,313 632,323 648,313 664,323 680,313 696,323 712,313" style="fill:none;stroke:var(--muted);stroke-width:2"/>
+<polyline points="8,369 24,379 40,369 56,379 72,369 88,379 104,369 120,379 136,369 152,379 168,369 184,379 200,369 216,379 232,369 248,379 264,369 280,379 296,369 312,379 328,369 344,379 360,369 376,379 392,369 408,379 424,369 440,379 456,369 472,379 488,369 504,379 520,369 536,379 552,369 568,379 584,369 600,379 616,369 632,379 648,369 664,379 680,369 696,379 712,369" style="fill:none;stroke:var(--muted);stroke-width:2"/>
+<rect x="8" y="324" width="704" height="44" style="fill:var(--paper);opacity:.0"/>
+<text class="s b mu mid" x="360" y="343">軸の途切れ：ここで縮尺が変わる（上は画素、下は m）</text>
+<text class="s b mid" x="360" y="362">上の三角形は画素で、下の三角形は m で描いた。形（比）だけが同じ</text>
+<!-- ===== lower part: metres ===== -->
+<text class="s b mu end" x="696" y="440">下：m で測る部分</text>
+<polygon points="200,410 200,830 256,830" style="fill:var(--ray);opacity:.16"/>
+<line x1="200" y1="410" x2="200" y2="830" style="stroke:var(--cam);stroke-width:1.5;stroke-dasharray:6 5"/>
+<text class="s cam end" x="192" y="540">前方（光軸、Z）↓</text>
+<line x1="200" y1="410" x2="256" y2="830" style="stroke:var(--ray);stroke-width:3"/>
+<circle cx="200" cy="410" r="7" style="fill:var(--cam)"/>
+<text class="s cam b" x="216" y="404">カメラの中心（上と同じ点）</text>
+<line x1="56" y1="412" x2="56" y2="828" style="stroke:var(--hl);stroke-width:2" marker-start="url(#a2hl)" marker-end="url(#a2hl)"/>
+<text class="hl b mid" transform="translate(40 620) rotate(-90)">Z = 0.75 m（光軸に沿った距離）</text>
+<line x1="40" y1="830" x2="700" y2="830" style="stroke:var(--muted);stroke-width:2"/>
+<text class="hl b end" x="696" y="822">深度 Z = 0.75 m の面</text>
+<circle cx="222.4" cy="578" r="6" style="fill:var(--ray);opacity:.4"/>
+<circle cx="244.8" cy="746" r="6" style="fill:var(--ray);opacity:.4"/>
+<text class="mu s" x="290" y="480" style="opacity:.9">同じ比: 前へ 1 m なら右へ 0.133 m</text>
+<text class="mu s" x="262" y="583">Z = 0.30 m なら X = 0.04 m</text>
+<text class="mu b" x="262" y="610">光線だけでは点は決まらない</text>
+<text class="mu s" x="268" y="751">Z = 0.60 m なら X = 0.08 m</text>
+<rect x="282" y="622" width="418" height="108" rx="8" style="fill:var(--paper);stroke:var(--hl);stroke-width:2"/>
+<text class="s mu" x="298" y="644">2 つの三角形は同じ形（相似）</text>
+<text class="m b hl xl" x="298" y="676">80 : 600 = X : 0.75 m</text>
+<text class="m b hl xl" x="298" y="712" style="font-size:19px">X = 0.75 × 80 / 600 = 0.10 m</text>
+<line x1="200" y1="830" x2="256" y2="830" style="stroke:var(--hl);stroke-width:5"/>
+<circle cx="256" cy="830" r="9.5" style="fill:var(--hl);stroke:var(--card);stroke-width:2"/>
+<text class="m b hl mid l" x="228" y="862">X = 0.10 m</text>
+<text class="hl b" x="280" y="800">● 深度 0.75 m が決める点</text>
+<rect x="8" y="884" width="704" height="64" rx="8" style="fill:var(--card);stroke:var(--hl);stroke-width:2"/>
+<text class="m hl b" x="22" y="910" style="font-size:16px">y も同じ: 120 : 600 = Y : 0.75 m → Y = 0.15 m</text>
+<text class="m cam b" x="22" y="936" style="font-size:17px">カメラから見た点 = (0.10, 0.15, 0.75) m</text>
 </svg>
   <figcaption>VLM の点は画像の中心から右へ 80 画素、下へ 120 画素にあり、80 : 600 = X : 0.75 m の比で深度 0.75 m の面の X = 0.10 m に着く。光線だけでは点は決まらず、深度を読んで初めて (0.10, 0.15, 0.75) m に決まる。</figcaption>
-</figure><p>図 2 の小さい三角形を見てほしい。カメラの中心から 600 画素前のスクリーンの上で、正面から右に 80 画素の位置に点がある。比は 80/600 = 2/15 ≈ 0.133 で、前へ 1 m 進むごとに右へ 0.133 m 進む線になる。縦は fy = 600 を使い、(360 − 240)/600 = 0.2 だ。</p><p>この線が「光線（ray）」で、カメラの中心を出て、その画素を通る 1 本の線のことだ。その画素に写る点は、すべてこの線の上にある。つまり 1 画素は 1 本の光線を決める。このモデルを「ピンホールカメラモデル」、fx, fy, cx, cy を「内部パラメータ（intrinsics）」と呼ぶ。実物のセンサーはレンズの後ろにあり、像は上下左右が逆になる。ただし傾きの比は同じなので、計算は変わらない。レンズの歪みは無視した。D435 級の color では、歪みの係数がほぼ 0 と報告されている。</p><h2>3. 深度が光線の上の 1 点を決める</h2><p>光線だけでは、その上の 1 cm 先か 1 m 先かが決まらない。同じ画素に写る点は無数にあるので、このままでは掴む位置にならない。</p><p>距離を教えてくれるのが「深度画像」だ。color 画像と同じ格子の画像で、各画素には色の代わりに、カメラからその点までの距離が入っている。単位はカメラごとに決まっていて、RealSense D400 の既定では 1 が 1 mm だ。だから 750 は 750 mm を表す。この画素の値が 750 なので、前方への距離 Z は 0.75 m になる。Z が要る理由は、光線の上のどこで止まるかを決めるためだ。</p><p>図 2 の大きい三角形を見てほしい。小さい三角形の光線をそのまま延ばした形で、薄い点が 2 つあり、奥行き 0.30 m では右に 0.04 m、0.60 m では右に 0.08 m だ。3 点とも同じ画素 (400, 360) に写る。一番下の点が Z = 0.75 m で、2 つの三角形は相似だから 80 : 600 = X : 0.75 になる。X = 80 × 0.75 / 600 = 0.10 m、縦も 120 × 0.75 / 600 = 0.15 m だ。カメラから見た点は (0.10, 0.15, 0.75) m である。</p><p>ここに toy の偶然がある。0.75 を掛けると 2/15 の分母の 15 が消えるように、深度を選んである。だから X が丸い値になるだけで、実際のカメラでは割り切れない。同じ式から、この深度での 1 画素の幅は 0.75/600 = 1.25 mm だ。これは後で誤差を見るときに使う。</p><p>この計算を「逆投影（back-projection）」と呼ぶ。RealSense の SDK の deprojection 関数も、中身は同じ式だ。</p><p>ただし深度画像と color 画像は視点が違うので、同じ画素の深度をそのまま読めない。だから depth を color の視点に合わせ直す「align」を先に行う。深度が 0 の画素は測れなかった穴なので除く。VLM や物体切り出しのモデル（SAM など）が「マスク（物体として印を付けた画素の集まり）」を返したときは、その中の有効な画素の中央値を使う。中央値やマスクの縮小は一般的な工夫で、文献が定めた手順ではない。</p><h2>4. 4x4 は「カメラの原点から軸に沿って歩く」計算だ</h2><p>求めた (0.10, 0.15, 0.75) m は、カメラから見た数字だ。これを motion planning にそのまま渡すと、土台の原点から 10 cm、15 cm、75 cm の場所を目指す。物体はそこにないので、腕は別の場所へ動く。だから土台から見た数字に直す必要がある。</p><p>そのために「座標系（frame）」を決めておく。座標系とは、数字を測るための物差しの組で、原点（数字がすべて 0 になる点）が 1 つと、x, y, z の 3 本の軸の向きでできている。点の数字は「原点から、各軸に沿って何 m 進んだか」だから、どの座標系で測るかで変わる。土台にもカメラにも、それぞれの座標系がある。</p><p>toy では、同じ点がこう書ける。カメラの座標系では (0.10, 0.15, 0.75)、土台の座標系では (0.60, −0.15, 0.05) だ。点は動いていない。測る原点と軸が違うだけである。ここでも toy の偶然がある。カメラは土台の x 方向に 0.5 m、高さ 0.8 m の位置で、真下を向いている。だから軸の向きは符号が変わるだけで済む。</p><figure class="fig" id="fig-3">
-  <p class="eyebrow">TOY · カメラは土台の x 方向 0.5 M、机の上 0.8 M、真下向き</p>
+</figure><p>画像は画素で測り、世界はメートルで測る。両者をつなぐのは「横のずれ ÷ 前への距離」という比だけだ。小さい三角形は前へ 600、右へ 80 で、比は 80/600 ≈ 0.133 になる。三角形は拡大しても形が同じなので、前へ 1 m なら右へ 1 × 80/600 ≈ 0.133 m だ。縦は (360 − 240)/600 = 0.2 で、下へ 0.2 m になる。</p><p>この「前へ 1 進むと右へ 0.133、下へ 0.2」が線の向きで、この線を「光線（ray）」と呼ぶ。その画素に写る点は、すべて光線の上にある。fx, fy, cx, cy を「内部パラメータ」と呼ぶ。実物の像はレンズの後ろで逆さになるが、画像の面を前に置いても比は同じなので、計算は変わらない。レンズは直線を少し曲げて写す（歪み）。D435 級の color では歪みの係数がほぼ 0 と報告されており、ここでは無いものとする。</p><h2>3. 深度が光線の上の 1 点を決める</h2><p>光線だけでは、その上の 1 cm 先か 1 m 先かが決まらない。同じ画素に写る点は無数にあるので、このままでは掴む位置にならない。</p><p>距離を教えてくれるのが「深度画像」だ。color 画像と同じ格子の画像で、各画素には色の代わりに距離が入っている。RealSense D400 の既定では、1 が 1 mm だ。この値は光線に沿った長さではなく、光軸の方向に測った距離で、Z と書く。</p><p>カメラ基準の数字は、右へ X、下へ Y、前へ Z と測る（optical frame の軸）。画素 (400, 360) の値は depth[360][400] で読み、750 だった。750 mm なので Z = 0.75 m だ。VLM の 750 と同じ数なのは偶然で、無関係である。</p><p>光線に沿った長さを Z に使うと、約 2〜3 % ずれる。この点の光線に沿った長さは √(0.10² + 0.15² + 0.75²) = √0.595 ≈ 0.771 m で、0.771 ÷ 0.75 ≈ 1.03 だ。RealSense の SDK の deprojection 関数も、深度の値をそのまま Z として使い、X と Y をそこから計算する。</p><p>2 章の図 2 の大きい三角形は、小さい三角形を延ばした形だ。2 つは相似なので 80 : 600 = X : 0.75 になり、X = 80 × 0.75 / 600 = 0.10 m、Y = 120 × 0.75 / 600 = 0.15 m だ。カメラから見た点は (0.10, 0.15, 0.75) m になる。この計算を「逆投影」と呼ぶ。この例は割り切れるように深度を選んだが、実際のカメラでは端数が出る。</p><p>隣の画素に移ると、この深度では X が 0.75 m ÷ 600 = 1.25 mm 動く。つまり画素 1 個の読み違いは、この距離でおよそ 1.25 mm の誤差になる。</p><p>深度と色は別のレンズで撮るので、同じ画素が同じ点を写していない。SDK の align で深度を色に合わせ直さないと、depth[v][u] は別の点の距離になる。深度 0 は測れなかった穴なので除く。マスク（物体の画素の集まり）が返れば、中央値を使うと縁の背景に引きずられにくい。この中央値は一般的な工夫で、文献の定める手順ではない。</p><h2>4. 4x4 は「カメラの原点から軸に沿って歩く」計算だ</h2><p>求めた (0.10, 0.15, 0.75) m は、カメラから見た数字だ。これを motion planning にそのまま渡すと、土台の原点から 10 cm、15 cm、75 cm の場所を目指し、腕は箱のない場所へ動く。だから土台から見た数字に直す必要がある。</p><p>そのために「座標系」を決める。座標系は、数字を測る原点（数字がすべて 0 になる点）と、x, y, z の 3 本の軸の向きでできている。点の数字は「原点から各軸に沿って何 m 進んだか」なので、どの座標系で測るかで変わる。この例の同じ点は、カメラの座標系では (0.10, 0.15, 0.75)、土台の座標系では (0.60, −0.15, 0.05) だ。点は動いておらず、測る原点と軸が違うだけである。</p><p>この例のカメラは、土台の x 方向に 0.5 m、高さ 0.8 m の位置で真下を向く。カメラの x 軸は土台の +x、y 軸は土台の −y、z 軸は土台の −z を向くので、軸の向きは符号が変わるだけで済む。斜めを向いたカメラなら、表に 0 や ±1 でない数が入る。</p><figure class="fig" id="fig-3">
+  <p class="eyebrow">TOY · カメラは土台の x 方向 0.5 m、机の上 0.8 m、真下向き</p>
   <h2>4x4 は「カメラの原点から、カメラの 3 本の軸に沿って歩く」計算だ</h2>
   <p class="sub">P_base = T_base_cam · P_cam</p>
 
@@ -264,12 +284,12 @@ main{max-width:720px;margin:0 auto;padding:16px;line-height:1.85;font-size:17px;
 <text class="cam b" x="187" y="246">カメラから見ると</text>
 <text class="m cam b l" x="187" y="270">(0.10, 0.15, 0.75)</text>
 <g>
-<text class="b" x="500" y="70">歩く順番</text>
-<text class="ray b" x="500" y="96">① x_c に沿って 0.10</text>
-<text class="cam b" x="500" y="122">② y_c に沿って 0.15</text>
-<text class="amb b" x="500" y="148">③ z_c に沿って 0.75</text>
-<text class="s mu" x="500" y="176">x_c = +x_b、y_c = −y_b</text>
-<text class="s mu" x="500" y="196">z_c = −z_b（真下）</text>
+<text class="b" x="486" y="70">歩く順番（カメラの数字 X, Y, Z）</text>
+<text class="ray b s" x="486" y="96">① X = 0.10 だけ x_c 方向へ</text>
+<text class="cam b s" x="486" y="122">② Y = 0.15 だけ y_c 方向へ</text>
+<text class="amb b s" x="486" y="148">③ Z = 0.75 だけ z_c 方向へ</text>
+<text class="s mu" x="486" y="176">x_c = +x_b、y_c = −y_b</text>
+<text class="s mu" x="486" y="196">z_c = −z_b（真下）</text>
 </g>
 <rect x="8" y="632" width="704" height="552" rx="8" style="fill:var(--card);stroke:var(--line)"/>
 <text class="b" x="22" y="658">同じ計算を 4x4 で書く</text>
@@ -311,6 +331,10 @@ main{max-width:720px;margin:0 auto;padding:16px;line-height:1.85;font-size:17px;
 <rect x="40" y="790" width="556" height="40" rx="4" style="fill:none;stroke:var(--hl);stroke-width:2.5"/>
 <text class="l mid" x="343.0" y="816.0">×</text>
 <text class="l mid" x="482.0" y="816.0">=</text>
+<rect x="54" y="714" width="190" height="120" rx="6" style="fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 4"/>
+<rect x="246" y="714" width="60" height="120" rx="6" style="fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 4"/>
+<text class="s b mu mid" x="149" y="676">R（1〜3 列目：向き）</text>
+<text class="s b mu mid" x="276" y="676">t（4 列目）</text>
 <text class="s mu mid" x="180" y="892">T_base_cam（4x4）</text>
 <text class="s cam b mid" x="412.0" y="892">カメラから見た点</text>
 <text class="s hl b mid" x="552.0" y="892">土台から見た点</text>
@@ -325,13 +349,13 @@ main{max-width:720px;margin:0 auto;padding:16px;line-height:1.85;font-size:17px;
 <text class="m l b hl" x="24" y="1166">z = 0.8 + (−1)×0.75 = 0.05</text>
 <text class="s mu" x="400" y="1166">物体の上面の高さ 0.05 m に一致</text>
 </svg>
-  <figcaption>カメラの原点から x_c に 0.10、y_c に 0.15、z_c に 0.75 歩くと、土台の数字では (0.60, −0.15, 0.05) になる。4x4 の 1〜3 列目が軸、4 列目が原点で、掛け算はこの歩き方そのものである。</figcaption>
-</figure><p>図 3 の左を見てほしい。カメラの x 軸は土台の +x、y 軸は土台の −y、z 軸は土台の −z（真下）を向いている。計算は「カメラの原点から出発し、カメラの 3 本の軸に沿って歩く」ことだ。土台の数字で書くと、次の 3 つになる。</p><ul><li>x = 0.5 + 1 × 0.10 = 0.60</li><li>y = 0 + (−1) × 0.15 = −0.15</li><li>z = 0.8 + (−1) × 0.75 = 0.05</li></ul><p>z = 0.05 は、机の上 5 cm の物体の上面の高さと合っている。</p><p>この歩き方を 1 つの表にまとめたのが「4x4 同次変換」だ。図 3 の右を見ると、1 列目 (1, 0, 0) はカメラの x 軸が土台の数字でどう見えるか、2 列目 (0, −1, 0) は y 軸、3 列目 (0, 0, −1) は z 軸を表す。4 列目 (0.5, 0, 0.8) は、カメラの原点が土台のどこにあるかだ。</p><p>この表に点を掛ける手順を、一度だけ具体的に書く。点を (0.10, 0.15, 0.75, 1) と 4 つの数にして、表の各行と、同じ位置どうしを掛けて全部足す。1 行目は 1 × 0.10 + 0 × 0.15 + 0 × 0.75 + 0.5 × 1 = 0.60 で、土台の x になる。2 行目は 0 + (−1) × 0.15 + 0 + 0 = −0.15、3 行目は 0 + 0 + (−1) × 0.75 + 0.8 × 1 = 0.05 だ。4 行目 (0, 0, 0, 1) は 1 になり、答えの最後の数が 1 のまま残る。</p><p>では、なぜ点に 1 を足すのか。軸に沿って歩く部分は掛け算で、出発点を足す部分は足し算だ。点の最後に 1 を付けると、4 列目に 1 が掛かり、足し算も掛け算の中に入る。だから 1 回の掛け算で、軸の向きと出発点が同時に済む。</p><p>この表を T_base_cam と書く。読み方は「土台から見たカメラの姿勢」で、使い方は「カメラの数字を土台の数字に直す表」だ。「外部パラメータ（extrinsics）」とも呼ぶ。形は、順運動学（FK）で出す T_base_ee と同じだ。T_base_ee は、手先（ee）の原点と軸を土台から見た表で、T_base_cam はその手先をカメラに替えたものである。</p><p>最後に落とし穴が 1 つある。この記事のカメラの軸は x が右、y が下、z が前方で、これを optical frame と呼ぶ。ROS のロボット本体の軸は x が前方、y が左、z が上で、camera_link はこちらに従う。2 つは向きが違うので、camera_link の姿勢をこの計算に使うなら、先に固定の回転で軸をそろえる。</p><h2>5. T_base_cam はつなぎ合わせで作る</h2><p>T_base_cam は、誰も直接は教えてくれない。カメラを手先に付けると、腕が動くたびにカメラも動くので、1 つの固定値では書けない。しかも掛ける順番や向きを 1 つでも間違えると、エラーは出ずに別の場所が返る。</p><p>そこで T を、下付き文字が打ち消し合うように掛ける。T_a_b · T_b_c = T_a_c のように、内側の b が消えて、外側の a と c が残る。順番に意味がある理由は、点に近い右の T から先に効くからだ。T_b_c は c の数字を b の数字に直し、次に T_a_b が b の数字を a の数字に直す。</p><figure class="fig" id="fig-4">
+  <figcaption>カメラの原点から x_c 方向に X = 0.10、y_c 方向に Y = 0.15、z_c 方向に Z = 0.75 歩くと、土台の数字では (0.60, −0.15, 0.05) になる。4x4 の 1〜3 列目（R）が軸、4 列目（t）が原点で、掛け算はこの歩き方そのものである。</figcaption>
+</figure><p>計算は、カメラの原点から出発し、カメラの軸に沿って歩くことだ。土台の数字で書くと、次の 3 つになる。</p><ul><li>x = 0.5 + 1 × 0.10 = 0.60</li><li>y = 0 + (−1) × 0.15 = −0.15</li><li>z = 0.8 + (−1) × 0.75 = 0.05</li></ul><p>z = 0.05 は、箱の上面の高さ 5 cm と合っている。</p><p>この歩き方を 1 つの 4x4 の表にまとめる。1〜3 列は、カメラの x, y, z 軸が土台の数字でどう見えるかを表す。この 3×3 の部分を R と呼び、この例では対角が 1, −1, −1 で他が 0 の行列、diag(1, −1, −1) だ。4 列目は、カメラの原点が土台のどこにあるかで、これを t と呼ぶ。この例では (0.5, 0, 0.8) だ。最下行が (0, 0, 0, 1) の形は、FK の T と同じだ。</p><p>この表に点を掛けるには、点を (0.10, 0.15, 0.75, 1) と 4 つの数にして、各行と掛けて足す。1 行目は 1 × 0.10 + 0.5 × 1 = 0.60、2 行目は (−1) × 0.15 = −0.15、3 行目は (−1) × 0.75 + 0.8 × 1 = 0.05 で、4 行目は 1 のまま残る。最後に 1 を付けるのは、足し算（出発点）も掛け算に含めて、1 回の掛け算で済ませるためだ。</p><p>この表を T_base_cam と書き、「土台から見たカメラの姿勢」と読む。使い方は「カメラの数字を土台の数字に直す表」で、「外部パラメータ」とも呼ぶ。</p><p>最後に ROS の落とし穴がある。ROS のカメラ本体の軸 camera_link は、x が前、y が左、z が上だ。画像の軸（3 章）とは違うので、camera_link の姿勢を T_base_cam に使うなら、固定の回転が要る。camera_link の x = 画像の z、y = −画像の x、z = −画像の y だ。</p><h2>5. T_base_cam はつなぎ合わせで作る</h2><p>T_base_cam は、誰も直接は教えてくれない。カメラの付け方は 2 通りで、机の脇に固定する場合と、手先に付ける場合だ。この例は固定の場合で、手先に付けると腕が動くたびにカメラも動き、1 つの固定値では書けない。掛ける順番や向きを間違えても、エラーは出ずに別の場所が返る。</p><p>T_a_b は「a から見た b の姿勢」で、b の数字を a の数字に直す表だ。続けて掛けると T_a_b · T_b_c = T_a_c となり、内側の b が消える。点に近い右側の表から先に働くので、T_b_c が c の数字を b の数字に直し、次に T_a_b が b の数字を a の数字に直す。</p><figure class="fig" id="fig-4">
   <p class="eyebrow">BY SHAPE · 固定カメラと手先カメラ</p>
   <h2>T_base_cam はつなぎ合わせで作る。内側の文字が消える順に掛ける</h2>
   <p class="sub">T_a_b · T_b_c = T_a_c</p>
 
-<svg viewBox="0 0 720 640" role="img" aria-labelledby="f4t f4d" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 720 688" role="img" aria-labelledby="f4t f4d" xmlns="http://www.w3.org/2000/svg">
 <title id="f4t">固定カメラと手先カメラの T_base_cam のつなぎ方</title>
 <desc id="f4d">固定カメラは土台からカメラへの T_base_cam を校正で一度測る。手先カメラは撮影の瞬間の関節角から FK で T_base_ee を出し、ハンドアイ校正で測った T_ee_cam を掛ける。</desc>
 <!-- by shape: no numeric values; chain structure from spine.md rung 4 -->
@@ -351,6 +375,9 @@ main{max-width:720px;margin:0 auto;padding:16px;line-height:1.85;font-size:17px;
 <text class="m b mid" x="258" y="388" style="font-size:16px">T_base_cam = T_base_ee(q) · T_ee_cam</text>
 <text class="s mu mid" x="258" y="410">手先カメラの T_base_cam は、撮影のたびに作り直す</text>
 
+<text class="s b" x="14" y="442">矢印は T_a_b の向き（a から b を見る）。</text>
+<text class="s b" x="14" y="464">点の数字はその逆、cam の数字 → base の数字へ直す</text>
+<g transform="translate(0 48)">
 <rect x="8" y="430" width="704" height="124" rx="8" style="fill:var(--card);stroke:var(--line)"/>
 <text class="m b l" x="22" y="462">T_a_b · T_b_c = T_a_c <tspan class="b" style="font-family:-apple-system,'Hiragino Sans','Noto Sans CJK JP',sans-serif;font-size:15px">（内側の b が消える）</tspan></text>
 <text class="m l" x="22" y="496">T_base_<tspan class="hl b">ee</tspan> · T_<tspan class="hl b">ee</tspan>_cam = T_base_cam</text>
@@ -358,6 +385,7 @@ main{max-width:720px;margin:0 auto;padding:16px;line-height:1.85;font-size:17px;
 <rect x="8" y="566" width="704" height="66" rx="8" style="fill:var(--card);stroke:var(--err);stroke-width:2;stroke-dasharray:6 4"/>
 <text class="er b" x="22" y="594">ツールが T_cam_base を返したら、逆行列をとる。</text>
 <text class="er b" x="22" y="618">数字の符号を変えるだけでは、逆にならない。</text>
+</g>
 </svg>
   <figcaption>固定カメラは T_base_cam を校正で一度測れば一定だが、手先カメラは撮影の瞬間の関節角から FK で T_base_ee を作り直し、校正で測った一定の T_ee_cam を掛ける。内側の文字が消える順に掛け、向きが逆なら逆行列をとる。</figcaption>
-</figure><p>図 4 の上の鎖が、固定カメラ（eye-to-hand）だ。base から cam への T_base_cam が 1 つあるだけで、カメラは動かないので、一度測れば一定である。下の鎖が手先カメラ（eye-in-hand）だ。base から ee へは、撮影した瞬間の関節角 q から、FK で T_base_ee(q) を出す。ee から cam へは T_ee_cam を掛ける。つまり T_base_cam = T_base_ee(q) · T_ee_cam で、ee が打ち消される。q は撮影の瞬間の値でなければならない。腕が動いた後の値を使うと、その分だけ点がずれる。</p><p>一定の部分は、測って求める。ロボットにチェッカーボード（白黒の市松模様の板）を何通りもの姿勢で見せ、そのときの手先の姿勢と、カメラから見た板の姿勢を集める。そこから未知の T を解く方法を「ハンドアイキャリブレーション」と呼び、式は AX = XB の形になる。X が未知の T で、A と B は姿勢の変化を表す。固定カメラでは T_base_cam が、手先カメラでは T_ee_cam が求まる。</p><p>測定ツールが、欲しいのと逆向きの T を返すことがある。OpenCV の calibrateHandEye は、手先カメラでは gripper から見た camera を返す。これは T_ee_cam と同じ向きだ。しかし入力の取り方で結果の向きが変わるので、返ってきた T の下付き文字を必ず確かめる。逆向きなら、逆の変換を取る。</p><p>逆の変換は、数字の符号を変えるだけでは作れない。軸の向きの部分 R は「転置」する。転置とは、表の行と列を入れ替えることだ。toy の R = diag(1, −1, −1) は、入れ替えても同じ形になる。原点の部分は、符号を変えた Rᵀ と原点の積にする。Rᵀ(0.5, 0, 0.8) = (0.5, 0, −0.8) で、符号を変えて T_cam_base の原点は (−0.5, 0, 0.8) になる。</p><p>これを確かめるために、土台の点 (0.60, −0.15, 0.05) に掛ける。x = 0.60 − 0.5 = 0.10、y = −1 × (−0.15) = 0.15、z = −1 × 0.05 + 0.8 = 0.75 で、カメラの数字に戻る。もし原点の符号だけを変えて (−0.5, 0, −0.8) としていたら、カメラの原点 (0.5, 0, 0.8) は (0, 0, −1.6) に行き、原点に戻らない。</p><p>キャリブレーションは時間とともにずれると報告されている。OK-Robot は、RealSense が時間とともに miscalibrate して、操作の失敗につながると述べている。測った T_base_cam や T_ee_cam を、いつまでも正しいとは考えない。</p></main></body></html>
+</figure><p>図 4 の矢印は base から cam、point へ向かう。しかし点の数字は逆に、カメラの数字から土台の数字へ直される。T_base_cam は「土台から見たカメラ」の表なので、矢印の向きと、数字を直す向きは逆なのだ。上の鎖が固定カメラで、T_base_cam が 1 つあり、一度測れば一定だ。下の鎖が手先カメラで、撮影した瞬間の関節角 q から FK で T_base_ee(q) を出し、T_base_cam = T_base_ee(q) · T_ee_cam となる。腕が動いた後の q を使うと、その分だけ点がずれる。</p><p>一定の部分は測って求める。チェッカーボード（市松模様の板）を何通りもの姿勢で見せ、板の姿勢を画像の角から OpenCV の solvePnP で出す。手先の姿勢は FK で分かる。この組を OpenCV の calibrateHandEye に渡すと、未知の T が返る。これを「ハンドアイキャリブレーション」と呼ぶ。ただし入力に「手先から土台」と「土台から手先」のどちらを渡すかで、逆向きの T が返るので、返った T の名前を必ず確かめる。逆向きなら、逆行列を取る。</p><p>T の逆行列は、符号を変えるだけでは作れない。R は「転置」する。転置は、行と列を入れ替えることだ。z 軸まわり 90° の回転 [[0, −1, 0], [1, 0, 0], [0, 0, 1]] の転置は [[0, 1, 0], [−1, 0, 0], [0, 0, 1]] で、別の行列になる。この例の R = diag(1, −1, −1) は対称なので、転置しても同じになるだけだ。原点は、Rᵀt を求めて符号を変える。Rᵀ(0.5, 0, 0.8) = (0.5, 0, −0.8) だから、逆行列の原点は (−0.5, 0, 0.8) になる。</p><p>確かめるため、土台の点 (0.60, −0.15, 0.05) に掛ける。x = 0.60 − 0.5 = 0.10、y = −1 × (−0.15) = 0.15、z = −1 × 0.05 + 0.8 = 0.75 で、カメラの数字に戻る。</p><p>ある論文（OK-Robot）は、RealSense の較正が時間とともにずれ、掴みの失敗につながったと述べている。測った T は、定期的に測り直す。ここで得た (0.60, −0.15, 0.05) m が、motion planning に渡す位置だ。向きと受け渡しは、後の章で扱う。</p></main></body></html>

@@ -369,7 +369,7 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
   <h2>T_base_cam はつなぎ合わせで作る。内側の文字が消える順に掛ける</h2>
   <p class="sub">T_a_b · T_b_c = T_a_c</p>
 
-<svg viewBox="0 0 720 680" role="img" aria-labelledby="f4t f4d" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 720 688" role="img" aria-labelledby="f4t f4d" xmlns="http://www.w3.org/2000/svg">
 <title id="f4t">固定カメラと手先カメラの T_base_cam のつなぎ方</title>
 <desc id="f4d">固定カメラは土台からカメラへの T_base_cam を校正で一度測る。手先カメラは撮影の瞬間の関節角から FK で T_base_ee を出し、ハンドアイ校正で測った T_ee_cam を掛ける。</desc>
 <!-- by shape: no numeric values; chain structure from spine.md rung 4 -->
@@ -389,9 +389,9 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 <text class="m b mid" x="258" y="388" style="font-size:16px">T_base_cam = T_base_ee(q) · T_ee_cam</text>
 <text class="s mu mid" x="258" y="410">手先カメラの T_base_cam は、撮影のたびに作り直す</text>
 
-<text class="s b" x="14" y="436">矢印は T_a_b の向き（a から b を見る）。</text>
-<text class="s b" x="14" y="458">点の数字はその逆、cam の数字 → base の数字へ直す</text>
-<g transform="translate(0 40)">
+<text class="s b" x="14" y="442">矢印は T_a_b の向き（a から b を見る）。</text>
+<text class="s b" x="14" y="464">点の数字はその逆、cam の数字 → base の数字へ直す</text>
+<g transform="translate(0 48)">
 <rect x="8" y="430" width="704" height="124" rx="8" style="fill:var(--card);stroke:var(--line)"/>
 <text class="m b l" x="22" y="462">T_a_b · T_b_c = T_a_c <tspan class="b" style="font-family:-apple-system,'Hiragino Sans','Noto Sans CJK JP',sans-serif;font-size:15px">（内側の b が消える）</tspan></text>
 <text class="m l" x="22" y="496">T_base_<tspan class="hl b">ee</tspan> · T_<tspan class="hl b">ee</tspan>_cam = T_base_cam</text>
