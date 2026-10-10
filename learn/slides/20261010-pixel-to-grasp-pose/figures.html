@@ -155,8 +155,8 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 <line x1="494.5" y1="200" x2="494.5" y2="454.25" style="stroke:var(--hl);stroke-width:1.5;stroke-dasharray:4 4;opacity:.55"/>
 <line x1="212" y1="454.25" x2="494.5" y2="454.25" style="stroke:var(--hl);stroke-width:1.5;stroke-dasharray:4 4;opacity:.55"/>
 <path d="M428 369.5h20M438 359.5v20" style="stroke:var(--cam);stroke-width:3"/>
-<text class="s b cam end" x="424" y="365.5" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">中心 (cx, cy)</text>
-<text class="m s b cam end" x="424" y="385.5" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">= (320, 240)</text>
+<text class="s b cam end" x="424" y="365.5" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">画像の中心</text>
+<text class="m s b cam end" x="424" y="385.5" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">(320, 240)</text>
 <path d="M545 405.875l12 12M557 405.875l-12 12" style="stroke:var(--err);stroke-width:2.5;opacity:.5"/>
 <line x1="551" y1="421.875" x2="551" y2="455" style="stroke:var(--err);stroke-width:1.5;opacity:.5;stroke-dasharray:3 3"/>
 <text class="s er end" x="664" y="473" style="opacity:.85;paint-order:stroke;stroke:var(--card);stroke-width:4px">[y, x] を [x, y] と読み違えると (480, 300)</text>
@@ -216,7 +216,7 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 <circle cx="224" cy="276" r="6.5" style="fill:var(--ray)"/>
 <text class="s cam end" x="192" y="300">画像中心</text>
 <text class="s ray b" x="236" y="262">画像の中心 (cx) から +80 画素 = 400 − 320</text>
-<text class="mu s" x="300" y="281">スクリーン（画像）: 中心から 600 画素前</text>
+<text class="mu s" x="300" y="281">画像の面（スクリーン）: 中心から 600 画素前</text>
 <line x1="160" y1="98" x2="160" y2="274" style="stroke:var(--muted);stroke-width:1.5" marker-start="url(#a2mu)" marker-end="url(#a2mu)"/>
 <text class="mu mid" transform="translate(150 186) rotate(-90)">600 画素</text>
 <!-- ===== axis break ===== -->
@@ -405,15 +405,15 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 </figure>
 <figure class="fig" id="fig-5">
   <p class="eyebrow">TOY · 深度 0.75 m · 1 画素 = 1.25 mm</p>
-  <h2>誤差は光線に対して 3 つの向きに分かれる</h2>
+  <h2>誤差の出どころは 3 つある</h2>
   <p class="sub">横へのずれ = 距離 × tan（角度）</p>
 
-<svg viewBox="0 0 720 650" role="img" aria-labelledby="f5t f5d" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 720 772" role="img" aria-labelledby="f5t f5d" xmlns="http://www.w3.org/2000/svg">
 <title id="f5t">3 種類の誤差を光線の図に重ねる</title>
 <desc id="f5d">カメラの中心から深度 0.75 m の点 (X = 0.10 m) へ光線が伸びる。画素が 10 個ずれると光線が横に傾き 12.5 mm 横へずれる。深度が 10 mm ずれると点は光線に沿って約 10 mm 動く。較正が 1 度ずれると光線全体が回り、0.75 m 先で約 13 mm ずれる。</desc>
 <!-- numbers (toy.md rung 5 error slice): 10 px*1.25 = 12.5 mm; Z+10 mm -> (+1.33,-2.00,-10.00) mm; 1 deg: 0.75*tan1deg = 13.09 ~ 13 mm. Arrow lengths exaggerated. -->
 <defs><marker id="a5err" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--err)"/></marker><marker id="a5hl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--hl)"/></marker></defs>
-<rect x="8" y="8" width="704" height="552" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+<rect x="8" y="8" width="704" height="576" rx="8" style="fill:var(--card);stroke:var(--line)"/>
 <text class="b" x="22" y="34">横から見た図（x–z 面）。右が x、下が前方（Z）</text>
 <!-- depth dimension -->
 <line x1="56" y1="86" x2="56" y2="462" style="stroke:var(--hl);stroke-width:2" marker-start="url(#a5hl)" marker-end="url(#a5hl)"/>
@@ -438,10 +438,11 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 <circle cx="236" cy="464" r="6" style="fill:var(--card);stroke:var(--err);stroke-width:2.5"/>
 <line x1="180.7" y1="464" x2="131" y2="464" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/>
 <circle cx="123" cy="464" r="6" style="fill:var(--card);stroke:var(--err);stroke-width:2.5"/>
-<line x1="180.7" y1="464" x2="189" y2="530" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/>
+<line x1="180.7" y1="464" x2="184.6" y2="499" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/>
+<circle cx="186.5" cy="507.8" r="6" style="fill:var(--card);stroke:var(--err);stroke-width:2.5"/>
 <circle cx="180.7" cy="464" r="9" style="fill:var(--hl);stroke:var(--card);stroke-width:2.5"/>
 <circle cx="236" cy="490" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="236" y="495">①</text>
-<circle cx="224" cy="528" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="224" y="533">②</text>
+<circle cx="214" cy="520" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="214" y="525">②</text>
 <circle cx="140" cy="490" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="140" y="495">③</text>
 <!-- label cards -->
 <g>
@@ -472,13 +473,17 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 <line x1="344" y1="456" x2="384" y2="456" style="stroke:var(--ray);stroke-width:2.5;stroke-dasharray:7 5"/><text class="s" x="396" y="461">① でずれた光線</text>
 <line x1="344" y1="482" x2="384" y2="482" style="stroke:var(--ray);stroke-width:3;opacity:.35"/><text class="s" x="396" y="487">③ で回った光線</text>
 <circle cx="364" cy="508" r="7" style="fill:var(--hl);stroke:var(--card);stroke-width:2"/><text class="s" x="396" y="513">本来の点（X = 0.10 m）</text>
-<line x1="344" y1="534" x2="378" y2="534" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/><text class="s" x="396" y="539">誤差（長さは見やすく誇張）</text>
+<line x1="344" y1="534" x2="378" y2="534" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/><text class="s" x="396" y="539">誤差の矢印</text><text class="s" x="344" y="562">長さは見やすく誇張（3 本は同じ倍率）</text>
 </g>
-<rect x="8" y="576" width="704" height="64" rx="8" style="fill:var(--card);stroke:var(--hl);stroke-width:2"/>
-<text class="b" x="22" y="602">VLM を良くして減るのは <tspan class="er">①</tspan> だけ。</text>
-<text class="b" x="22" y="626"><tspan class="er">②</tspan> は深度センサー、<tspan class="er">③</tspan> は較正の問題だ</text>
+<rect x="8" y="596" width="704" height="64" rx="8" style="fill:var(--card);stroke:var(--line);stroke-width:1.5"/>
+<text class="b s" x="22" y="622"><tspan class="er">①</tspan> はこの画素の光線だけが傾く。</text>
+<text class="b s" x="22" y="646"><tspan class="er">③</tspan> はすべての光線とカメラの原点がまとめて動く</text>
+<rect x="8" y="672" width="704" height="92" rx="8" style="fill:var(--card);stroke:var(--hl);stroke-width:2"/>
+<text class="b" x="22" y="700">VLM を良くして減るのは <tspan class="er">①</tspan> だけ。</text>
+<text class="b s" x="22" y="724">（ただし <tspan class="er">①</tspan> で点が箱の縁から外れると、深度も背景に跳ぶ）</text>
+<text class="b" x="22" y="750"><tspan class="er">②</tspan> は深度センサー、<tspan class="er">③</tspan> は較正の問題だ</text>
 </svg>
-  <figcaption>誤差は光線に対して、横（①）、光線に沿う向き（②）、光線ごと回る向き（③）の 3 つに分かれる。VLM を替えて効くのは ① だけで、② は深度センサー、③ は較正を直す問題だ。図の矢印の長さは見やすく誇張してある。</figcaption>
+  <figcaption>誤差の出どころは 3 つ。画素のずれ（①）は光線を横に傾け、深度のずれ（②）は点を光線の上で前後させ、較正のずれ（③）は光線ごと回す。VLM を替えて効くのは ① だけで、② は深度センサー、③ は較正を直す問題だ。図の矢印の長さは見やすく誇張してあり、3 本とも同じ倍率だ。</figcaption>
 </figure>
 </body>
 </html>
