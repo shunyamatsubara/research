@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Figures pilot</title>
+<style>
+:root{
+  /* colour roles, reused unchanged in Figures 2 and 3 */
+  --paper:#fbfaf7;   /* page background */
+  --card:#ffffff;    /* panels inside a figure */
+  --ink:#1d2330;     /* text, lines of the scene */
+  --muted:#6b7280;   /* eyebrow, captions, unchanged values */
+  --faint:#b9bdc6;   /* unused / candidate / not yet fixed */
+  --line:#d9dbe0;    /* panel borders */
+  --ray:#2563eb;     /* the ray and pixel values */
+  --hl:#d9480f;      /* the highlighted value being computed (accent) */
+  --cam:#0f766e;     /* camera frame (optical axis, camera, P_cam) */
+  --base:#7c3aed;    /* base frame (Figures 2-3) */
+  --err:#c92a2a;     /* error / trap */
+  --table:#d6cfc2;   /* table surface */
+  --obj:#e9e3d6;     /* object */
+  --amber:#b7791f;   /* camera z axis (Figures 2-3) */
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#14171d; --card:#1c2028; --ink:#e8eaee; --muted:#9aa1ad; --faint:#4a505c;
+    --line:#343a46; --ray:#6ea0ff; --hl:#ff9a5c; --cam:#4fd1c0; --base:#b794f6;
+    --err:#ff7b7b; --table:#3a362e; --obj:#4a4538; --amber:#f0b44c;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14171d; --card:#1c2028; --ink:#e8eaee; --muted:#9aa1ad; --faint:#4a505c;
+  --line:#343a46; --ray:#6ea0ff; --hl:#ff9a5c; --cam:#4fd1c0; --base:#b794f6;
+  --err:#ff7b7b; --table:#3a362e; --obj:#4a4538; --amber:#f0b44c;
+}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);
+  font-family:-apple-system,"Hiragino Sans","Yu Gothic","Noto Sans CJK JP","Noto Sans JP",system-ui,sans-serif;
+  line-height:1.6}
+figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box}
+.fig .eyebrow{font-size:12px;letter-spacing:.04em;text-transform:none;color:var(--muted);margin:0 0 4px}
+.fig h2{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif CJK JP","Noto Serif JP",Georgia,serif;
+  font-size:22px;line-height:1.35;margin:0 0 6px;font-weight:700;color:var(--ink)}
+.fig .sub{font-style:italic;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:13px;color:var(--muted);margin:0 0 10px}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+.fig svg text{fill:var(--ink);font-family:-apple-system,"Hiragino Sans","Yu Gothic","Noto Sans CJK JP",system-ui,sans-serif;font-size:15px}
+.fig svg .m{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.fig svg .s{font-size:14px}
+.fig svg .l{font-size:18px}
+.fig svg .xl{font-size:20px}
+.fig svg .b{font-weight:700}
+.fig svg .mu{fill:var(--muted)}
+.fig svg .ray{fill:var(--ray)}
+.fig svg .hl{fill:var(--hl)}
+.fig svg .cam{fill:var(--cam)}
+.fig svg .base{fill:var(--base)}
+.fig svg .amb{fill:var(--amber)}
+.fig svg .er{fill:var(--err)}
+.fig svg .mid{text-anchor:middle}
+.fig svg .end{text-anchor:end}
+</style>
+</head>
+<body>
+<figure class="fig" id="fig-1">
+  <p class="eyebrow">TOY · 画像 640×480 画素 · VLM の答え [y, x] = [750, 625]</p>
+  <h2>画像は画素のマス目で、VLM の答えは画像の大きさに対する割合だ</h2>
+  <p class="sub">u = x/1000 × 640,&nbsp; v = y/1000 × 480</p>
+
+<svg viewBox="0 0 720 738" role="img" aria-labelledby="f1t f1d" xmlns="http://www.w3.org/2000/svg">
+<title id="f1t">画素のマス目と、VLM の割合から画素の住所への変換</title>
+<desc id="f1d">画像は横 640、縦 480 画素のマス目で、左上が (0, 0)、右下が (639, 479)。VLM の答え [y, x] = [750, 625] は 0 から 1000 の物差し上の値で、625 ÷ 1000 × 640 = 400、750 ÷ 1000 × 480 = 360 となり、画素 (400, 360) に戻る。</desc>
+<!-- numbers (toy.md rung 1): [y,x]=[750,625], 640x480, centre (320,240), (u,v)=(400,360), 0.625*640=400, 0.75*480=360, wrong order -> (480,300) -->
+<defs><marker id="a1ray" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ray)"/></marker><marker id="a1hl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--hl)"/></marker><marker id="a1mu" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker></defs>
+<rect x="8" y="8" width="704" height="596" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+<text class="s b mu end" x="664" y="24">VLM の x（0–1000）</text>
+<line x1="212" y1="62" x2="664" y2="62" style="stroke:var(--ink);stroke-width:2"/>
+<line x1="212" y1="54" x2="212" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="212" y="46">0</text>
+<line x1="325" y1="54" x2="325" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="325" y="46">250</text>
+<line x1="438" y1="54" x2="438" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="438" y="46">500</text>
+<line x1="494.5" y1="52" x2="494.5" y2="62" style="stroke:var(--hl);stroke-width:3"/>
+<text class="m s hl b mid" x="494.5" y="46">625</text>
+<line x1="551" y1="54" x2="551" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="551" y="46">750</text>
+<line x1="664" y1="54" x2="664" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="664" y="46">1000</text>
+<text class="s b mu" x="212" y="118">画像の u（0–640 画素）</text>
+<line x1="212" y1="128" x2="664" y2="128" style="stroke:var(--ink);stroke-width:2"/>
+<line x1="212" y1="128" x2="212" y2="136" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="212" y="156">0</text>
+<line x1="325" y1="128" x2="325" y2="136" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="325" y="156">160</text>
+<line x1="438" y1="128" x2="438" y2="136" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="438" y="156">320</text>
+<line x1="494.5" y1="128" x2="494.5" y2="138" style="stroke:var(--hl);stroke-width:3"/>
+<text class="m s hl b mid" x="494.5" y="156">400</text>
+<line x1="551" y1="128" x2="551" y2="136" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="551" y="156">480</text>
+<line x1="664" y1="128" x2="664" y2="136" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="664" y="156">640</text>
+<line x1="494.5" y1="64" x2="494.5" y2="126" style="stroke:var(--hl);stroke-width:2.5;stroke-dasharray:6 4"/>
+<text class="m s b hl end" x="484.5" y="96">625 ÷ 1000 = 0.625 → × 640 = 400</text>
+<line x1="212" y1="188" x2="666" y2="188" style="stroke:var(--ray);stroke-width:2.5" marker-end="url(#a1ray)"/>
+<text class="s b ray end" x="664" y="182">u：左から何画素目 →</text>
+<rect x="212" y="200" width="452" height="339" style="fill:var(--paper);stroke:var(--ink);stroke-width:2"/>
+<g style="stroke:var(--line);stroke-width:1">
+<line x1="268.5" y1="200" x2="268.5" y2="539"/>
+<line x1="325" y1="200" x2="325" y2="539"/>
+<line x1="381.5" y1="200" x2="381.5" y2="539"/>
+<line x1="438" y1="200" x2="438" y2="539"/>
+<line x1="494.5" y1="200" x2="494.5" y2="539"/>
+<line x1="551" y1="200" x2="551" y2="539"/>
+<line x1="607.5" y1="200" x2="607.5" y2="539"/>
+<line x1="212" y1="256.5" x2="664" y2="256.5"/>
+<line x1="212" y1="313" x2="664" y2="313"/>
+<line x1="212" y1="369.5" x2="664" y2="369.5"/>
+<line x1="212" y1="426" x2="664" y2="426"/>
+<line x1="212" y1="482.5" x2="664" y2="482.5"/>
+</g>
+<circle cx="212" cy="200" r="3.5" style="fill:var(--ink)"/><circle cx="664" cy="539" r="3.5" style="fill:var(--ink)"/>
+<text class="m s b" x="220" y="220" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">(0, 0)</text>
+<text class="m s b end" x="656" y="533" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">(639, 479)</text>
+<line x1="190" y1="200" x2="190" y2="541" style="stroke:var(--ray);stroke-width:2.5" marker-end="url(#a1ray)"/>
+<text class="s b ray" transform="translate(234 234) rotate(90)" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">v：上から何画素目 ↓</text>
+<text class="s ray" transform="translate(258 234) rotate(90)" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">下へ行くほど v は大きい</text>
+<text class="s b mu mid" x="64" y="168">VLM の y</text><text class="s b mu mid" x="64" y="186">（0–1000）</text><text class="s b mu mid" x="138" y="168">画像の v</text><text class="s b mu mid" x="138" y="186">（画素）</text>
+<line x1="64" y1="200" x2="64" y2="539" style="stroke:var(--ink);stroke-width:2"/>
+<line x1="136" y1="200" x2="136" y2="539" style="stroke:var(--ink);stroke-width:2"/>
+<line x1="56" y1="200" x2="64" y2="200" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu end" x="50" y="205">0</text>
+<line x1="56" y1="284.75" x2="64" y2="284.75" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu end" x="50" y="289.75">250</text>
+<line x1="56" y1="369.5" x2="64" y2="369.5" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu end" x="50" y="374.5">500</text>
+<line x1="54" y1="454.25" x2="64" y2="454.25" style="stroke:var(--hl);stroke-width:3"/>
+<text class="m s hl b end" x="50" y="459.25">750</text>
+<line x1="56" y1="539" x2="64" y2="539" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu end" x="50" y="544">1000</text>
+<line x1="136" y1="200" x2="144" y2="200" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu" x="150" y="205">0</text>
+<line x1="136" y1="284.75" x2="144" y2="284.75" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu" x="150" y="289.75">120</text>
+<line x1="136" y1="369.5" x2="144" y2="369.5" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu" x="150" y="374.5">240</text>
+<line x1="136" y1="454.25" x2="146" y2="454.25" style="stroke:var(--hl);stroke-width:3"/>
+<text class="m s hl b" x="150" y="459.25">360</text>
+<line x1="136" y1="539" x2="144" y2="539" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu" x="150" y="544">480</text>
+<line x1="66" y1="454.25" x2="134" y2="454.25" style="stroke:var(--hl);stroke-width:2.5;stroke-dasharray:6 4"/>
+<line x1="494.5" y1="200" x2="494.5" y2="454.25" style="stroke:var(--hl);stroke-width:1.5;stroke-dasharray:4 4;opacity:.55"/>
+<line x1="212" y1="454.25" x2="494.5" y2="454.25" style="stroke:var(--hl);stroke-width:1.5;stroke-dasharray:4 4;opacity:.55"/>
+<path d="M428 369.5h20M438 359.5v20" style="stroke:var(--cam);stroke-width:3"/>
+<text class="s b cam end" x="424" y="365.5" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">中心 (cx, cy)</text>
+<text class="m s b cam end" x="424" y="385.5" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">= (320, 240)</text>
+<path d="M545 405.875l12 12M557 405.875l-12 12" style="stroke:var(--err);stroke-width:2.5;opacity:.5"/>
+<line x1="551" y1="421.875" x2="551" y2="455" style="stroke:var(--err);stroke-width:1.5;opacity:.5;stroke-dasharray:3 3"/>
+<text class="s er end" x="664" y="473" style="opacity:.85;paint-order:stroke;stroke:var(--card);stroke-width:4px">[y, x] を [x, y] と読み違えると (480, 300)</text>
+<text class="s er end" x="664" y="491" style="opacity:.85;paint-order:stroke;stroke:var(--card);stroke-width:4px">エラーは出ず、別の画素を指す</text>
+<circle cx="494.5" cy="454.25" r="9" style="fill:var(--hl);stroke:var(--card);stroke-width:2.5"/>
+<text class="m s b hl end" x="480.5" y="448.25" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">(u, v) = (400, 360)</text>
+<text class="s b hl end" x="480.5" y="430.25" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">VLM の点</text>
+<g>
+<rect x="466" y="208" width="196" height="138" rx="6" style="fill:var(--card);stroke:var(--hl);stroke-width:1.5"/>
+<text class="s b mu" x="476" y="228">拡大：実際の画素 4 個</text>
+<rect x="476" y="238" width="88" height="48" style="fill:var(--paper);stroke:var(--ink);stroke-width:1.5"/>
+<rect x="564" y="238" width="88" height="48" style="fill:var(--paper);stroke:var(--ink);stroke-width:1.5"/>
+<rect x="476" y="286" width="88" height="48" style="fill:var(--paper);stroke:var(--ink);stroke-width:1.5"/>
+<rect x="564" y="286" width="88" height="48" style="fill:var(--hl);fill-opacity:.22;stroke:var(--hl);stroke-width:2.5"/>
+<text class="m mid mu" x="520" y="268" style="font-size:12px">(399, 359)</text>
+<text class="m mid mu" x="608" y="268" style="font-size:12px">(400, 359)</text>
+<text class="m mid mu" x="520" y="316" style="font-size:12px">(399, 360)</text>
+<text class="m mid hl b" x="608" y="316" style="font-size:12px">(400, 360)</text>
+</g>
+<text class="s b" x="212" y="562">図では 80×80 画素を 1 マスにまとめて描いた</text>
+<text class="m s mu" x="212" y="584">配列では image[v][u]（行 = v、列 = u）</text>
+<g transform="translate(0 22)">
+<rect x="8" y="594" width="704" height="114" rx="8" style="fill:var(--card);stroke:var(--hl);stroke-width:2"/>
+<text class="m hl b" x="22" y="624" style="font-size:16px">625 ÷ 1000 = 0.625（幅の 62.5 %）→ 0.625 × 640 = 400</text>
+<text class="m hl b" x="22" y="654" style="font-size:16px">750 ÷ 1000 = 0.75 → 0.75 × 480 = 360</text>
+<rect x="22" y="676" width="25.6818" height="25.6818" style="fill:none;stroke:var(--ink);stroke-width:1.5"/>
+<text class="s mu" x="57.6818" y="692">1 マス = 80 画素（640 ÷ 8 = 80、480 ÷ 6 = 80）。この図は 8×6 マス</text>
+</g>
+</svg>
+  <figcaption>VLM は縮めた画像を見るので、画素の番号ではなく割合で答える。割合に幅と高さを掛けると住所に戻る。</figcaption>
+</figure>
+
+<figure class="fig" id="fig-2">
+  <p class="eyebrow">TOY · 640×480 · fx = fy = 600 px · 深度 0.75 m</p>
+  <h2>1 画素は 1 本の光線になり、深度がその上の 1 点を決める</h2>
+  <p class="sub">X = (u − cx)·Z / fx,&nbsp; Y = (v − cy)·Z / fy</p>
+
+<svg viewBox="0 0 720 964" role="img" aria-labelledby="f2t f2d" xmlns="http://www.w3.org/2000/svg">
+<title id="f2t">画素から光線、深度で点</title>
+<desc id="f2d">VLM の [y, x] = [750, 625] は画素 (400, 360) で、中心から右へ 80、下へ 120 画素。80 : 600 = X : 0.75 m から X = 0.10 m、同様に Y = 0.15 m で、カメラから見た点は (0.10, 0.15, 0.75) m。</desc>
+<!-- panel 1 (image) moved to Figure 1; numbers (toy.md rung 1-2): [750,625], 640x480, (320,240), (400,360), +80, +120, f=600, Z=0.75, X=0.10, Y=0.15, faint Z=0.30/X=0.04, Z=0.60/X=0.08 (X=Z*80/600) -->
+<defs><marker id="a2ray" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ray)"/></marker><marker id="a2hl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--hl)"/></marker><marker id="a2cam" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--cam)"/></marker><marker id="a2amb" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--amber)"/></marker><marker id="a2base" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--base)"/></marker><marker id="a2mu" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker><marker id="a2ink" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ink)"/></marker></defs>
+<rect x="8" y="8" width="704" height="948" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+<text class="b" x="22" y="34">横から見た図（x–z 面）。右が x、下が「前方（光軸、Z）」</text>
+<text class="s mu" x="22" y="54">この図の「下」は前方で、図 1 の v（画像の下）とは別の向き</text>
+<!-- ===== upper part: pixels ===== -->
+<text class="s b mu end" x="696" y="140">上：画素 (px) で測る部分</text>
+<polygon points="200,96 200,276 224,276" style="fill:var(--ray);opacity:.16"/>
+<line x1="200" y1="96" x2="200" y2="300" style="stroke:var(--cam);stroke-width:1.5;stroke-dasharray:6 5"/>
+<text class="s cam" x="232" y="176">前方（光軸、Z）↓</text>
+<line x1="200" y1="96" x2="227.2" y2="300" style="stroke:var(--ray);stroke-width:3"/>
+<circle cx="200" cy="96" r="7" style="fill:var(--cam)"/>
+<text class="s cam b" x="216" y="90">カメラの中心（レンズの 1 点。光はすべてここを通る）</text>
+<line x1="130" y1="276" x2="290" y2="276" style="stroke:var(--ink);stroke-width:3.5"/>
+<line x1="200" y1="276" x2="224" y2="276" style="stroke:var(--ray);stroke-width:5"/>
+<circle cx="200" cy="276" r="5" style="fill:var(--cam)"/>
+<circle cx="224" cy="276" r="6.5" style="fill:var(--ray)"/>
+<text class="s cam end" x="192" y="300">画像中心</text>
+<text class="s ray b" x="236" y="262">画像の中心 (cx) から +80 画素 = 400 − 320</text>
+<text class="mu s" x="300" y="281">スクリーン（画像）: 中心から 600 画素前</text>
+<line x1="160" y1="98" x2="160" y2="274" style="stroke:var(--muted);stroke-width:1.5" marker-start="url(#a2mu)" marker-end="url(#a2mu)"/>
+<text class="mu mid" transform="translate(150 186) rotate(-90)">600 画素</text>
+<!-- ===== axis break ===== -->
+<polyline points="8,313 24,323 40,313 56,323 72,313 88,323 104,313 120,323 136,313 152,323 168,313 184,323 200,313 216,323 232,313 248,323 264,313 280,323 296,313 312,323 328,313 344,323 360,313 376,323 392,313 408,323 424,313 440,323 456,313 472,323 488,313 504,323 520,313 536,323 552,313 568,323 584,313 600,323 616,313 632,323 648,313 664,323 680,313 696,323 712,313" style="fill:none;stroke:var(--muted);stroke-width:2"/>
+<polyline points="8,369 24,379 40,369 56,379 72,369 88,379 104,369 120,379 136,369 152,379 168,369 184,379 200,369 216,379 232,369 248,379 264,369 280,379 296,369 312,379 328,369 344,379 360,369 376,379 392,369 408,379 424,369 440,379 456,369 472,379 488,369 504,379 520,369 536,379 552,369 568,379 584,369 600,379 616,369 632,379 648,369 664,379 680,369 696,379 712,369" style="fill:none;stroke:var(--muted);stroke-width:2"/>
+<rect x="8" y="324" width="704" height="44" style="fill:var(--paper);opacity:.0"/>
+<text class="s b mu mid" x="360" y="343">軸の途切れ：ここで縮尺が変わる（上は画素、下は m）</text>
+<text class="s b mid" x="360" y="362">上の三角形は画素で、下の三角形は m で描いた。形（比）だけが同じ</text>
+<!-- ===== lower part: metres ===== -->
+<text class="s b mu end" x="696" y="440">下：m で測る部分</text>
+<polygon points="200,410 200,830 256,830" style="fill:var(--ray);opacity:.16"/>
+<line x1="200" y1="410" x2="200" y2="830" style="stroke:var(--cam);stroke-width:1.5;stroke-dasharray:6 5"/>
+<text class="s cam end" x="192" y="540">前方（光軸、Z）↓</text>
+<line x1="200" y1="410" x2="256" y2="830" style="stroke:var(--ray);stroke-width:3"/>
+<circle cx="200" cy="410" r="7" style="fill:var(--cam)"/>
+<text class="s cam b" x="216" y="404">カメラの中心（上と同じ点）</text>
+<line x1="56" y1="412" x2="56" y2="828" style="stroke:var(--hl);stroke-width:2" marker-start="url(#a2hl)" marker-end="url(#a2hl)"/>
+<text class="hl b mid" transform="translate(40 620) rotate(-90)">Z = 0.75 m（光軸に沿った距離）</text>
+<line x1="40" y1="830" x2="700" y2="830" style="stroke:var(--muted);stroke-width:2"/>
+<text class="hl b end" x="696" y="822">深度 Z = 0.75 m の面</text>
+<circle cx="222.4" cy="578" r="6" style="fill:var(--ray);opacity:.4"/>
+<circle cx="244.8" cy="746" r="6" style="fill:var(--ray);opacity:.4"/>
+<text class="mu s" x="290" y="480" style="opacity:.9">同じ比: 前へ 1 m なら右へ 0.133 m</text>
+<text class="mu s" x="262" y="583">Z = 0.30 m なら X = 0.04 m</text>
+<text class="mu b" x="262" y="610">光線だけでは点は決まらない</text>
+<text class="mu s" x="268" y="751">Z = 0.60 m なら X = 0.08 m</text>
+<rect x="282" y="622" width="418" height="108" rx="8" style="fill:var(--paper);stroke:var(--hl);stroke-width:2"/>
+<text class="s mu" x="298" y="644">2 つの三角形は同じ形（相似）</text>
+<text class="m b hl xl" x="298" y="676">80 : 600 = X : 0.75 m</text>
+<text class="m b hl xl" x="298" y="712" style="font-size:19px">X = 0.75 × 80 / 600 = 0.10 m</text>
+<line x1="200" y1="830" x2="256" y2="830" style="stroke:var(--hl);stroke-width:5"/>
+<circle cx="256" cy="830" r="9.5" style="fill:var(--hl);stroke:var(--card);stroke-width:2"/>
+<text class="m b hl mid l" x="228" y="862">X = 0.10 m</text>
+<text class="hl b" x="280" y="800">● 深度 0.75 m が決める点</text>
+<rect x="8" y="884" width="704" height="64" rx="8" style="fill:var(--card);stroke:var(--hl);stroke-width:2"/>
+<text class="m hl b" x="22" y="910" style="font-size:16px">y も同じ: 120 : 600 = Y : 0.75 m → Y = 0.15 m</text>
+<text class="m cam b" x="22" y="936" style="font-size:17px">カメラから見た点 = (0.10, 0.15, 0.75) m</text>
+</svg>
+  <figcaption>VLM の点は画像の中心から右へ 80 画素、下へ 120 画素にあり、80 : 600 = X : 0.75 m の比で深度 0.75 m の面の X = 0.10 m に着く。光線だけでは点は決まらず、深度を読んで初めて (0.10, 0.15, 0.75) m に決まる。</figcaption>
+</figure>
+
+<figure class="fig" id="fig-3">
+  <p class="eyebrow">TOY · カメラは土台の x 方向 0.5 m、机の上 0.8 m、真下向き</p>
+  <h2>4x4 は「カメラの原点から、カメラの 3 本の軸に沿って歩く」計算だ</h2>
+  <p class="sub">P_base = T_base_cam · P_cam</p>
+
+<svg viewBox="0 0 720 1190" role="img" aria-labelledby="f3t f3d" xmlns="http://www.w3.org/2000/svg">
+<title id="f3t">カメラの原点から 3 本の軸に沿って歩く</title>
+<desc id="f3d">カメラの原点 (0.5, 0, 0.8) から、x 軸に 0.10、y 軸に 0.15、z 軸に 0.75 歩くと、土台から見た点 (0.60, −0.15, 0.05) に着く。</desc>
+<!-- numbers (toy.md rung 3): R = diag(1,-1,-1), t = (0.5, 0, 0.8), P_cam = (0.10, 0.15, 0.75), P_base = (0.60, -0.15, 0.05) -->
+<defs><marker id="a3ray" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ray)"/></marker><marker id="a3hl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--hl)"/></marker><marker id="a3cam" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--cam)"/></marker><marker id="a3amb" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--amber)"/></marker><marker id="a3base" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--base)"/></marker><marker id="a3mu" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker><marker id="a3ink" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ink)"/></marker></defs>
+<rect x="8" y="8" width="704" height="600" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+<text class="b" x="22" y="34">土台の座標系の中で、カメラの原点から歩く</text>
+<polygon points="367.3,256.0 585.5,382.0 276.3,560.5 58.1,434.5" style="fill:var(--table);opacity:.55;stroke:var(--line)"/>
+<text class="s mu" x="290" y="554">机の面 z_b = 0</text>
+<line x1="440.0" y1="340.0" x2="330.9" y2="403.0" style="stroke:var(--base);stroke-width:3" marker-end="url(#a3base)"/><line x1="440.0" y1="340.0" x2="549.1" y2="403.0" style="stroke:var(--base);stroke-width:3" marker-end="url(#a3base)"/><line x1="440.0" y1="340.0" x2="440.0" y2="214.0" style="stroke:var(--base);stroke-width:3" marker-end="url(#a3base)"/>
+<circle cx="440.0" cy="340.0" r="5" style="fill:var(--base)"/>
+<text class="base b" x="301" y="427">x_b</text>
+<text class="base b" x="557" y="425">y_b</text>
+<text class="base b" x="450" y="218">z_b</text>
+<text class="base b end" x="430" y="330">土台の原点</text>
+<!-- camera axes (thin) -->
+<line x1="258.1" y1="109.0" x2="178.1" y2="155.2" style="stroke:var(--ray);stroke-width:2" marker-end="url(#a3ray)"/><line x1="258.1" y1="109.0" x2="167.2" y2="56.5" style="stroke:var(--cam);stroke-width:2" marker-end="url(#a3cam)"/><line x1="258.1" y1="109.0" x2="258.1" y2="214.0" style="stroke:var(--amber);stroke-width:2" marker-end="url(#a3amb)"/>
+<text class="ray b" x="184" y="169">x_c</text>
+<text class="cam b end" x="161" y="54">y_c</text>
+<text class="amb b" x="266" y="220">z_c</text>
+<!-- walk -->
+<line x1="258.1" y1="109.0" x2="221.8" y2="130.0" style="stroke:var(--ray);stroke-width:5" marker-end="url(#a3ray)"/><line x1="221.8" y1="130.0" x2="167.2" y2="98.5" style="stroke:var(--cam);stroke-width:5" marker-end="url(#a3cam)"/><line x1="167.2" y1="98.5" x2="167.2" y2="413.5" style="stroke:var(--amber);stroke-width:5" marker-end="url(#a3amb)"/>
+<circle cx="258.1" cy="109.0" r="7" style="fill:var(--cam)"/>
+<text class="cam b" x="272" y="91">カメラの原点 (0.5, 0, 0.8)</text>
+<circle cx="244" cy="102" r="10" style="fill:var(--card);stroke:var(--ray);stroke-width:2"/><text class="b mid" x="244" y="107" style="font-size:14px">①</text>
+<circle cx="184" cy="131" r="10" style="fill:var(--card);stroke:var(--cam);stroke-width:2"/><text class="b mid" x="184" y="136" style="font-size:14px">②</text>
+<circle cx="143" cy="256" r="10" style="fill:var(--card);stroke:var(--amber);stroke-width:2"/><text class="b mid" x="143" y="261" style="font-size:14px">③</text>
+<circle cx="167.2" cy="413.5" r="10" style="fill:var(--hl);stroke:var(--card);stroke-width:2"/>
+<text class="hl b" x="30" y="462">土台から見ると</text>
+<text class="m hl b l" x="30" y="486">(0.60, −0.15, 0.05)</text>
+<text class="cam b" x="187" y="246">カメラから見ると</text>
+<text class="m cam b l" x="187" y="270">(0.10, 0.15, 0.75)</text>
+<g>
+<text class="b" x="486" y="70">歩く順番（カメラの数字 X, Y, Z）</text>
+<text class="ray b s" x="486" y="96">① X = 0.10 だけ x_c 方向へ</text>
+<text class="cam b s" x="486" y="122">② Y = 0.15 だけ y_c 方向へ</text>
+<text class="amb b s" x="486" y="148">③ Z = 0.75 だけ z_c 方向へ</text>
+<text class="s mu" x="486" y="176">x_c = +x_b、y_c = −y_b</text>
+<text class="s mu" x="486" y="196">z_c = −z_b（真下）</text>
+</g>
+<rect x="8" y="632" width="704" height="552" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+<text class="b" x="22" y="658">同じ計算を 4x4 で書く</text>
+<rect x="52" y="710" width="64" height="160" style="fill:var(--ray);opacity:.13"/>
+<text class="ray b mid s" x="84.0" y="702">x 軸</text>
+<rect x="116" y="710" width="64" height="160" style="fill:var(--cam);opacity:.13"/>
+<text class="cam b mid s" x="148.0" y="702">y 軸</text>
+<rect x="180" y="710" width="64" height="160" style="fill:var(--amber);opacity:.13"/>
+<text class="amb b mid s" x="212.0" y="702">z 軸</text>
+<rect x="244" y="710" width="64" height="160" style="fill:var(--base);opacity:.13"/>
+<text class="base b mid s" x="276.0" y="702">原点</text>
+<path d="M52 710h-8v160h8M308 710h8v160h-8" style="fill:none;stroke:var(--ink);stroke-width:2"/>
+<path d="M380 710h-8v160h8M444 710h8v160h-8" style="fill:none;stroke:var(--ink);stroke-width:2"/>
+<path d="M520 710h-8v160h8M584 710h8v160h-8" style="fill:none;stroke:var(--ink);stroke-width:2"/>
+<text class="m ray b mid l" x="84.0" y="736.0">1</text>
+<text class="m cam b mid l" x="148.0" y="736.0">0</text>
+<text class="m amb b mid l" x="212.0" y="736.0">0</text>
+<text class="m base b mid l" x="276.0" y="736.0">0.5</text>
+<text class="m ray b mid l" x="412.0" y="736.0">0.10</text>
+<text class="m  b mid l" x="552.0" y="736.0">0.60</text>
+<text class="m ray b mid l" x="84.0" y="776.0">0</text>
+<text class="m cam b mid l" x="148.0" y="776.0">−1</text>
+<text class="m amb b mid l" x="212.0" y="776.0">0</text>
+<text class="m base b mid l" x="276.0" y="776.0">0</text>
+<text class="m cam b mid l" x="412.0" y="776.0">0.15</text>
+<text class="m  b mid l" x="552.0" y="776.0">−0.15</text>
+<text class="m ray b mid l" x="84.0" y="816.0">0</text>
+<text class="m cam b mid l" x="148.0" y="816.0">0</text>
+<text class="m amb b mid l" x="212.0" y="816.0">−1</text>
+<text class="m base b mid l" x="276.0" y="816.0">0.8</text>
+<text class="m amb b mid l" x="412.0" y="816.0">0.75</text>
+<text class="m hl b mid l" x="552.0" y="816.0">0.05</text>
+<text class="m ray b mid l" x="84.0" y="856.0">0</text>
+<text class="m cam b mid l" x="148.0" y="856.0">0</text>
+<text class="m amb b mid l" x="212.0" y="856.0">0</text>
+<text class="m base b mid l" x="276.0" y="856.0">1</text>
+<text class="m base b mid l" x="412.0" y="856.0">1</text>
+<text class="m  b mid l" x="552.0" y="856.0">1</text>
+<rect x="40" y="790" width="556" height="40" rx="4" style="fill:none;stroke:var(--hl);stroke-width:2.5"/>
+<text class="l mid" x="343.0" y="816.0">×</text>
+<text class="l mid" x="482.0" y="816.0">=</text>
+<rect x="54" y="714" width="190" height="120" rx="6" style="fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 4"/>
+<rect x="246" y="714" width="60" height="120" rx="6" style="fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 4"/>
+<text class="s b mu mid" x="149" y="676">R（1〜3 列目：向き）</text>
+<text class="s b mu mid" x="276" y="676">t（4 列目）</text>
+<text class="s mu mid" x="180" y="892">T_base_cam（4x4）</text>
+<text class="s cam b mid" x="412.0" y="892">カメラから見た点</text>
+<text class="s hl b mid" x="552.0" y="892">土台から見た点</text>
+<rect x="24" y="913" width="16" height="16" rx="3" style="fill:var(--ray);opacity:.85"/><text class="ray b" x="48" y="926">1 列目 = カメラの x 軸（土台の数字で書いた向き）</text>
+<rect x="24" y="939" width="16" height="16" rx="3" style="fill:var(--cam);opacity:.85"/><text class="cam b" x="48" y="952">2 列目 = カメラの y 軸</text>
+<rect x="24" y="965" width="16" height="16" rx="3" style="fill:var(--amber);opacity:.85"/><text class="amb b" x="48" y="978">3 列目 = カメラの z 軸</text>
+<rect x="24" y="991" width="16" height="16" rx="3" style="fill:var(--base);opacity:.85"/><text class="base b" x="48" y="1004">4 列目 = カメラの原点（土台の数字）</text>
+<text class="b" x="24" y="1060">行ごとの計算 = 原点 + 軸 × 歩いた量</text>
+<text class="m l" x="24" y="1094">x = <tspan class="base b">0.5</tspan> + <tspan class="ray b">1</tspan>×0.10 = 0.60</text>
+<text class="m l" x="24" y="1128">y = <tspan class="base b">0</tspan> + <tspan class="cam b">(−1)</tspan>×0.15 = −0.15</text>
+<rect x="16" y="1140" width="360" height="36" rx="6" style="fill:none;stroke:var(--hl);stroke-width:2.5"/>
+<text class="m l b hl" x="24" y="1166">z = 0.8 + (−1)×0.75 = 0.05</text>
+<text class="s mu" x="400" y="1166">物体の上面の高さ 0.05 m に一致</text>
+</svg>
+  <figcaption>カメラの原点から x_c 方向に X = 0.10、y_c 方向に Y = 0.15、z_c 方向に Z = 0.75 歩くと、土台の数字では (0.60, −0.15, 0.05) になる。4x4 の 1〜3 列目（R）が軸、4 列目（t）が原点で、掛け算はこの歩き方そのものである。</figcaption>
+</figure>
+
+<figure class="fig" id="fig-4">
+  <p class="eyebrow">BY SHAPE · 固定カメラと手先カメラ</p>
+  <h2>T_base_cam はつなぎ合わせで作る。内側の文字が消える順に掛ける</h2>
+  <p class="sub">T_a_b · T_b_c = T_a_c</p>
+
+<svg viewBox="0 0 720 688" role="img" aria-labelledby="f4t f4d" xmlns="http://www.w3.org/2000/svg">
+<title id="f4t">固定カメラと手先カメラの T_base_cam のつなぎ方</title>
+<desc id="f4d">固定カメラは土台からカメラへの T_base_cam を校正で一度測る。手先カメラは撮影の瞬間の関節角から FK で T_base_ee を出し、ハンドアイ校正で測った T_ee_cam を掛ける。</desc>
+<!-- by shape: no numeric values; chain structure from spine.md rung 4 -->
+<defs><marker id="a4ray" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ray)"/></marker><marker id="a4hl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--hl)"/></marker><marker id="a4cam" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--cam)"/></marker><marker id="a4amb" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--amber)"/></marker><marker id="a4base" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--base)"/></marker><marker id="a4mu" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker><marker id="a4ink" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ink)"/></marker></defs>
+<line x1="16" y1="26" x2="60" y2="26" style="stroke:var(--cam);stroke-width:3.5"/><text class="cam b" x="68" y="31">一度測れば一定（校正）</text>
+<line x1="300" y1="26" x2="344" y2="26" style="stroke:var(--hl);stroke-width:3.5"/><text class="hl b" x="352" y="31">撮影のたびに計算し直す（FK）</text>
+<text class="b" x="14" y="76">固定カメラ（eye-to-hand）</text>
+<rect x="14" y="92" width="84" height="60" rx="8" style="fill:var(--card);stroke:var(--base);stroke-width:2.5"/><text class="b mid" x="56.0" y="118">土台</text><text class="m mid s" x="56.0" y="138">base</text><rect x="418" y="92" width="84" height="60" rx="8" style="fill:var(--card);stroke:var(--cam);stroke-width:2.5"/><text class="b mid" x="460.0" y="118">カメラ</text><text class="m mid s" x="460.0" y="138">cam</text><rect x="620" y="92" width="84" height="60" rx="8" style="fill:var(--card);stroke:var(--ink);stroke-width:2.5"/><text class="b mid" x="662.0" y="118">点</text><text class="m mid s" x="662.0" y="138">P</text>
+<line x1="102" y1="122" x2="414" y2="122" style="stroke:var(--cam);stroke-width:3.5" marker-end="url(#a4cam)"/><text class="m b mid s" x="258.0" y="112" style="font-size:14px">T_base_cam</text><text class="s mid" x="258.0" y="146">校正で一度測る・一定</text>
+<line x1="506" y1="122" x2="616" y2="122" style="stroke:var(--ink);stroke-width:3.5" marker-end="url(#a4ink)"/><text class="m b mid s" x="561.0" y="112" style="font-size:14px">P_cam</text><text class="s mid" x="561.0" y="146">カメラ基準の点</text>
+<text class="b" x="14" y="236">手先カメラ（eye-in-hand）</text>
+<rect x="14" y="252" width="84" height="60" rx="8" style="fill:var(--card);stroke:var(--base);stroke-width:2.5"/><text class="b mid" x="56.0" y="278">土台</text><text class="m mid s" x="56.0" y="298">base</text><rect x="216" y="252" width="84" height="60" rx="8" style="fill:var(--card);stroke:var(--ink);stroke-width:2.5"/><text class="b mid" x="258.0" y="278">手先</text><text class="m mid s" x="258.0" y="298">ee</text><rect x="418" y="252" width="84" height="60" rx="8" style="fill:var(--card);stroke:var(--cam);stroke-width:2.5"/><text class="b mid" x="460.0" y="278">カメラ</text><text class="m mid s" x="460.0" y="298">cam</text><rect x="620" y="252" width="84" height="60" rx="8" style="fill:var(--card);stroke:var(--ink);stroke-width:2.5"/><text class="b mid" x="662.0" y="278">点</text><text class="m mid s" x="662.0" y="298">P</text>
+<line x1="102" y1="282" x2="212" y2="282" style="stroke:var(--hl);stroke-width:3.5" marker-end="url(#a4hl)"/><text class="m b mid s" x="157.0" y="272" style="font-size:14px">T_base_ee(q)</text><text class="s mid" x="157.0" y="306">撮影した瞬間の</text><text class="s mid" x="157.0" y="326">関節角から FK</text>
+<line x1="304" y1="282" x2="414" y2="282" style="stroke:var(--cam);stroke-width:3.5" marker-end="url(#a4cam)"/><text class="m b mid s" x="359.0" y="272" style="font-size:14px">T_ee_cam</text><text class="s mid" x="359.0" y="306">ハンドアイ校正</text><text class="s mid" x="359.0" y="326">で測る・一定</text>
+<line x1="506" y1="282" x2="616" y2="282" style="stroke:var(--ink);stroke-width:3.5" marker-end="url(#a4ink)"/><text class="m b mid s" x="561.0" y="272" style="font-size:14px">P_cam</text><text class="s mid" x="561.0" y="306">カメラ基準の点</text>
+<path d="M56 346v10h404v-10M258 356v8" style="fill:none;stroke:var(--muted);stroke-width:1.5"/>
+<text class="m b mid" x="258" y="388" style="font-size:16px">T_base_cam = T_base_ee(q) · T_ee_cam</text>
+<text class="s mu mid" x="258" y="410">手先カメラの T_base_cam は、撮影のたびに作り直す</text>
+
+<text class="s b" x="14" y="442">矢印は T_a_b の向き（a から b を見る）。</text>
+<text class="s b" x="14" y="464">点の数字はその逆、cam の数字 → base の数字へ直す</text>
+<g transform="translate(0 48)">
+<rect x="8" y="430" width="704" height="124" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+<text class="m b l" x="22" y="462">T_a_b · T_b_c = T_a_c <tspan class="b" style="font-family:-apple-system,'Hiragino Sans','Noto Sans CJK JP',sans-serif;font-size:15px">（内側の b が消える）</tspan></text>
+<text class="m l" x="22" y="496">T_base_<tspan class="hl b">ee</tspan> · T_<tspan class="hl b">ee</tspan>_cam = T_base_cam</text>
+<text class="m l" x="22" y="530">T_base_<tspan class="cam b">cam</tspan> · P_<tspan class="cam b">cam</tspan> = P_base</text>
+<rect x="8" y="566" width="704" height="66" rx="8" style="fill:var(--card);stroke:var(--err);stroke-width:2;stroke-dasharray:6 4"/>
+<text class="er b" x="22" y="594">ツールが T_cam_base を返したら、逆行列をとる。</text>
+<text class="er b" x="22" y="618">数字の符号を変えるだけでは、逆にならない。</text>
+</g>
+</svg>
+  <figcaption>固定カメラは T_base_cam を校正で一度測れば一定だが、手先カメラは撮影の瞬間の関節角から FK で T_base_ee を作り直し、校正で測った一定の T_ee_cam を掛ける。内側の文字が消える順に掛け、向きが逆なら逆行列をとる。</figcaption>
+</figure>
+<figure class="fig" id="fig-5">
+  <p class="eyebrow">TOY · 深度 0.75 m · 1 画素 = 1.25 mm</p>
+  <h2>誤差は光線に対して 3 つの向きに分かれる</h2>
+  <p class="sub">横へのずれ = 距離 × tan（角度）</p>
+
+<svg viewBox="0 0 720 650" role="img" aria-labelledby="f5t f5d" xmlns="http://www.w3.org/2000/svg">
+<title id="f5t">3 種類の誤差を光線の図に重ねる</title>
+<desc id="f5d">カメラの中心から深度 0.75 m の点 (X = 0.10 m) へ光線が伸びる。画素が 10 個ずれると光線が横に傾き 12.5 mm 横へずれる。深度が 10 mm ずれると点は光線に沿って約 10 mm 動く。較正が 1 度ずれると光線全体が回り、0.75 m 先で約 13 mm ずれる。</desc>
+<!-- numbers (toy.md rung 5 error slice): 10 px*1.25 = 12.5 mm; Z+10 mm -> (+1.33,-2.00,-10.00) mm; 1 deg: 0.75*tan1deg = 13.09 ~ 13 mm. Arrow lengths exaggerated. -->
+<defs><marker id="a5err" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--err)"/></marker><marker id="a5hl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--hl)"/></marker></defs>
+<rect x="8" y="8" width="704" height="552" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+<text class="b" x="22" y="34">横から見た図（x–z 面）。右が x、下が前方（Z）</text>
+<!-- depth dimension -->
+<line x1="56" y1="86" x2="56" y2="462" style="stroke:var(--hl);stroke-width:2" marker-start="url(#a5hl)" marker-end="url(#a5hl)"/>
+<text class="hl b mid s" transform="translate(44 274) rotate(-90)">Z = 0.75 m（光軸に沿った距離）</text>
+<!-- table plane -->
+<line x1="24" y1="464" x2="326" y2="464" style="stroke:var(--muted);stroke-width:2"/>
+<!-- ray extension beyond the point -->
+<line x1="180.7" y1="464" x2="190.5" y2="546" style="stroke:var(--ray);stroke-width:2;stroke-dasharray:5 4;opacity:.45"/>
+<!-- 3: rotated faint copy -->
+<line x1="130" y1="84" x2="123" y2="464" style="stroke:var(--ray);stroke-width:3;opacity:.35"/>
+<path d="M150 232.7A150 150 0 0 1 127.2 234" style="fill:none;stroke:var(--err);stroke-width:2.5" marker-end="url(#a5err)"/>
+<text class="m b er end s" x="118" y="244">1°</text>
+<circle cx="76" cy="236" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="76" y="241">③</text>
+<!-- 1: tilted dashed ray -->
+<line x1="130" y1="84" x2="236" y2="464" style="stroke:var(--ray);stroke-width:2.5;stroke-dasharray:7 5"/>
+<!-- true ray -->
+<line x1="130" y1="84" x2="180.7" y2="464" style="stroke:var(--ray);stroke-width:3.5"/>
+<circle cx="130" cy="84" r="7" style="fill:var(--cam)"/>
+<text class="s cam b" x="146" y="78">カメラの中心</text>
+<!-- error arrows at the table plane -->
+<line x1="180.7" y1="464" x2="228" y2="464" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/>
+<circle cx="236" cy="464" r="6" style="fill:var(--card);stroke:var(--err);stroke-width:2.5"/>
+<line x1="180.7" y1="464" x2="131" y2="464" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/>
+<circle cx="123" cy="464" r="6" style="fill:var(--card);stroke:var(--err);stroke-width:2.5"/>
+<line x1="180.7" y1="464" x2="189" y2="530" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/>
+<circle cx="180.7" cy="464" r="9" style="fill:var(--hl);stroke:var(--card);stroke-width:2.5"/>
+<circle cx="236" cy="490" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="236" y="495">①</text>
+<circle cx="224" cy="528" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="224" y="533">②</text>
+<circle cx="140" cy="490" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="140" y="495">③</text>
+<!-- label cards -->
+<g>
+<rect x="340" y="56" width="364" height="100" rx="6" style="fill:var(--card);stroke:var(--err);stroke-width:1.5"/>
+<circle cx="360" cy="78" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="360" y="83">①</text>
+<text class="b" x="378" y="84">画素のずれ</text>
+<text class="b" x="378" y="106">→ 光線が横に傾く</text>
+<text class="m b er s" x="356" y="136">10 画素 → 10 × 1.25 = 12.5 mm 横へ</text>
+</g>
+<g>
+<rect x="340" y="168" width="364" height="122" rx="6" style="fill:var(--card);stroke:var(--err);stroke-width:1.5"/>
+<circle cx="360" cy="190" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="360" y="195">②</text>
+<text class="b" x="378" y="196">深度のずれ</text>
+<text class="b" x="378" y="218">→ 点が光線の上を前後する</text>
+<text class="m b er s" x="356" y="248">深度 +10 mm → 光線に沿って約 10 mm</text>
+<text class="m b er s" x="356" y="270">（土台では (+1.3, −2.0, −10.0) mm）</text>
+</g>
+<g>
+<rect x="340" y="302" width="364" height="100" rx="6" style="fill:var(--card);stroke:var(--err);stroke-width:1.5"/>
+<circle cx="360" cy="324" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="360" y="329">③</text>
+<text class="b" x="378" y="330">較正のずれ</text>
+<text class="b" x="378" y="352">→ 光線ごと回る</text>
+<text class="m b er s" x="356" y="382">1° → 0.75 m × tan 1° ≈ 13 mm</text>
+</g>
+<!-- legend -->
+<g>
+<line x1="344" y1="430" x2="384" y2="430" style="stroke:var(--ray);stroke-width:3.5"/><text class="s" x="396" y="435">本来の光線</text>
+<line x1="344" y1="456" x2="384" y2="456" style="stroke:var(--ray);stroke-width:2.5;stroke-dasharray:7 5"/><text class="s" x="396" y="461">① でずれた光線</text>
+<line x1="344" y1="482" x2="384" y2="482" style="stroke:var(--ray);stroke-width:3;opacity:.35"/><text class="s" x="396" y="487">③ で回った光線</text>
+<circle cx="364" cy="508" r="7" style="fill:var(--hl);stroke:var(--card);stroke-width:2"/><text class="s" x="396" y="513">本来の点（X = 0.10 m）</text>
+<line x1="344" y1="534" x2="378" y2="534" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/><text class="s" x="396" y="539">誤差（長さは見やすく誇張）</text>
+</g>
+<rect x="8" y="576" width="704" height="64" rx="8" style="fill:var(--card);stroke:var(--hl);stroke-width:2"/>
+<text class="b" x="22" y="602">VLM を良くして減るのは <tspan class="er">①</tspan> だけ。</text>
+<text class="b" x="22" y="626"><tspan class="er">②</tspan> は深度センサー、<tspan class="er">③</tspan> は較正の問題だ</text>
+</svg>
+  <figcaption>誤差は光線に対して、横（①）、光線に沿う向き（②）、光線ごと回る向き（③）の 3 つに分かれる。VLM を替えて効くのは ① だけで、② は深度センサー、③ は較正を直す問題だ。図の矢印の長さは見やすく誇張してある。</figcaption>
+</figure>
+</body>
+</html>

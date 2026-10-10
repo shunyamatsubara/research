@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Figure 5</title>
+<style>
+:root{
+  /* colour roles, reused unchanged in Figures 2 and 3 */
+  --paper:#fbfaf7;   /* page background */
+  --card:#ffffff;    /* panels inside a figure */
+  --ink:#1d2330;     /* text, lines of the scene */
+  --muted:#6b7280;   /* eyebrow, captions, unchanged values */
+  --faint:#b9bdc6;   /* unused / candidate / not yet fixed */
+  --line:#d9dbe0;    /* panel borders */
+  --ray:#2563eb;     /* the ray and pixel values */
+  --hl:#d9480f;      /* the highlighted value being computed (accent) */
+  --cam:#0f766e;     /* camera frame (optical axis, camera, P_cam) */
+  --base:#7c3aed;    /* base frame (Figures 2-3) */
+  --err:#c92a2a;     /* error / trap */
+  --table:#d6cfc2;   /* table surface */
+  --obj:#e9e3d6;     /* object */
+  --amber:#b7791f;   /* camera z axis (Figures 2-3) */
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#14171d; --card:#1c2028; --ink:#e8eaee; --muted:#9aa1ad; --faint:#4a505c;
+    --line:#343a46; --ray:#6ea0ff; --hl:#ff9a5c; --cam:#4fd1c0; --base:#b794f6;
+    --err:#ff7b7b; --table:#3a362e; --obj:#4a4538; --amber:#f0b44c;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14171d; --card:#1c2028; --ink:#e8eaee; --muted:#9aa1ad; --faint:#4a505c;
+  --line:#343a46; --ray:#6ea0ff; --hl:#ff9a5c; --cam:#4fd1c0; --base:#b794f6;
+  --err:#ff7b7b; --table:#3a362e; --obj:#4a4538; --amber:#f0b44c;
+}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);
+  font-family:-apple-system,"Hiragino Sans","Yu Gothic","Noto Sans CJK JP","Noto Sans JP",system-ui,sans-serif;
+  line-height:1.6}
+figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box}
+.fig .eyebrow{font-size:12px;letter-spacing:.04em;text-transform:none;color:var(--muted);margin:0 0 4px}
+.fig h2{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif CJK JP","Noto Serif JP",Georgia,serif;
+  font-size:22px;line-height:1.35;margin:0 0 6px;font-weight:700;color:var(--ink)}
+.fig .sub{font-style:italic;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:13px;color:var(--muted);margin:0 0 10px}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+.fig svg text{fill:var(--ink);font-family:-apple-system,"Hiragino Sans","Yu Gothic","Noto Sans CJK JP",system-ui,sans-serif;font-size:15px}
+.fig svg .m{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.fig svg .s{font-size:14px}
+.fig svg .l{font-size:18px}
+.fig svg .xl{font-size:20px}
+.fig svg .b{font-weight:700}
+.fig svg .mu{fill:var(--muted)}
+.fig svg .ray{fill:var(--ray)}
+.fig svg .hl{fill:var(--hl)}
+.fig svg .cam{fill:var(--cam)}
+.fig svg .base{fill:var(--base)}
+.fig svg .amb{fill:var(--amber)}
+.fig svg .er{fill:var(--err)}
+.fig svg .mid{text-anchor:middle}
+.fig svg .end{text-anchor:end}
+</style>
+</head>
+<body>
+<figure class="fig" id="fig-5">
+  <p class="eyebrow">TOY · 深度 0.75 m · 1 画素 = 1.25 mm</p>
+  <h2>誤差は光線に対して 3 つの向きに分かれる</h2>
+  <p class="sub">横へのずれ = 距離 × tan（角度）</p>
+
+<svg viewBox="0 0 720 650" role="img" aria-labelledby="f5t f5d" xmlns="http://www.w3.org/2000/svg">
+<title id="f5t">3 種類の誤差を光線の図に重ねる</title>
+<desc id="f5d">カメラの中心から深度 0.75 m の点 (X = 0.10 m) へ光線が伸びる。画素が 10 個ずれると光線が横に傾き 12.5 mm 横へずれる。深度が 10 mm ずれると点は光線に沿って約 10 mm 動く。較正が 1 度ずれると光線全体が回り、0.75 m 先で約 13 mm ずれる。</desc>
+<!-- numbers (toy.md rung 5 error slice): 10 px*1.25 = 12.5 mm; Z+10 mm -> (+1.33,-2.00,-10.00) mm; 1 deg: 0.75*tan1deg = 13.09 ~ 13 mm. Arrow lengths exaggerated. -->
+<defs><marker id="a5err" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--err)"/></marker><marker id="a5hl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--hl)"/></marker></defs>
+<rect x="8" y="8" width="704" height="552" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+<text class="b" x="22" y="34">横から見た図（x–z 面）。右が x、下が前方（Z）</text>
+<!-- depth dimension -->
+<line x1="56" y1="86" x2="56" y2="462" style="stroke:var(--hl);stroke-width:2" marker-start="url(#a5hl)" marker-end="url(#a5hl)"/>
+<text class="hl b mid s" transform="translate(44 274) rotate(-90)">Z = 0.75 m（光軸に沿った距離）</text>
+<!-- table plane -->
+<line x1="24" y1="464" x2="326" y2="464" style="stroke:var(--muted);stroke-width:2"/>
+<!-- ray extension beyond the point -->
+<line x1="180.7" y1="464" x2="190.5" y2="546" style="stroke:var(--ray);stroke-width:2;stroke-dasharray:5 4;opacity:.45"/>
+<!-- 3: rotated faint copy -->
+<line x1="130" y1="84" x2="123" y2="464" style="stroke:var(--ray);stroke-width:3;opacity:.35"/>
+<path d="M150 232.7A150 150 0 0 1 127.2 234" style="fill:none;stroke:var(--err);stroke-width:2.5" marker-end="url(#a5err)"/>
+<text class="m b er end s" x="118" y="244">1°</text>
+<circle cx="76" cy="236" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="76" y="241">③</text>
+<!-- 1: tilted dashed ray -->
+<line x1="130" y1="84" x2="236" y2="464" style="stroke:var(--ray);stroke-width:2.5;stroke-dasharray:7 5"/>
+<!-- true ray -->
+<line x1="130" y1="84" x2="180.7" y2="464" style="stroke:var(--ray);stroke-width:3.5"/>
+<circle cx="130" cy="84" r="7" style="fill:var(--cam)"/>
+<text class="s cam b" x="146" y="78">カメラの中心</text>
+<!-- error arrows at the table plane -->
+<line x1="180.7" y1="464" x2="228" y2="464" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/>
+<circle cx="236" cy="464" r="6" style="fill:var(--card);stroke:var(--err);stroke-width:2.5"/>
+<line x1="180.7" y1="464" x2="131" y2="464" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/>
+<circle cx="123" cy="464" r="6" style="fill:var(--card);stroke:var(--err);stroke-width:2.5"/>
+<line x1="180.7" y1="464" x2="189" y2="530" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/>
+<circle cx="180.7" cy="464" r="9" style="fill:var(--hl);stroke:var(--card);stroke-width:2.5"/>
+<circle cx="236" cy="490" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="236" y="495">①</text>
+<circle cx="224" cy="528" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="224" y="533">②</text>
+<circle cx="140" cy="490" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="140" y="495">③</text>
+<!-- label cards -->
+<g>
+<rect x="340" y="56" width="364" height="100" rx="6" style="fill:var(--card);stroke:var(--err);stroke-width:1.5"/>
+<circle cx="360" cy="78" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="360" y="83">①</text>
+<text class="b" x="378" y="84">画素のずれ</text>
+<text class="b" x="378" y="106">→ 光線が横に傾く</text>
+<text class="m b er s" x="356" y="136">10 画素 → 10 × 1.25 = 12.5 mm 横へ</text>
+</g>
+<g>
+<rect x="340" y="168" width="364" height="122" rx="6" style="fill:var(--card);stroke:var(--err);stroke-width:1.5"/>
+<circle cx="360" cy="190" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="360" y="195">②</text>
+<text class="b" x="378" y="196">深度のずれ</text>
+<text class="b" x="378" y="218">→ 点が光線の上を前後する</text>
+<text class="m b er s" x="356" y="248">深度 +10 mm → 光線に沿って約 10 mm</text>
+<text class="m b er s" x="356" y="270">（土台では (+1.3, −2.0, −10.0) mm）</text>
+</g>
+<g>
+<rect x="340" y="302" width="364" height="100" rx="6" style="fill:var(--card);stroke:var(--err);stroke-width:1.5"/>
+<circle cx="360" cy="324" r="10" style="fill:var(--card);stroke:var(--err);stroke-width:2"/><text class="b mid s er" x="360" y="329">③</text>
+<text class="b" x="378" y="330">較正のずれ</text>
+<text class="b" x="378" y="352">→ 光線ごと回る</text>
+<text class="m b er s" x="356" y="382">1° → 0.75 m × tan 1° ≈ 13 mm</text>
+</g>
+<!-- legend -->
+<g>
+<line x1="344" y1="430" x2="384" y2="430" style="stroke:var(--ray);stroke-width:3.5"/><text class="s" x="396" y="435">本来の光線</text>
+<line x1="344" y1="456" x2="384" y2="456" style="stroke:var(--ray);stroke-width:2.5;stroke-dasharray:7 5"/><text class="s" x="396" y="461">① でずれた光線</text>
+<line x1="344" y1="482" x2="384" y2="482" style="stroke:var(--ray);stroke-width:3;opacity:.35"/><text class="s" x="396" y="487">③ で回った光線</text>
+<circle cx="364" cy="508" r="7" style="fill:var(--hl);stroke:var(--card);stroke-width:2"/><text class="s" x="396" y="513">本来の点（X = 0.10 m）</text>
+<line x1="344" y1="534" x2="378" y2="534" style="stroke:var(--err);stroke-width:3.5" marker-end="url(#a5err)"/><text class="s" x="396" y="539">誤差（長さは見やすく誇張）</text>
+</g>
+<rect x="8" y="576" width="704" height="64" rx="8" style="fill:var(--card);stroke:var(--hl);stroke-width:2"/>
+<text class="b" x="22" y="602">VLM を良くして減るのは <tspan class="er">①</tspan> だけ。</text>
+<text class="b" x="22" y="626"><tspan class="er">②</tspan> は深度センサー、<tspan class="er">③</tspan> は較正の問題だ</text>
+</svg>
+  <figcaption>誤差は光線に対して、横（①）、光線に沿う向き（②）、光線ごと回る向き（③）の 3 つに分かれる。VLM を替えて効くのは ① だけで、② は深度センサー、③ は較正を直す問題だ。図の矢印の長さは見やすく誇張してある。</figcaption>
+</figure>
+</body>
+</html>
