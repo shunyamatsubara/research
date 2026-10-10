@@ -77,21 +77,21 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 <!-- numbers (toy.md rung 1): [y,x]=[750,625], 640x480, centre (320,240), (u,v)=(400,360), 0.625*640=400, 0.75*480=360, wrong order -> (480,300) -->
 <defs><marker id="a1ray" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ray)"/></marker><marker id="a1hl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--hl)"/></marker><marker id="a1mu" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker></defs>
 <rect x="8" y="8" width="704" height="574" rx="8" style="fill:var(--card);stroke:var(--line)"/>
-<text class="s b mu end" x="664" y="26">VLM の物差し 0 … 1000</text>
-<line x1="212" y1="56" x2="664" y2="56" style="stroke:var(--ink);stroke-width:2"/>
-<line x1="212" y1="48" x2="212" y2="56" style="stroke:var(--ink);stroke-width:1.5"/>
-<text class="m s mu mid" x="212" y="40">0</text>
-<line x1="325" y1="48" x2="325" y2="56" style="stroke:var(--ink);stroke-width:1.5"/>
-<text class="m s mu mid" x="325" y="40">250</text>
-<line x1="438" y1="48" x2="438" y2="56" style="stroke:var(--ink);stroke-width:1.5"/>
-<text class="m s mu mid" x="438" y="40">500</text>
-<line x1="494.5" y1="46" x2="494.5" y2="56" style="stroke:var(--hl);stroke-width:3"/>
-<text class="m s hl b mid" x="494.5" y="40">625</text>
-<line x1="551" y1="48" x2="551" y2="56" style="stroke:var(--ink);stroke-width:1.5"/>
-<text class="m s mu mid" x="551" y="40">750</text>
-<line x1="664" y1="48" x2="664" y2="56" style="stroke:var(--ink);stroke-width:1.5"/>
-<text class="m s mu mid" x="664" y="40">1000</text>
-<text class="s b mu end" x="664" y="112">画像の物差し 0 … 640 画素</text>
+<text class="s b mu end" x="664" y="24">VLM の物差し 0 … 1000</text>
+<line x1="212" y1="62" x2="664" y2="62" style="stroke:var(--ink);stroke-width:2"/>
+<line x1="212" y1="54" x2="212" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="212" y="46">0</text>
+<line x1="325" y1="54" x2="325" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="325" y="46">250</text>
+<line x1="438" y1="54" x2="438" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="438" y="46">500</text>
+<line x1="494.5" y1="52" x2="494.5" y2="62" style="stroke:var(--hl);stroke-width:3"/>
+<text class="m s hl b mid" x="494.5" y="46">625</text>
+<line x1="551" y1="54" x2="551" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="551" y="46">750</text>
+<line x1="664" y1="54" x2="664" y2="62" style="stroke:var(--ink);stroke-width:1.5"/>
+<text class="m s mu mid" x="664" y="46">1000</text>
+<text class="s b mu" x="212" y="118">画像の物差し 0 … 640 画素</text>
 <line x1="212" y1="128" x2="664" y2="128" style="stroke:var(--ink);stroke-width:2"/>
 <line x1="212" y1="128" x2="212" y2="136" style="stroke:var(--ink);stroke-width:1.5"/>
 <text class="m s mu mid" x="212" y="156">0</text>
@@ -105,8 +105,8 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 <text class="m s mu mid" x="551" y="156">480</text>
 <line x1="664" y1="128" x2="664" y2="136" style="stroke:var(--ink);stroke-width:1.5"/>
 <text class="m s mu mid" x="664" y="156">640</text>
-<line x1="494.5" y1="58" x2="494.5" y2="126" style="stroke:var(--hl);stroke-width:2.5;stroke-dasharray:6 4"/>
-<text class="m s b hl" x="504.5" y="96">625 ÷ 1000 = 0.625 → × 640 = 400</text>
+<line x1="494.5" y1="64" x2="494.5" y2="126" style="stroke:var(--hl);stroke-width:2.5;stroke-dasharray:6 4"/>
+<text class="m s b hl end" x="484.5" y="96">625 ÷ 1000 = 0.625 → × 640 = 400</text>
 <line x1="212" y1="188" x2="666" y2="188" style="stroke:var(--ray);stroke-width:2.5" marker-end="url(#a1ray)"/>
 <text class="s b ray end" x="664" y="182">u：左から何画素目 →</text>
 <rect x="212" y="200" width="452" height="339" style="fill:var(--paper);stroke:var(--ink);stroke-width:2"/>
@@ -126,9 +126,10 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 </g>
 <circle cx="212" cy="200" r="3.5" style="fill:var(--ink)"/><circle cx="664" cy="539" r="3.5" style="fill:var(--ink)"/>
 <text class="m s b" x="220" y="220" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">(0, 0)</text>
-<text class="m s b end" x="656" y="529" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">(639, 479)</text>
+<text class="m s b end" x="656" y="533" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">(639, 479)</text>
 <line x1="190" y1="200" x2="190" y2="541" style="stroke:var(--ray);stroke-width:2.5" marker-end="url(#a1ray)"/>
-<text class="s b ray" transform="translate(182 369.5) rotate(90)" style="text-anchor:middle">v：上から何画素目 ↓（下ほど大きい）</text>
+<text class="s b ray" transform="translate(234 234) rotate(90)" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">v：上から何画素目 ↓</text>
+<text class="s ray" transform="translate(258 234) rotate(90)" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">下へ行くほど v は大きい</text>
 <text class="s b mu mid" x="64" y="190">VLM</text><text class="s b mu mid" x="138" y="190">画像</text>
 <line x1="64" y1="200" x2="64" y2="539" style="stroke:var(--ink);stroke-width:2"/>
 <line x1="136" y1="200" x2="136" y2="539" style="stroke:var(--ink);stroke-width:2"/>
@@ -159,8 +160,9 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 <text class="s b cam end" x="424" y="365.5" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">中心 (cx, cy)</text>
 <text class="m s b cam end" x="424" y="385.5" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">= (320, 240)</text>
 <path d="M545 405.875l12 12M557 405.875l-12 12" style="stroke:var(--err);stroke-width:2.5;opacity:.5"/>
-<text class="s er end" x="664" y="439.875" style="opacity:.8;paint-order:stroke;stroke:var(--card);stroke-width:4px">[y, x] を [x, y] と読み違えると (480, 300)</text>
-<text class="s er end" x="664" y="459.875" style="opacity:.8;paint-order:stroke;stroke:var(--card);stroke-width:4px">（エラーは出ず、別の画素を指す）</text>
+<line x1="551" y1="421.875" x2="551" y2="455" style="stroke:var(--err);stroke-width:1.5;opacity:.5;stroke-dasharray:3 3"/>
+<text class="s er end" x="664" y="473" style="opacity:.85;paint-order:stroke;stroke:var(--card);stroke-width:4px">[y, x] を [x, y] と読み違えると (480, 300)</text>
+<text class="s er end" x="664" y="491" style="opacity:.85;paint-order:stroke;stroke:var(--card);stroke-width:4px">エラーは出ず、別の画素を指す</text>
 <circle cx="494.5" cy="454.25" r="9" style="fill:var(--hl);stroke:var(--card);stroke-width:2.5"/>
 <text class="m s b hl end" x="480.5" y="448.25" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">(u, v) = (400, 360)</text>
 <text class="s b hl end" x="480.5" y="430.25" style="paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">VLM の点</text>
@@ -185,7 +187,7 @@ figure.fig{margin:0 auto 24px;padding:16px;max-width:720px;box-sizing:border-box
 <defs><marker id="a2ray" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ray)"/></marker><marker id="a2hl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--hl)"/></marker><marker id="a2cam" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--cam)"/></marker><marker id="a2amb" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--amber)"/></marker><marker id="a2base" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--base)"/></marker><marker id="a2mu" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker><marker id="a2ink" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ink)"/></marker></defs>
 <g transform="translate(0 -234)">
 <rect x="8" y="242" width="704" height="598" rx="8" style="fill:var(--card);stroke:var(--line)"/>
-<text class="b" x="22" y="270">② 横から見た図（x–z 面）: x は右、z は前方 = 下</text>
+<text class="b" x="22" y="270">横から見た図（x–z 面）: x は右、z は前方 = 下</text>
 <text class="cam b mid" x="200" y="302">カメラ中心（ピンホール）</text>
 <polygon points="200,322 200,472 220,472" style="fill:var(--ray);opacity:.16"/>
 <polygon points="200,322 200,772 260,772" style="fill:var(--ray);opacity:.16"/>
