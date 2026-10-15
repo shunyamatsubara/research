@@ -111,12 +111,14 @@
         else button.classList.add("is-dim");
       });
       const right = oi === q.answer;
-      feedback.replaceChildren(
+      // replaceChildren() would print a null as the text "null", so drop empty parts first
+      feedback.replaceChildren(...[
         h("span", { class: "quiz-verdict " + (right ? "good" : "bad"), text: right ? "Correct" : "Not quite" }),
         " ",
         right ? null : h("span", { text: "The answer is " + LETTERS[q.answer] + ": " + q.options[q.answer] + ". " }),
         h("span", { text: q.why || "" }),
-        sourceLink(q.source));
+        sourceLink(q.source),
+      ].filter((part) => part != null));
       if (picks.every((p) => p !== null)) showSummary();
     }
 
