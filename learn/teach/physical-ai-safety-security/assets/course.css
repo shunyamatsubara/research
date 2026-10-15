@@ -1,0 +1,391 @@
+/* Physical AI Safety & Security: shared course stylesheet.
+   Layout: one reading column (about 65 characters) with a right margin for notes on wide
+   screens, in the style of Tufte; on narrow screens each note drops below its paragraph.
+   Color: the ISO 7010 safety-sign colors carry meaning and are used for nothing else:
+   yellow = hazard, red = stop or wrong, green = safe state or right, blue = required action
+   and links. Everything else is neutral ink on paper. */
+
+:root {
+  --bg: #F6F7F9;
+  --surface: #FFFFFF;
+  --ink: #14171C;
+  --muted: #535C6A;
+  --rule: #D5DAE1;
+  --hazard: #F2B200;
+  --hazard-ink: #6E5000;
+  --hazard-wash: #FFF5D1;
+  --stop: #B3261E;
+  --stop-wash: #FCEBE9;
+  --safe: #1C7347;
+  --safe-wash: #E3F3EA;
+  --act: #1B5CA3;
+  --act-wash: #E5EEF8;
+  --tape-dark: #14171C;
+
+  --font-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --step--2: 0.78rem;
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.3rem;
+  --step-2: 1.7rem;
+  --step-3: 2.3rem;
+  --step-4: 3.1rem;
+
+  --measure: 40rem;
+  --page: 62rem;
+  --note-w: 15rem;
+  --note-gap: 2.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111317;
+    --surface: #191C21;
+    --ink: #E6E9EE;
+    --muted: #A2AAB6;
+    --rule: #2D323A;
+    --hazard: #F4BE1C;
+    --hazard-ink: #F4C94A;
+    --hazard-wash: #2B2410;
+    --stop: #FF7A6E;
+    --stop-wash: #33191A;
+    --safe: #4FCB8D;
+    --safe-wash: #142A20;
+    --act: #82B6F2;
+    --act-wash: #172433;
+    --tape-dark: #0B0C0F;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #111317;
+  --surface: #191C21;
+  --ink: #E6E9EE;
+  --muted: #A2AAB6;
+  --rule: #2D323A;
+  --hazard: #F4BE1C;
+  --hazard-ink: #F4C94A;
+  --hazard-wash: #2B2410;
+  --stop: #FF7A6E;
+  --stop-wash: #33191A;
+  --safe: #4FCB8D;
+  --safe-wash: #142A20;
+  --act: #82B6F2;
+  --act-wash: #172433;
+  --tape-dark: #0B0C0F;
+  color-scheme: dark;
+}
+
+/* ---------- Base ---------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+:root {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+}
+img, svg { max-width: 100%; }
+a { color: var(--act); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--act); outline-offset: 2px; }
+code, .mono { font-family: var(--font-mono); font-size: 0.88em; }
+.std { font-family: var(--font-mono); font-size: 0.86em; white-space: nowrap; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* ---------- Frame ---------- */
+
+/* Yellow-and-black tape, like the floor marking around a robot cell. */
+.tape {
+  height: 10px;
+  background: repeating-linear-gradient(-45deg,
+    var(--hazard) 0 12px, var(--tape-dark) 12px 24px);
+}
+.wrap {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: var(--page); margin-inline: auto; }
+
+.topnav {
+  display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem;
+  padding-block: 0.9rem;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-display); font-weight: 600;
+  font-size: var(--step--1); letter-spacing: 0.06em; text-transform: uppercase;
+}
+.topnav a { color: var(--muted); text-decoration: none; }
+.topnav a:hover, .topnav a:focus-visible { color: var(--act); }
+.topnav .here { color: var(--ink); }
+
+.masthead { padding-block: 2.5rem 1.75rem; }
+.eyebrow {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem;
+  margin: 0 0 0.6rem;
+  font-family: var(--font-display); font-weight: 600;
+  font-size: var(--step--1); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted);
+}
+h1 {
+  margin: 0 0 1rem; max-width: var(--measure);
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--step-4); line-height: 1.02; letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+.lede { margin: 0; max-width: var(--measure); font-size: var(--step-1); line-height: 1.45; }
+
+.goal {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem 0.9rem;
+  align-items: baseline; margin-top: 1.5rem; max-width: var(--measure);
+}
+.goal p { margin: 0; }
+
+/* ---------- Prose ---------- */
+
+.prose { padding-bottom: 2rem; }
+.prose > * { max-width: var(--measure); }
+.prose > .wide { max-width: none; }
+.prose p { margin: 0 0 1rem; }
+.prose ul, .prose ol { padding-left: 1.3rem; margin: 0 0 1rem; }
+.prose li { margin-bottom: 0.35rem; }
+.prose h2 {
+  margin: 3rem 0 0.8rem;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--step-3); line-height: 1.08; text-wrap: balance;
+}
+.prose h3 {
+  margin: 2rem 0 0.5rem;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--step-1); letter-spacing: 0.02em; text-wrap: balance;
+}
+.section-label {
+  display: block; margin-bottom: 0.2rem;
+  font-family: var(--font-mono); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: 0.04em; color: var(--muted); text-transform: uppercase;
+}
+
+/* Notes sit in the right margin on wide screens and below the line on narrow ones.
+   Write them as <span class="note"> at the end of a paragraph. */
+.note {
+  display: block; margin: 0.5rem 0 0; padding-left: 0.75rem;
+  border-left: 2px solid var(--rule);
+  font-size: var(--step--1); line-height: 1.45; color: var(--muted);
+}
+@media (min-width: 66rem) {
+  .note {
+    float: right; clear: right; width: var(--note-w);
+    margin: 0.2rem calc(-1 * (var(--note-w) + var(--note-gap))) 0.75rem 0;
+    padding-left: 0; border-left: 0;
+  }
+}
+
+/* ---------- Callouts ---------- */
+
+.tag {
+  display: inline-block; padding: 0.12rem 0.45rem; border-radius: 2px;
+  font-family: var(--font-display); font-weight: 700; font-size: var(--step--2);
+  letter-spacing: 0.08em; line-height: 1.35; text-transform: uppercase; white-space: nowrap;
+}
+.tag-hazard { background: var(--hazard); color: var(--tape-dark); }
+.tag-stop { background: var(--stop-wash); color: var(--stop); }
+.tag-safe { background: var(--safe-wash); color: var(--safe); }
+.tag-act { background: var(--act-wash); color: var(--act); }
+.tag-plain { border: 1px solid var(--rule); color: var(--muted); }
+
+.keyrule {
+  margin: 2rem 0; padding: 1rem 1.25rem 1.1rem;
+  border: 2px solid var(--ink); background: var(--surface);
+}
+.keyrule .tag { margin-bottom: 0.5rem; }
+.keyrule p { margin: 0 0 0.6rem; }
+.keyrule p:last-child { margin-bottom: 0; }
+.keyrule .big {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--step-2); line-height: 1.15; text-wrap: balance;
+}
+
+/* "You already know this": links the learner's security knowledge to the new idea. */
+.bridge { margin: 1.75rem 0; padding: 1rem 1.25rem; background: var(--act-wash); }
+.bridge .tag { margin-bottom: 0.4rem; }
+.bridge p { margin: 0 0 0.6rem; }
+.bridge p:last-child { margin-bottom: 0; }
+
+/* ---------- Figures ---------- */
+
+figure { margin: 2rem 0; }
+.figure-box {
+  padding: 1rem; overflow-x: auto;
+  border: 1px solid var(--rule); background: var(--surface);
+}
+.figure-box svg { display: block; margin-inline: auto; height: auto; }
+figcaption {
+  margin-top: 0.6rem; max-width: var(--measure);
+  font-size: var(--step--1); color: var(--muted);
+}
+
+/* ---------- Tables ---------- */
+
+.table-scroll { overflow-x: auto; max-width: 100%; margin: 1.5rem 0; }
+table { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+th, td {
+  padding: 0.55rem 0.7rem; text-align: left; vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+}
+th {
+  font-family: var(--font-display); font-weight: 700; font-size: var(--step--2);
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+}
+td { min-width: 8rem; }
+
+/* ---------- Widgets (see assets/widgets.js) ---------- */
+
+.widget {
+  margin: 1.5rem 0; padding: 1.25rem;
+  border: 1px solid var(--rule); background: var(--surface);
+}
+.widget-head {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline;
+  gap: 0.4rem 1rem; margin-bottom: 1rem;
+}
+.widget-title {
+  font-family: var(--font-display); font-weight: 700; font-size: var(--step--1);
+  letter-spacing: 0.07em; text-transform: uppercase;
+}
+.score {
+  font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.widget-error { color: var(--stop); }
+.widget-foot { margin-top: 1rem; display: flex; justify-content: flex-end; }
+
+.q { padding-block: 1.1rem; border-top: 1px solid var(--rule); }
+.q:first-of-type { padding-top: 0; border-top: 0; }
+.q-prompt { margin: 0 0 0.75rem; font-weight: 700; }
+.q-num { margin-right: 0.45rem; font-family: var(--font-mono); font-weight: 400; color: var(--muted); }
+.options { display: grid; gap: 0.5rem; }
+.opt {
+  display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: 0.5rem; align-items: start;
+  width: 100%; padding: 0.6rem 0.75rem; border: 1.5px solid var(--rule); border-radius: 3px;
+  background: var(--bg); color: var(--ink); font: inherit; text-align: left; cursor: pointer;
+}
+.opt:hover:not(:disabled) { border-color: var(--act); }
+.opt .key { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); padding-top: 0.1rem; }
+.opt:disabled { cursor: default; }
+.opt[data-state="right"] { border-color: var(--safe); background: var(--safe-wash); }
+.opt[data-state="wrong"] { border-color: var(--stop); background: var(--stop-wash); }
+.feedback { margin: 0.75rem 0 0; font-size: var(--step--1); line-height: 1.5; }
+.feedback .tag { margin-right: 0.4rem; }
+
+.legend {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.35rem 0.75rem;
+  margin: 0 0 1rem; padding: 0.8rem 0.9rem; background: var(--bg); font-size: var(--step--1);
+}
+.legend dt { font-family: var(--font-mono); font-weight: 500; }
+.legend dd { margin: 0; }
+.sort-item { padding-block: 1rem; border-top: 1px solid var(--rule); }
+.sort-text { margin: 0 0 0.6rem; }
+.sort-choices { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip-btn {
+  padding: 0.35rem 0.7rem; border: 1.5px solid var(--rule); border-radius: 3px;
+  background: var(--bg); color: var(--ink); font: inherit; font-size: var(--step--1); cursor: pointer;
+}
+.chip-btn:hover:not(:disabled) { border-color: var(--act); }
+.chip-btn:disabled { cursor: default; }
+.chip-btn[data-state="right"] { border-color: var(--safe); background: var(--safe-wash); }
+.chip-btn[data-state="wrong"] { border-color: var(--stop); background: var(--stop-wash); }
+
+.recall-prompt { margin: 0 0 0.75rem; font-weight: 700; }
+.recall textarea {
+  display: block; width: 100%; min-height: 7rem; margin-bottom: 0.75rem; padding: 0.6rem 0.7rem;
+  border: 1.5px solid var(--rule); border-radius: 3px;
+  background: var(--bg); color: var(--ink); font: inherit; line-height: 1.5;
+}
+.recall-answer { margin-top: 0.9rem; padding: 0.9rem 1rem; background: var(--safe-wash); }
+.recall-answer > :last-child { margin-bottom: 0; }
+.grade { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; margin-top: 0.9rem; }
+.grade-label { font-size: var(--step--1); color: var(--muted); }
+.grade-tip { flex-basis: 100%; margin: 0.3rem 0 0; font-size: var(--step--1); }
+
+.btn {
+  padding: 0.5rem 0.9rem; border: 1.5px solid var(--act); border-radius: 3px;
+  background: var(--act); color: var(--surface); cursor: pointer;
+  font-family: var(--font-display); font-weight: 700; font-size: var(--step--1);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.btn-quiet { background: transparent; color: var(--act); }
+
+/* ---------- Lesson endings ---------- */
+
+.source {
+  display: grid; gap: 0.35rem; margin: 1.5rem 0; padding: 1.1rem 1.25rem;
+  border: 1px solid var(--rule); background: var(--surface);
+}
+.source p { margin: 0; }
+.source .title { font-weight: 700; }
+.ask { margin: 1.5rem 0; padding: 1rem 1.25rem; background: var(--act-wash); }
+.ask p { margin: 0 0 0.5rem; }
+.ask p:last-child { margin-bottom: 0; }
+.pager {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem;
+  padding-block: 1.5rem; border-top: 1px solid var(--rule);
+  font-family: var(--font-display); font-weight: 600; letter-spacing: 0.04em;
+}
+.foot {
+  padding-block: 1.5rem 3rem; border-top: 1px solid var(--rule);
+  font-size: var(--step--1); color: var(--muted);
+}
+.foot p { margin: 0 0 0.4rem; max-width: var(--measure); }
+
+/* ---------- Reference pages ---------- */
+
+.terms { margin: 0; }
+.term {
+  display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); gap: 0.25rem 1.5rem;
+  padding-block: 0.9rem; border-top: 1px solid var(--rule);
+}
+.term dt { font-weight: 700; }
+.term dd { margin: 0; }
+.term .avoid { display: block; margin-top: 0.25rem; font-size: var(--step--1); color: var(--muted); }
+@media (max-width: 42rem) { .term { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Narrow screens ---------- */
+
+@media (max-width: 30rem) {
+  :root { --step-4: 2.4rem; --step-3: 1.9rem; }
+  .widget { padding: 1rem; }
+}
+
+/* ---------- Print ---------- */
+
+@media print {
+  :root, :root[data-theme="dark"], :root:not([data-theme="light"]) {
+    --bg: #FFFFFF; --surface: #FFFFFF; --ink: #000000; --muted: #333333; --rule: #BBBBBB;
+    --act: #000000; --act-wash: #F2F2F2; --safe-wash: #F2F2F2; --stop-wash: #F2F2F2;
+    --hazard-wash: #F2F2F2;
+    color-scheme: light;
+  }
+  body { font-size: 10.5pt; }
+  .tape, .topnav, .pager, .widget, .btn { display: none !important; }
+  .page { max-width: none; }
+  a { color: inherit; }
+  .note { float: none; width: auto; margin: 0.3rem 0 0; }
+  .keyrule, .figure-box, table, .term { break-inside: avoid; }
+}
