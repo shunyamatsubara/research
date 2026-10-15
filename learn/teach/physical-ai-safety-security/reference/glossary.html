@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Glossary · Physical AI Safety &amp; Security</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a href="../index.html">Course home</a>
+  <a href="../lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a>
+  <a href="field-guide.html">Field guide</a>
+  <a class="here" href="glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-plain">Reference</span> Updated 15 October 2026 · Terms from Lesson 1</p>
+  <h1>Glossary</h1>
+  <p class="lede">The words this course uses, with one meaning each. A term joins this list when a lesson teaches it. "Avoid" lists words that mean the same thing or that blur the meaning. Use the main term instead.</p>
+</header>
+
+<main class="prose">
+
+<h2>Core ideas</h2>
+<dl class="terms wide">
+  <div class="term"><dt>Physical AI</dt><dd>AI that senses the physical world and acts in it through a machine, such as a robot arm.<span class="avoid">Avoid: embodied AI (common in research; this course uses one name).</span></dd></div>
+  <div class="term"><dt>VLA (vision-language-action model)</dt><dd>An AI model that takes camera images and a language instruction and outputs robot actions. In the running example, the VLA performs the grasp.</dd></div>
+  <div class="term"><dt>Doer / checker</dt><dd>A design in which a complex part (the doer) does the work and a simple, independent part (the checker) watches it and can always force a safe state.<span class="avoid">Also called in research: monitor/actuator pair, Simplex architecture, runtime assurance. Avoid: "AI safety layer" (says nothing about independence).</span></dd></div>
+  <div class="term"><dt>Safety function</dt><dd>A function that protects people, whose failure would increase the risk of harm. Example: a protective stop.</dd></div>
+  <div class="term"><dt>Safety-rated</dt><dd>Designed and certified to a functional-safety standard, such as ISO 13849-1 or IEC 62061, for a stated reliability level.<span class="avoid">Avoid: "safe", "safety-grade" (marketing words with no stated level).</span></dd></div>
+  <div class="term"><dt>Performance level (PL)</dt><dd>The ISO 13849-1 grade for how reliably a safety function works, written with a letter, for example "PL d".</dd></div>
+  <div class="term"><dt>Safe state</dt><dd>A condition in which the machine cannot cause harm. It is not always "power off": a legged robot falls when its power is cut.<span class="avoid">Avoid: "off".</span></dd></div>
+  <div class="term"><dt>Semantic safety</dt><dd>Avoiding harm that comes from the meaning of a task, such as which object goes where, rather than from the motion itself.</dd></div>
+  <div class="term"><dt>Trust boundary</dt><dd>In this course: the line between L3 and L4. Below it, no safety function depends on the AI or on the computer the AI runs on.</dd></div>
+  <div class="term"><dt>Reference monitor</dt><dd>A security mechanism that is always invoked, tamperproof, and small enough to verify (NIST). In this course, the model for a good checker.</dd></div>
+</dl>
+
+<h2>The five layers (course model)</h2>
+<p>The numbers follow the path of a motion command, from the request down to the moving steel. They are not a ranking.</p>
+<dl class="terms wide">
+  <div class="term"><dt>L1 Check the task</dt><dd>Checks before the AI acts: is the request or plan safe and clear? Refuses it, or asks a person.</dd></div>
+  <div class="term"><dt>L2 The AI itself</dt><dd>The VLA and the motion planner, trained and tested to do the job well. The untrusted doer.</dd></div>
+  <div class="term"><dt>L3 Check the motion</dt><dd>Software checks between the AI and the robot (work area, speed and joint limits, collisions, stale sensor data), with a simple fallback. Not certified.</dd></div>
+  <div class="term"><dt>L4 Certified safety functions</dt><dd>Safety-rated functions that work without the AI and its computer: protective stop, speed and separation monitoring, power and force limiting, safety-rated zones, emergency stop.</dd></div>
+  <div class="term"><dt>L5 Physical design and procedures</dt><dd>Guards, a layout without pinch points, low-energy tools, training, and work rules such as stopping and locking the robot before maintenance.</dd></div>
+</dl>
+
+<h2>Safety functions (L4)</h2>
+<dl class="terms wide">
+  <div class="term"><dt>Protective stop</dt><dd>A stop that a safety function triggers to protect people, for example when a person comes too close.<span class="avoid">Avoid: calling it an emergency stop; that is the manual button.</span></dd></div>
+  <div class="term"><dt>Emergency stop (e-stop)</dt><dd>A stop that a person triggers by hand in an emergency, usually with a red button.</dd></div>
+  <div class="term"><dt>Speed and separation monitoring (SSM)</dt><dd>Safety-rated sensors measure the distance between a person and the robot; the robot slows down and stops before they can touch.</dd></div>
+  <div class="term"><dt>Power and force limiting (PFL)</dt><dd>The robot is designed so that any contact with a person stays below set force limits for each body region.</dd></div>
+</dl>
+
+<h2>Japan</h2>
+<dl class="terms wide">
+  <div class="term"><dt>Motion range (可動範囲)</dt><dd>Under the labour ministry (MHLW) notice for industrial robots: the maximum range the robot's parts, tool included, can structurally move. Only electrical or mechanical stoppers make it smaller.</dd></div>
+</dl>
+
+</main>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security · Glossary. Sources for each term are in <a href="../lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a> and the <a href="field-guide.html">field guide</a>.</p>
+</footer>
+
+</div></div>
+</body>
+</html>

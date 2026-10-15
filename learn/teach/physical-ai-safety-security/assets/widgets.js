@@ -207,7 +207,45 @@
     root.appendChild(grade);
   }
 
+  // The course's five-layer model of an AI robot cell. Defined once here so every lesson
+  // and reference page shows the same layers with the same words (see reference/glossary.html).
+  var LAYERS = [
+    { id: "L1", kind: "soft", name: "Check the task", tag: ["tag-plain", "Software"],
+      desc: "Before the AI acts: is the request safe and clear? Refuse it, or ask a person." },
+    { id: "L2", kind: "ai", name: "The AI itself", tag: ["tag-hazard", "Untrusted doer"],
+      desc: "The VLA grasp policy and the motion planner, trained and tested to do the job well. Fewer failures, but no guarantee." },
+    { id: "L3", kind: "soft", name: "Check the motion", tag: ["tag-plain", "Software"],
+      desc: "Software checks between the AI and the robot: work area, speed and joint limits, collisions, stale sensor data. On a problem, switch to a simple fallback." },
+    { boundary: "Trust boundary: below this line, nothing depends on the AI or its computer" },
+    { id: "L4", kind: "cert", name: "Certified safety functions", tag: ["tag-safe", "Safety-rated"],
+      desc: "Safety-rated hardware and software, independent of the AI: protective stop, speed and separation monitoring, power and force limiting, safety-rated zones, emergency stop." },
+    { id: "L5", kind: "phys", name: "Physical design and procedures", tag: ["tag-plain", "Physical"],
+      desc: "Guards where needed, no pinch points, low-energy tools, training, and stopping and locking the robot before maintenance." }
+  ];
+
+  function initLayers(root) {
+    root.innerHTML = "";
+    root.appendChild(h("p", { class: "stack-end", text: "A request enters here" }));
+    root.appendChild(h("ol", { class: "layers" }, LAYERS.map(function (layer) {
+      if (layer.boundary) return h("li", { class: "boundary", text: layer.boundary });
+      return h("li", { class: "layer", "data-id": layer.id, "data-kind": layer.kind }, [
+        h("span", { class: "layer-id", text: layer.id }),
+        h("span", {}, [
+          h("span", { class: "layer-name", text: layer.name }),
+          h("span", { class: "layer-desc", text: layer.desc })
+        ]),
+        h("span", { class: "tag " + layer.tag[0], text: layer.tag[1] })
+      ]);
+    })));
+    root.appendChild(h("p", { class: "stack-end", text: "The arm moves here" }));
+    root.appendChild(h("div", { class: "crosscut" }, [
+      h("p", { html: "<strong>Security</strong> protects every layer and every link between them." }),
+      h("p", { html: "<strong>Assurance</strong> shows that the layers work: risk assessment, tests, safety case." })
+    ]));
+  }
+
   function boot() {
+    document.querySelectorAll('[data-widget="layers"]').forEach(initLayers);
     document.querySelectorAll('[data-widget="quiz"]').forEach(initQuiz);
     document.querySelectorAll('[data-widget="sorter"]').forEach(initSorter);
     document.querySelectorAll('[data-widget="recall"]').forEach(initRecall);

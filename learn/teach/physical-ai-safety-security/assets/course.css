@@ -197,6 +197,9 @@ h1 {
   }
 }
 
+/* A paragraph that lists sources for the block above it. */
+.prose .sources { font-size: var(--step--1); line-height: 1.45; color: var(--muted); }
+
 /* ---------- Callouts ---------- */
 
 .tag {
@@ -365,6 +368,63 @@ td { min-width: 8rem; }
 .term dd { margin: 0; }
 .term .avoid { display: block; margin-top: 0.25rem; font-size: var(--step--1); color: var(--muted); }
 @media (max-width: 42rem) { .term { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Layer stack: the course's five-layer model ----------
+   Built in HTML so it stays readable on phones. A lesson can set data-focus="L3" (etc.)
+   on .stack to dim every layer except the one it is about. Markup: assets/README.md. */
+
+.stack { display: grid; gap: 0.5rem; }
+.stack-end {
+  font-family: var(--font-mono); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted);
+}
+.stack .layers { display: grid; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+.stack .layers > li { margin: 0; }
+.stack > p { margin: 0; }
+.layer {
+  display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; gap: 0.35rem 1rem;
+  align-items: center; padding: 0.75rem 1rem;
+  border: 1px solid var(--rule); background: var(--surface);
+}
+.layer-id {
+  font-family: var(--font-display); font-weight: 700; font-size: var(--step-2);
+  line-height: 1; color: var(--muted);
+}
+.layer-name { display: block; font-weight: 700; }
+.layer-desc { display: block; font-size: var(--step--1); line-height: 1.45; color: var(--muted); }
+.layer[data-kind="ai"] { border-color: var(--hazard); background: var(--hazard-wash); }
+.layer[data-kind="ai"] .layer-id { color: var(--hazard-ink); }
+.layer[data-kind="cert"] { border-color: var(--safe); background: var(--safe-wash); }
+.layer[data-kind="cert"] .layer-id { color: var(--safe); }
+.layer[data-kind="cert"] .tag-safe { border: 1px solid var(--safe); }
+.boundary {
+  display: flex; align-items: center; gap: 0.75rem; padding-block: 0.25rem;
+  font-family: var(--font-mono); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: 0.03em; text-transform: uppercase; color: var(--stop); text-align: center;
+}
+.boundary::before, .boundary::after { content: ""; flex: 1; border-top: 2px dashed var(--stop); }
+.crosscut { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem; }
+.crosscut p {
+  margin: 0; padding: 0.6rem 0.9rem; border: 1px dashed var(--act);
+  background: var(--act-wash); font-size: var(--step--1);
+}
+.stack[data-focus] .layer { opacity: 0.45; }
+.stack[data-focus="L1"] .layer[data-id="L1"],
+.stack[data-focus="L2"] .layer[data-id="L2"],
+.stack[data-focus="L3"] .layer[data-id="L3"],
+.stack[data-focus="L4"] .layer[data-id="L4"],
+.stack[data-focus="L5"] .layer[data-id="L5"] { opacity: 1; }
+
+@media (max-width: 36rem) {
+  .boundary {
+    display: block; padding-block: 0.45rem;
+    border-top: 2px dashed var(--stop); border-bottom: 2px dashed var(--stop);
+  }
+  .boundary::before, .boundary::after { display: none; }
+  .layer { grid-template-columns: 2.4rem minmax(0, 1fr); }
+  .layer > .tag { grid-column: 2; justify-self: start; }
+  .crosscut { grid-template-columns: minmax(0, 1fr); }
+}
 
 /* ---------- Narrow screens ---------- */
 

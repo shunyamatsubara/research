@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lesson 1 · The AI Is Not the Safety System</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/widgets.js" defer></script>
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a href="../index.html">Course home</a>
+  <a class="here" href="0001-the-ai-is-not-the-safety-system.html">Lesson 1</a>
+  <a href="../reference/field-guide.html">Field guide</a>
+  <a href="../reference/glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-hazard">Lesson 1</span> About 15 minutes · Running example: an AI pick-and-place cell</p>
+  <h1>The AI Is Not the Safety System</h1>
+  <p class="lede">In an AI robot cell, the AI model makes the robot useful. A separate, simpler layer keeps people safe. Experts from AI labs, chip makers, regulators and safety research all agree on this. This lesson shows why, and how to tell which layer should stop which failure.</p>
+  <div class="goal">
+    <span class="tag tag-act">Your goal</span>
+    <p>Look at a failure in an AI pick-and-place cell, name the layer you should rely on to stop it, and explain to a client why the AI model cannot be that layer.</p>
+  </div>
+</header>
+
+<main class="prose">
+
+<h2>A wrong answer that moves</h2>
+
+<p>In the software you secure today, a model's wrong answer is text on a screen. A person can read it, ignore it, or roll it back. In a pick-and-place cell, the model's answer is a motion command. It moves a steel arm with real speed and force, close to real people. There is no undo.</p>
+
+<p>So the main question changes. In software you ask, "How do we make the model's answer right?" In a robot cell you must also ask, "What stops the arm when the answer is wrong?"</p>
+
+<h2>Even good AI cannot be the safety function</h2>
+
+<p>Google DeepMind tested leading AI models as a human-safety monitor. Each model looked at a camera image and decided whether a person was too close to a robot. When a model was tuned to rarely stop the robot by mistake (fewer than 5% false alarms), it missed more than 40% of real hazards. Models tuned to miss fewer hazards (10–15%) stopped the robot for no reason 15–25% of the time. No model was good at both. DeepMind's conclusion: use these models "alongside deterministic, low-level safety guardrails".<span class="note">Source: <a href="https://storage.googleapis.com/deepmind-media/gemini-robotics/Gemini-Robotics-2-Safety.pdf">Google DeepMind, <em>Gemini Robotics 2: Safety Evaluations</em></a> (29 July 2026), p. 5.</span></p>
+
+<div class="bridge">
+  <span class="tag tag-act">You already know this</span>
+  <p>This is the intrusion-detection trade-off. A detector tuned for few false alarms misses attacks. A detector tuned to catch everything floods you with alerts. In security, you never let one detector be your only control. In a robot cell, you never let an AI model be the only thing that keeps people safe.</p>
+</div>
+
+<p>The people who build these models say the same thing about their own products:</p>
+
+<div class="table-scroll">
+<table>
+  <thead><tr><th scope="col">Who</th><th scope="col">What they say</th></tr></thead>
+  <tbody>
+    <tr><td>Google DeepMind, safety report for its newest robot models (July 2026)</td><td>Traditional protections such as "e-stops, barriers, and speed/force limits" "remain essential". The report also says it "does not evaluate the underlying functional safety architecture". <a href="https://storage.googleapis.com/deepmind-media/gemini-robotics/Gemini-Robotics-2-Safety.pdf">pp. 1–2</a></td></tr>
+    <tr><td>NVIDIA, model card of its GR00T N1.6 robot model</td><td>"This model is not tested or intended for use in mission critical applications that require functional safety." <a href="https://huggingface.co/nvidia/GR00T-N1.6-3B/blob/main/SAFETY_and_SECURITY.md">Model card</a></td></tr>
+    <tr><td>Google, usage rules for Gemini Robotics-ER 2 (July 2026)</td><td>Users must "not use the Robotics Models for safety-critical applications". <a href="https://deepmind.google/models/model-cards/gemini-robotics-er-2/">Model card</a></td></tr>
+    <tr><td>Nine government security agencies from seven countries, led by the US agency CISA (December 2025)</td><td>"AI such as LLMs almost certainly should not be used to make safety decisions for OT environments." (OT, operational technology, means the computers that control physical machines.) <a href="https://www.cisa.gov/resources-tools/resources/principles-secure-integration-artificial-intelligence-operational-technology">Joint guidance</a>, p. 9</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The reason is simple. A learned model's failures cannot be listed or bounded in advance, so nobody can prove how it behaves in the next new situation. A safety function needs exactly that kind of proof.</p>
+
+<h2>The pattern: the AI proposes, a checker decides</h2>
+
+<p>Safety engineers handle this with one pattern. A complex part does the work. A simple, independent part watches it and can always force the machine into a safe state. The safety researcher Philip Koopman calls these the <strong>doer</strong> and the <strong>checker</strong>.<span class="note">Koopman, Kane &amp; Black, <a href="https://users.ece.cmu.edu/~koopman/pubs/Koopman19_SSS_CredibleSafetyArgumentation.pdf">"Credible Autonomy Safety Argumentation"</a> (2019), pp. 6–7. Related designs are also called a monitor/actuator pair, the Simplex architecture, or runtime assurance.</span></p>
+
+<p>You can find this pattern everywhere in the field:</p>
+<ul>
+  <li><strong>NVIDIA Halos for Robotics:</strong> a monitor flags camera input that looks unlike the AI's training data, because then "the accuracy and reliability of the AI model can no longer be assured". A separate Safety Decision Maker then makes the robot "fall back to a safe operating state". It runs on a safety processor "isolated from the main AI compute domain".<span class="note"><a href="https://developer.nvidia.com/blog/inside-nvidia-halos-for-robotics-a-full-stack-functional-safety-system-for-physical-ai/">NVIDIA Technical Blog, "Inside NVIDIA Halos for Robotics"</a> (22 June 2026).</span></li>
+  <li><strong>Agility Robotics</strong>, a humanoid startup, added a safety PLC (a certified safety computer) inside its robot, because "if the humanoid's main control system had a software bug or made a bad decision, the safety PLC was there to step in".<span class="note"><a href="https://www.agilityrobotics.com/content/built-for-the-real-world">Agility Robotics, "Built for the Real World"</a> (22 June 2026).</span></li>
+  <li><strong>The international technical report on AI and functional safety</strong> lists, as one of its main topics, the "use of non-AI safety related functions to ensure safety for an AI controlled equipment".<span class="note">ISO/IEC TR 5469:2024, scope (<a href="https://www.vde-verlag.de/iec-normen/preview-pdf/info_isoiectr5469%7Bed1.0%7Den.pdf">official preview</a>).</span></li>
+</ul>
+
+<div class="keyrule">
+  <span class="tag tag-hazard">Key rule</span>
+  <p class="big">The AI may propose any motion. An independent checker decides what the arm is allowed to do.</p>
+  <p>In the EU this becomes law on 20 January 2027. For a machine whose behavior changes through learning, the control system "shall not cause the machinery or related product to perform actions beyond its defined task and movement space".<span class="note"><a href="https://eur-lex.europa.eu/eli/reg/2023/1230/oj/eng">EU Machinery Regulation 2023/1230</a>, Annex III, section 1.2.1. Application date: <a href="https://single-market-economy.ec.europa.eu/sectors/mechanical-engineering/machinery_en">European Commission</a>.</span></p>
+</div>
+
+<div class="bridge">
+  <span class="tag tag-act">You already know this</span>
+  <p>A <strong>reference monitor</strong> must be always invoked, tamperproof, and small enough to verify.<span class="note"><a href="https://csrc.nist.gov/glossary/term/reference_monitor">NIST glossary, "reference monitor"</a> (from NIST SP 800-53 Rev. 5). The comparison is a teaching analogy, not wording from a safety standard.</span> A good safety checker needs the same three properties:</p>
+  <ul>
+    <li><strong>Always invoked:</strong> it watches every motion, not only the motions the AI thinks are risky.</li>
+    <li><strong>Tamperproof:</strong> it runs on separate, safety-rated hardware. Neither the AI nor an attacker who controls the AI computer can change it.</li>
+    <li><strong>Verifiable:</strong> it is simple enough to certify to a reliability level, such as a performance level (PL) under ISO 13849-1.</li>
+  </ul>
+</div>
+
+<p>Koopman gives a test that will feel familiar to you. Imagine that the doer "maliciously attempts to compromise safety in the worst way possible, with full and complete knowledge of every aspect of the design. Could it compromise safety?" If the answer is yes, your checker is not independent enough.<span class="note">Koopman, Kane &amp; Black, <a href="https://users.ece.cmu.edu/~koopman/pubs/Koopman19_SSS_CredibleSafetyArgumentation.pdf">"Credible Autonomy Safety Argumentation"</a> (Safety-Critical Systems Symposium 2019), p. 8.</span> The security company Exein says the same thing from the security side: "Any mitigation that depends on the model behaving is not a mitigation."<span class="note"><a href="https://www.exein.io/blog/threat-modeling-physical-ai">Exein, "Threat modeling physical AI"</a> (10 July 2026).</span></p>
+
+<h2>Five layers in a pick-and-place cell</h2>
+
+<p>A real cell has more than one check. This course uses five layers that a motion command passes through, from the request down to the moving steel. The numbers follow the path of a command; they are not a ranking. DeepMind describes its safety approach as "a stack of Swiss cheese slices. No single slice is a perfect barrier."<span class="note"><a href="https://deepmind.google/models/gemini-robotics/responsibly-advancing-ai-and-robotics/">Google DeepMind, "Responsibly advancing AI and robotics"</a>.</span></p>
+
+<figure class="wide">
+  <div class="stack" data-widget="layers">
+    <p>L1 Check the task · L2 The AI itself · L3 Check the motion · trust boundary · L4 Certified safety functions · L5 Physical design and procedures</p>
+  </div>
+  <figcaption>The five layers of this course. Yellow marks the untrusted doer. Green marks the certified checker. Everything above the dashed line runs on, or depends on, the AI's computer.</figcaption>
+</figure>
+
+<p>The most important line is the dashed one between L3 and L4. L3 runs in your normal software stack. It is smart and catches most problems early, so the robot can recover smoothly. But it is not certified, and it runs on computers that a bug or an attacker can take over. L4 is certified and independent. <strong>When a person can get hurt, you rely on L4.</strong> A useful question for any client is: "Is this limit enforced by a safety-rated function, or only by our own code?"</p>
+
+<h3>What L4 does</h3>
+<ul>
+  <li><strong>Protective stop:</strong> a safety function stops the robot in a controlled way, for example when a person comes too close.</li>
+  <li><strong>Speed and separation monitoring:</strong> safety-rated sensors, such as laser scanners, measure how close a person is. The robot slows down and stops before contact. The required distance comes from how fast a person can approach, the robot's reaction time, and its stopping distance.<span class="note">ISO 10218-1/-2:2025 include these collaborative modes, which came from ISO/TS 15066. Summary in the <a href="https://storage.googleapis.com/deepmind-media/gemini-robotics/Gemini-Robotics-2-Safety.pdf">DeepMind safety report</a>, p. 12.</span></li>
+  <li><strong>Power and force limiting:</strong> the robot is built so that if it touches a person, the force stays below set limits for each body region.</li>
+</ul>
+<p>A safe state is not always "power off". A legged robot falls when its motor power is cut. That is why Boston Dynamics' Spot first sits down and only then cuts power, and why humanoid makers design stops that keep power long enough to stay balanced. Choosing the right kind of stop is part of the design.<span class="note"><a href="https://dev.bostondynamics.com/docs/concepts/estop_service">Boston Dynamics Spot SDK, E-Stop service</a>; <a href="https://www.therobotreport.com/wp-content/uploads/2025/09/IEEE-Humanoid-Report-of-Future-Standards-Development.pdf">IEEE Humanoid Study Group report</a> (September 2025).</span></p>
+
+<p><strong>In Japan</strong>, the law measures the hazard by where the arm can physically reach. It does not use the path the program plans. An official notice from the labour ministry (MHLW) defines the robot's motion range (可動範囲) as the maximum range its parts can structurally move, tool included. Only electrical or mechanical stoppers make it smaller.<span class="note"><a href="https://www.mhlw.go.jp/web/t_doc?dataId=00tb9779&amp;dataType=1&amp;pageNo=1">MHLW notice 基発第339号</a> (1983, as amended in 2013), section 3 I 1(7).</span> So a VLA that "intends" to stay in a small area does not make the hazard smaller. A safety-rated limit does.</p>
+
+<h2>Practice: which layer stops it?</h2>
+
+<p>For each failure, choose the layer you should <em>rely on</em> to stop it. That means the layer whose job this is, and which still works when the layers above it are wrong.</p>
+
+<div class="widget" data-widget="sorter" data-title="Which layer do you rely on?">
+<script type="application/json">
+{"buckets": [
+  {"id": "L1", "short": "L1", "label": "Check the task"},
+  {"id": "L2", "short": "L2", "label": "The AI itself"},
+  {"id": "L3", "short": "L3", "label": "Check the motion"},
+  {"id": "L4", "short": "L4", "label": "Certified safety functions"},
+  {"id": "L5", "short": "L5", "label": "Physical design and procedures"}
+ ],
+ "items": [
+  {"text": "A user asks the robot to throw a lithium battery into the metal-scrap bin. Every motion would be slow and inside the work area.",
+   "answer": "L1",
+   "why": "The motions are fine, but the meaning of the task is dangerous (batteries in scrap can start fires). Only a check of the task itself can catch this. Researchers call this <em>semantic safety</em>.",
+   "miss": {"L2": "The AI is the part that would do this. You cannot rely on it to refuse.",
+            "L3": "Every motion is inside the limits, so a motion check sees nothing wrong.",
+            "L4": "The certified layer checks speed, distance, force and zones. It knows nothing about batteries.",
+            "L5": "The bin is part of the normal work area, so physical design does not prevent this."}},
+  {"text": "A worker walks into the cell while the arm is moving fast. The VLA has not noticed the worker.",
+   "answer": "L4",
+   "why": "Protecting a person is the certified layer's job. Safety-rated sensors measure the distance and trigger a protective stop, whatever the AI noticed.",
+   "miss": {"L1": "The task was fine when it started. The danger appeared during the motion.",
+            "L2": "The AI did not notice. Even when it does, tests show that AI person-detection misses many hazards.",
+            "L3": "L3 may react too, but it is ordinary software and is not certified. For a person, rely on L4.",
+            "L5": "A fence would keep the person out, but this cell lets people in. Inside the cell, L4 must act."}},
+  {"text": "The VLA sends a command that would move the gripper 40 cm outside the grasp area, toward the conveyor frame. Nobody is near.",
+   "answer": "L3",
+   "why": "A software work-area check rejects the command and switches to a simple fallback, so the robot can recover. L4 stays as the backstop if L3 fails.",
+   "miss": {"L1": "The task was fine. One motion command is wrong.",
+            "L2": "The AI produced the bad command. You need a check outside it.",
+            "L4": "L4 would stop the arm at a safety-rated limit, but you want a smarter check to catch it earlier and recover without a hard stop.",
+            "L5": "Physical design is the last resort here, not the planned catch."}},
+  {"text": "An attacker gets root access on the computer that runs the VLA, the planner and the motion checks. They send full-speed commands while a person is in the cell.",
+   "answer": "L4",
+   "why": "L1, L2 and L3 all run on the computer the attacker controls. Only a checker on separate, safety-rated hardware still works. This is Koopman's malicious-doer test.",
+   "miss": {"L1": "The attacker controls the computer that runs this check.",
+            "L2": "The attacker controls the AI's computer.",
+            "L3": "The motion checks run on the same compromised computer, so the attacker can turn them off.",
+            "L5": "Procedures cannot stop an attack that is already running. L4 can."}},
+  {"text": "The VLA tears soft bags about once in twenty grasps. Nobody is at risk; only parts are damaged.",
+   "answer": "L2",
+   "why": "This is a quality problem inside the AI's own job. Fix it with better data, more training, and evaluation with enough trials. Safety layers protect people; they do not fix grasp quality.",
+   "miss": {"L1": "The task (pick up the bag) is fine.",
+            "L3": "A grip-force limit might help a little, but the root cause is how the AI chooses its grasp. Improve the AI.",
+            "L4": "The certified layer protects people. It does not judge grasp quality.",
+            "L5": "Physical design will not change how the AI grasps."}},
+  {"text": "The camera stops sending new images, but the VLA keeps sending motion commands based on the last image.",
+   "answer": "L3",
+   "why": "A watchdog in the motion checks sees that the input is old and switches to a safe stop. NVIDIA Halos uses the same idea: watch the AI's inputs and fall back when they look wrong.",
+   "miss": {"L1": "The task is fine. The input froze during the motion.",
+            "L2": "The AI cannot tell that its own input is old.",
+            "L4": "If a person comes near, L4 still protects them. But the frozen input itself is caught earlier, by a software watchdog.",
+            "L5": "This needs a live check, not a change to the physical design."}},
+  {"text": "A worker needs to reach inside the arm's motion range to clear a jammed part.",
+   "answer": "L5",
+   "why": "This is a procedure. In Japan, Article 150-5 of the Ordinance on Industrial Safety and Health says that before inspection, repair, adjustment or cleaning inside the motion range, you stop the robot, lock its start switch and show a sign that work is in progress. Strict written rules are required if the work must be done while it runs.",
+   "miss": {"L1": "This is human work inside the cell, not a task for the AI.",
+            "L2": "The AI should not be running at all during this work.",
+            "L3": "Software checks are not enough when a person puts a hand inside the motion range.",
+            "L4": "L4 helps, for example by monitoring that the robot stands still. But the basic rule is a procedure: stop, lock, and show a sign."}}
+ ]}
+</script>
+</div>
+
+<h2>Check yourself</h2>
+
+<div class="widget" data-widget="quiz" data-title="Four questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "A client says: \"Our VLA picks correctly 99% of the time, so it can also keep people safe.\" What is the main problem with this idea?",
+   "options": ["It runs too slowly for the robot's safety controller.",
+               "Nobody can bound or certify its errors in advance.",
+               "Its accuracy falls when the cell lights are dimmed.",
+               "It needs a network link that might fail sometimes."],
+   "answer": 1,
+   "why": ["Speed can matter, but a fast AI has the same problem: you cannot prove in advance how it fails.",
+           "A learned model's failures cannot be listed or bounded ahead of time, so it cannot be certified as a safety function. The model makers themselves say not to use their models for safety-critical work.",
+           "This can happen (the input is unlike the training data). But even in perfect light, the remaining 1% of errors has no bound.",
+           "A network problem can be designed away. The deeper problem stays: the model's errors have no bound."]},
+  {"prompt": "A vendor says: \"Our camera AI detects people with 98% accuracy, so you can remove the safety laser scanner.\" What do you advise?",
+   "options": ["Accept it, but only if they measured it inside your cell.",
+               "Accept it, but only if the AI runs on certified hardware.",
+               "Keep the scanner, and treat the AI as an additional layer.",
+               "Remove the scanner, but cut the robot's top speed by half."],
+   "answer": 2,
+   "why": ["Measuring on site is good practice, but 98% still means misses. In DeepMind's tests, AI person-detection tuned for few false alarms missed more than 40% of hazards.",
+           "Certified hardware does not make the AI's answers certified. The detection itself is still not a safety function.",
+           "The scanner is safety-rated; the AI is not. The AI can still help, for example by slowing the robot early, as an extra layer above the certified one.",
+           "Slower is better, but then nothing detects a person reliably. A speed limit alone does not replace separation monitoring."]},
+  {"prompt": "In the reference-monitor comparison, which property means \"the AI computer cannot change the safety limits\"?",
+   "options": ["Always invoked", "Verifiable size", "Least privilege", "Tamper proofing"],
+   "answer": 3,
+   "why": ["Always invoked means every motion passes the checker. That is about coverage, not about who can change the checker.",
+           "Verifiable means small and simple enough to certify. It does not stop anyone from changing it.",
+           "Least privilege helps (the AI should have no write access to the limits), but it is not one of the three reference-monitor properties.",
+           "Tamperproof means neither the AI nor an attacker who controls the AI computer can change the checker or its limits."]},
+  {"prompt": "Under Japan's MHLW notice for industrial robots, what sets the motion range (可動範囲) that you must assess?",
+   "options": ["How far the arm can physically reach",
+               "Where the robot program plans to move",
+               "Where the AI was trained to grasp",
+               "The area marked with yellow floor tape"],
+   "answer": 0,
+   "why": ["The notice defines the motion range as the maximum range the robot's parts can structurally move, tool included. Only electrical or mechanical stoppers make it smaller.",
+           "The notice says the range is not limited to what one program does. A program can change, or be wrong.",
+           "The AI's training says nothing about where the arm can go when the AI is wrong.",
+           "Floor tape marks an area for people. It does not limit where the arm can reach."]}
+ ]}
+</script>
+</div>
+
+<div class="widget recall" id="recall-l1" data-widget="recall" data-title="From memory">
+  <p class="recall-prompt">A client asks: "Our VLA is 99% accurate. Why do we still need a separate safety controller?" Answer in three sentences, without looking back.</p>
+  <div class="recall-answer">
+    <p>1. Accuracy describes average behavior in tested conditions. The remaining errors, new situations and attacks cannot be bounded in advance, so the model cannot be certified as a safety function, and its makers say so too.</p>
+    <p>2. Safety needs a checker that still works when the AI is wrong or compromised: a small, independent, safety-rated layer (protective stop, speed and separation monitoring, force and zone limits) that the AI computer cannot change.</p>
+    <p>3. The AI makes the cell productive and the checker keeps people safe. In the EU, from January 2027, a learning machine must not act beyond its defined task and movement space.</p>
+  </div>
+</div>
+
+<h2>Read the primary source</h2>
+
+<div class="source">
+  <p class="title"><a href="https://storage.googleapis.com/deepmind-media/gemini-robotics/Gemini-Robotics-2-Safety.pdf">Google DeepMind, <em>Gemini Robotics 2: Safety Evaluations</em> (29 July 2026)</a></p>
+  <p>Read the abstract and introduction (pages 1–2), then the human safety monitoring result (pages 4–5). About 20 minutes.</p>
+  <p>Why this one: a leading AI lab explains which safety work its models can do and which work must stay with certified functions. It includes numbers and states the limits of its own study.</p>
+</div>
+
+<div class="ask">
+  <p><strong>Ask your teacher.</strong> Questions are part of the lesson. Ask Claude anything that is unclear. For example:</p>
+  <p>"How does a safety laser scanner measure distance?" · "What is the difference between PL d and SIL 2?" · "How would these layers look for a mobile robot?"</p>
+</div>
+
+<h2>Next</h2>
+<p><strong>Lesson 2: Threat-model the cell.</strong> You will use these five layers to find where an attacker can turn a software flaw into a physical hazard, with real cases from 2025 and 2026. Before you start it, try the "From memory" question above once more.</p>
+
+</main>
+
+<nav class="pager" aria-label="Lesson navigation">
+  <a href="../index.html">← Course home</a>
+  <a href="../reference/field-guide.html">Field guide →</a>
+</nav>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security · Lesson 1 · Written 15 October 2026. Sources were checked on that date; standards and rules change, so check dates before you rely on them with a client.</p>
+</footer>
+
+</div></div>
+</body>
+</html>

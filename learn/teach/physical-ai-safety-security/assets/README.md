@@ -30,6 +30,7 @@ Useful classes inside `.prose`:
 | Class | Use |
 |---|---|
 | `span.note` | Margin note. Put it at the end of a paragraph. Sits in the right margin on wide screens. |
+| `p.sources` | A paragraph listing the sources for the block above it (for lists and tables). |
 | `.keyrule` | The one rule the lesson is about. Add `.big` to the main sentence. |
 | `.bridge` | "You already know this": connects security knowledge to the new idea. |
 | `.wide` | Lets a figure or table use the full page width. |
@@ -75,6 +76,20 @@ number of characters); move the correct answer to a different position in each q
   </script>
 </div>
 ```
+
+### Layers (the course's five-layer map)
+
+```html
+<figure class="wide">
+  <div class="stack" data-widget="layers" data-focus="L4">
+    <p>Short text fallback, replaced by the widget.</p>
+  </div>
+</figure>
+```
+
+`data-focus` is optional: it dims every layer except the one a lesson is about. The layer
+names and descriptions live once, in `LAYERS` in `widgets.js`. If you change them, change
+`reference/glossary.html` in the same edit so the course keeps one vocabulary.
 
 ### Recall
 

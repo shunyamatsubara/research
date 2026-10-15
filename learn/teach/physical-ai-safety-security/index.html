@@ -1,0 +1,87 @@
+<title>Physical AI Safety &amp; Security</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/course.css">
+<script src="assets/widgets.js" defer></script>
+
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a class="here" href="index.html">Course home</a>
+  <a href="lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a>
+  <a href="reference/field-guide.html">Field guide</a>
+  <a href="reference/glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-hazard">Course</span> Started 15 October 2026 · Plain English · About 15 minutes per lesson</p>
+  <h1>Physical AI Safety &amp; Security</h1>
+  <p class="lede">A short course for a security engineer who advises on AI-driven robots. The running example is a robot arm doing pick-and-place, with classical motion planning for the approach and a VLA policy for the grasp.</p>
+  <div class="goal">
+    <span class="tag tag-act">Mission</span>
+    <p>Propose, review and test the safety and security of clients' physical AI projects, with the same confidence you have for secure software, and talk credibly with robotics safety experts.</p>
+  </div>
+</header>
+
+<main class="prose">
+
+<h2>Start here</h2>
+<div class="source">
+  <p class="title"><a href="lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1 · The AI Is Not the Safety System</a></p>
+  <p>Why an independent, certified checker must limit what an AI-driven robot can do, and how to tell which layer should stop which failure. Includes a sorting exercise, a quiz and a recall question.</p>
+</div>
+<div class="source">
+  <p class="title"><a href="reference/field-guide.html">Field guide</a></p>
+  <p>All the research on one page: seven findings, the five layers, a threat model, a map of standards and rules (international, EU, Japan), how to prove a system is safe, how to read vendor claims, and a checklist of questions for clients.</p>
+</div>
+<div class="source">
+  <p class="title"><a href="reference/glossary.html">Glossary</a></p>
+  <p>The course's words, with one meaning each. It grows with every lesson.</p>
+</div>
+
+<h2>The map you will learn</h2>
+<p>Every lesson places itself on this map. A motion command passes through the layers from top to bottom. The dashed line is the trust boundary: below it, nothing depends on the AI or its computer.</p>
+<figure class="wide">
+  <div class="stack" data-widget="layers">
+    <p>L1 Check the task · L2 The AI itself · L3 Check the motion · trust boundary · L4 Certified safety functions · L5 Physical design and procedures</p>
+  </div>
+</figure>
+
+<h2>Course path</h2>
+<p>A plan, not a promise. It will change as you learn and as your client work needs change.</p>
+<ol>
+  <li><strong>The AI is not the safety system</strong> <span class="tag tag-safe">Ready</span></li>
+  <li><strong>Threat-model the cell:</strong> where an attacker turns a software flaw into a physical hazard, with real cases from 2025–2026. <span class="tag tag-plain">Next</span></li>
+  <li><strong>Standards and rules for an arm cell:</strong> ISO 10218:2025, ISO/TS 15066, ISO 13849-1, the EU Machinery Regulation, and Japan's rules on fence-free work.</li>
+  <li><strong>Guardrails for the AI itself:</strong> task checks, asking for help, and evaluation with enough trials.</li>
+  <li><strong>Proving it:</strong> hazard analysis, statistics, and a minimal safety case.</li>
+  <li><strong>Reading vendor claims:</strong> NVIDIA Halos as a case study.</li>
+  <li><strong>Capstone:</strong> a short assessment of a sample client cell.</li>
+</ol>
+
+<h2>How to study</h2>
+<ul>
+  <li>Answer the practice questions before you look anything up. Effortful recall is what builds memory.</li>
+  <li>After two or three days, try each lesson's "From memory" question again without looking.</li>
+  <li>Ask Claude about anything that is unclear. Questions are part of the course.</li>
+</ul>
+
+<h2>Learn with practitioners</h2>
+<p>Lessons build knowledge. Judgment comes from talking with people who do this work.</p>
+<ul>
+  <li><strong>Japan Robot Association (JARA):</strong> free online lecture "協働ロボットの利活用とフィジカルAI" (collaborative robots and physical AI), 4 November 2026, 13:15–15:00. Apply by 28 October. <a href="https://www.jara.jp/news/2026/260907/info.pdf">Flyer (PDF)</a></li>
+  <li><strong>Safety-Critical Systems Club (UK):</strong> seminars "AI in a Safety Workflow" (29 October 2026) and "Safety Assurance for AI Systems" (12 November 2026). <a href="https://scsc.uk">scsc.uk</a></li>
+  <li><strong>ROS Discourse:</strong> ask concrete safety and security questions about ROS 2 systems. <a href="https://discourse.ros.org">discourse.ros.org</a></li>
+  <li><strong>Phil Koopman's newsletter:</strong> clear expert writing on safety cases and the limits of testing. <a href="https://philkoopman.substack.com">philkoopman.substack.com</a></li>
+</ul>
+
+</main>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security. Lessons cite their sources. Standards and rules change, so check dates before you rely on them with a client. A learning aid, not legal advice.</p>
+</footer>
+
+</div></div>

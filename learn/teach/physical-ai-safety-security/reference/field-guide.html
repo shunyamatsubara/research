@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Field Guide · Physical AI Safety &amp; Security</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/widgets.js" defer></script>
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a href="../index.html">Course home</a>
+  <a href="../lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a>
+  <a class="here" href="field-guide.html">Field guide</a>
+  <a href="glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-plain">Reference</span> Research as of 15 October 2026</p>
+  <h1>Field Guide</h1>
+  <p class="lede">What the research says about making physical AI safe and secure, on one page. Read the seven findings first. Use the tables when you work on a client's system. Each lesson teaches one part in depth.</p>
+</header>
+
+<main class="prose">
+
+<p><strong>On this page:</strong> <a href="#findings">Seven findings</a> · <a href="#layers">The five layers</a> · <a href="#threats">Threat model</a> · <a href="#rules">Standards and rules</a> · <a href="#proof">Proving it is safe</a> · <a href="#vendors">Reading vendor claims</a> · <a href="#questions">Questions for clients and vendors</a></p>
+
+<p>How to read the sources: links go to the primary source. Company figures are marked "company-reported". Papers without a confirmed peer review are marked "preprint".</p>
+
+<h2 id="findings">Seven findings</h2>
+
+<h3>1. The AI cannot be the safety function</h3>
+<p>An independent, certified checker must limit what the machine can do. AI labs, chip makers, regulators, standards groups and safety researchers agree on this. DeepMind says "e-stops, barriers, and speed/force limits" "remain essential". Nine security agencies led by CISA say LLM-type AI "almost certainly should not be used to make safety decisions". The EU Machinery Regulation says a learning machine's control system "shall not cause the machinery or related product to perform actions beyond its defined task and movement space". Japan's AI Safety Institute notes that machine-safety principles require the safety-related part to be independent from everything else.<span class="note"><a href="https://storage.googleapis.com/deepmind-media/gemini-robotics/Gemini-Robotics-2-Safety.pdf">DeepMind GR2 safety report</a> p. 1; <a href="https://www.cisa.gov/resources-tools/resources/principles-secure-integration-artificial-intelligence-operational-technology">CISA et al.</a> p. 9; <a href="https://eur-lex.europa.eu/eli/reg/2023/1230/oj/eng">Reg. (EU) 2023/1230</a> Annex III 1.2.1; <a href="https://aisi.go.jp/output/output_information/260723/">J-AISI robotics guide v1.0</a> p. 28.</span> → <a href="../lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a></p>
+
+<h3>2. Build layers, and know which one must hold</h3>
+<p>Use defense in depth across the five layers below. The line that must hold, even when the AI's computer is hacked, is the trust boundary between L3 and L4. Koopman's test: imagine the doer attacks "in the worst way possible, with full and complete knowledge of every aspect of the design." If harm is still possible, the checker is not independent enough.<span class="note"><a href="https://users.ece.cmu.edu/~koopman/pubs/Koopman19_SSS_CredibleSafetyArgumentation.pdf">Koopman, Kane &amp; Black (2019)</a> p. 8.</span></p>
+
+<h3>3. AI brings new kinds of failure</h3>
+<p>Nothing needs to break for a learned policy to fail. It can choose an action whose meaning is unsafe, act on input unlike its training data, ignore its instruction, or point at objects that do not exist. In one study, VLA success fell "from 95% to below 30% under modest perturbations" such as a moved camera, and models tended "to ignore language instructions completely". DeepMind also found "a gap between semantically understanding a constraint (Text) and physically acting on it".<span class="note"><a href="https://arxiv.org/abs/2510.13626">LIBERO-Plus</a> (2025, abstract); <a href="https://storage.googleapis.com/deepmind-media/gemini-robotics/Gemini-Robotics-2-Safety.pdf">DeepMind GR2 safety report</a> p. 3 (company-reported).</span></p>
+
+<h3>4. Security failures become safety failures</h3>
+<p>The camera's view is now an input channel. Researchers have hidden commands in signs placed in a robot's view, and printed patches cut VLA task success by "up to a 100% reduction" in simulation. Jailbreak attacks moved from chat to robots: RoboPAIR often reached "100% attack success rates", including "the first successful jailbreak of a deployed commercial robotic system". Backdoors can hide inside a policy with "near-100% attack success rates". Old-fashioned bugs remain too (see the <a href="#threats">threat model</a>).<span class="note"><a href="https://arxiv.org/abs/2510.00181">CHAI</a> (2025); <a href="https://arxiv.org/abs/2411.13587">Wang et al.</a> (2024); <a href="https://arxiv.org/abs/2410.13691">RoboPAIR</a> (2024); <a href="https://arxiv.org/abs/2505.16640">BadVLA</a> (2025, preprint).</span></p>
+
+<h3>5. Testing alone cannot show safety</h3>
+<p>If a policy succeeds 50 times out of 50, you can only claim, with 95% confidence, that its failure rate is below about 6%. To claim below 1%, you need about 300 failure-free trials, run under the conditions of real use. Toyota Research Institute warns that "many robotics papers are measuring statistical noise". So combine testing with hazard analysis, fault injection, runtime monitoring and a safety case.<span class="note">Formula: n = ln(1 − C) / ln(R), used by <a href="https://www.rand.org/pubs/research_reports/RR1478.html">RAND (2016)</a>; the arithmetic is ours. <a href="https://arxiv.org/abs/2507.05331">TRI, "A Careful Examination of Large Behavior Models"</a> (2025, preprint).</span></p>
+
+<h3>6. The rules are changing, and dates matter for clients</h3>
+<ul>
+  <li><strong>EU:</strong> the Machinery Regulation applies from 20 January 2027. Under it, machine-learning safety components need third-party assessment, safety software must be protected against corruption, and safety decisions must be logged. Cyber Resilience Act reporting has applied since 11 September 2026: an early warning within 24 hours and a full notification within 72 hours. After the AI Omnibus, AI Act high-risk duties start on 2 December 2027 (Annex III systems) and 2 August 2028 (AI in regulated products).<span class="note"><a href="https://single-market-economy.ec.europa.eu/sectors/mechanical-engineering/machinery_en">Commission: machinery</a>; <a href="https://digital-strategy.ec.europa.eu/en/policies/cra-reporting">Commission: CRA reporting</a>; <a href="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai">Commission: AI Act</a>.</span></li>
+  <li><strong>Japan:</strong> machines that use physical AI are, in the labour ministry's words (our translation), "not currently subject to specific regulation" under safety law, and a review is under way. JIS still follows the 2011 edition of ISO 10218. Japan's AI Safety Institute published an AI robotics safety evaluation guide (v1.0, July 2026). It covers LLM, image and speech AI, and adds VLA models in the next edition.<span class="note"><a href="https://www.mhlw.go.jp/stf/newpage_74141.html">MHLW interim summary</a> (29 June 2026); <a href="https://www.jisc.go.jp/app/jis/general/GnrJISNumberNameSearchList?show&amp;jisStdNo=B8433">JISC: JIS B 8433</a>; <a href="https://aisi.go.jp/output/output_information/260723/">J-AISI guide</a>.</span></li>
+</ul>
+
+<h3>7. Read vendor claims with care</h3>
+<p>Model makers rule out safety-critical use of their own robot models. NVIDIA's "Halos Certified" lab is accredited as a <em>second-party</em> inspection body that reviews documentation. Third-party certification of the robotics stack is still in progress. Several physical-AI startups publish little or no safety engineering. Always ask who certified what, to which standard, at which level, and for which use. → <a href="#vendors">Reading vendor claims</a></p>
+
+<h2 id="layers">The five layers</h2>
+
+<figure class="wide">
+  <div class="stack" data-widget="layers">
+    <p>L1 Check the task · L2 The AI itself · L3 Check the motion · trust boundary · L4 Certified safety functions · L5 Physical design and procedures</p>
+  </div>
+</figure>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Layer</th><th scope="col">Catches</th><th scope="col">Good practice</th><th scope="col">Sources</th></tr></thead>
+  <tbody>
+    <tr><td><strong>L1</strong> Check the task</td><td>Unsafe or unclear requests; jailbreak prompts; forbidden objects or places.</td><td>Write the rules down (a "robot constitution"). Check plans against them with a guardrail that user prompts cannot reach. Use plain code where facts are known (object lists, payload). Ask a person when an instruction is ambiguous.</td><td><a href="https://arxiv.org/abs/2503.07885">RoboGuard</a>: unsafe plans executed fell "from over 92% to below 3%"; <a href="https://arxiv.org/abs/2503.08663">robot constitutions</a>; <a href="https://arxiv.org/abs/2307.01928">KnowNo</a> (ask for help)</td></tr>
+    <tr><td><strong>L2</strong> The AI itself</td><td>Poor task quality; some unsafe choices (fewer, with no guarantee).</td><td>Evaluate with enough trials and blind A/B tests. Test under change: camera position, lighting, new objects. Load signed models in safe formats (safetensors, not pickle). Track who trains the model and on which data.</td><td><a href="https://arxiv.org/abs/2507.05331">TRI</a> (50 trials per task and condition); <a href="https://huggingface.co/docs/hub/security-pickle">Hugging Face on pickle</a>; <a href="https://github.com/sigstore/model-transparency">model signing</a></td></tr>
+    <tr><td><strong>L3</strong> Check the motion</td><td>Erratic or out-of-range commands; stale input; input unlike the training data.</td><td>Put a safety filter between the policy and the controller: work area, speed and joint limits, collision checks. Add watchdogs and failure detectors. Fall back to a simple controller. Keep slow VLM monitors out of the fast control loop.</td><td><a href="https://arxiv.org/abs/2309.05837">Safety filters</a>; <a href="https://arxiv.org/abs/1908.00528">Simplex</a>; <a href="https://arxiv.org/abs/2506.09937">SAFE</a>; <a href="https://developer.nvidia.com/blog/inside-nvidia-halos-for-robotics-a-full-stack-functional-safety-system-for-physical-ai/">NVIDIA Halos</a> (input monitor and fallback)</td></tr>
+    <tr><td><strong>L4</strong> Certified safety functions</td><td>People near the robot; contact force; any failure or hack of the AI computer.</td><td>Use the ISO 10218:2025 functions (monitored standstill, speed and separation monitoring, power and force limiting, speed and stopping limits) on safety-rated hardware. Protect safety settings against change. Keep machine learning out of this layer: in the EU, a machine-learning safety component needs third-party assessment.</td><td><a href="https://committee.iso.org/standard/73934.html">ISO 10218-2:2025</a>; <a href="https://arxiv.org/abs/2602.17822">2011 vs 2025 comparison</a> (preprint); <a href="https://eur-lex.europa.eu/eli/reg/2023/1230/oj/eng">EU MR</a> Annex I A.5; <a href="https://www.agilityrobotics.com/content/built-for-the-real-world">Agility safety PLC</a></td></tr>
+    <tr><td><strong>L5</strong> Physical design and procedures</td><td>What the other layers leave.</td><td>Follow the ISO 12100 order: remove the hazard first, then add protection, then inform users. Avoid clamping points: MHLW's example keeps at least 500 mm between the arm and fixed structures, or lets a trapped person be freed by hand. Stop, lock and sign before maintenance. Give the training the law requires.</td><td><a href="https://committee.iso.org/standard/51528.html">ISO 12100</a>; <a href="https://jsite.mhlw.go.jp/mie-roudoukyoku/var/rev0/0108/4336/20131225164348.pdf">MHLW notice 基安安発1224第1号</a>; <a href="https://laws.e-gov.go.jp/law/347M50002000032">Ordinance</a> Art. 150-5</td></tr>
+    <tr><td><strong>Security</strong> (all layers)</td><td>Attacks on any layer or link.</td><td>Threat-model the whole loop: perception, reasoning, action, memory, connectivity. Turn on and enforce ROS 2 security. Split the network into zones (IEC 62443). Use secure boot, signed updates and per-device authorization. Push data out of the cell instead of letting AI systems reach in. Record evidence of every intervention.</td><td><a href="https://www.exein.io/blog/threat-modeling-physical-ai">Exein</a>; <a href="https://design.ros2.org/articles/ros2_threat_model.html">ROS 2 threat model</a>; <a href="https://www.cisa.gov/resources-tools/resources/principles-secure-integration-artificial-intelligence-operational-technology">CISA et al.</a>; EU MR Annex III 1.1.9</td></tr>
+    <tr><td><strong>Assurance</strong> (all layers)</td><td>Gaps in the argument that the system is safe.</td><td>Define the operating conditions. Analyze hazards top-down and bottom-up (STPA and FMEA). Test with statistics and fault injection. Write a safety case. Re-check it after every retraining.</td><td><a href="https://www.york.ac.uk/media/assuring-autonomy/documents/guidancedocuments/SACE_v1_1.pdf">SACE</a>; <a href="https://psas.scripts.mit.edu/home/get_file.php?name=STPA_Handbook.pdf">STPA Handbook</a>; <a href="https://users.ece.cmu.edu/~koopman/ul4600/191213_UL4600_VotingVersion.pdf">UL 4600 draft</a></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="threats">Threat model in one table</h2>
+<p>Use STRIDE per component as usual, and also trace attack chains across the whole loop. Exein's framing: "Perception is the injection surface", "Reasoning is the hijack surface", "Action is where compromise becomes consequence".<span class="note"><a href="https://www.exein.io/blog/threat-modeling-physical-ai">Exein</a> (10 July 2026). The <a href="https://design.ros2.org/articles/ros2_threat_model.html">ROS 2 threat model</a> applies STRIDE to a robot arm.</span></p>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Attack surface</th><th scope="col">Real case</th><th scope="col">Control (layer)</th></tr></thead>
+  <tbody>
+    <tr><td>The scene (camera view)</td><td>Commands hidden in signs (<a href="https://arxiv.org/abs/2510.00181">CHAI</a>, 2025). Printed patches stop VLAs (<a href="https://arxiv.org/abs/2411.13587">2024</a>).</td><td>Treat text in view as untrusted (L1). Detect unusual input (L3). People stay protected by L4 whatever the camera sees.</td></tr>
+    <tr><td>Language and commands</td><td>RoboPAIR jailbroke a Unitree Go2 robot dog (<a href="https://arxiv.org/abs/2410.13691">2024</a>).</td><td>Guardrail outside the model (L1). Authorize actions in downstream systems, not in the model (<a href="https://genai.owasp.org/llmrisk/llm062025-excessive-agency/">OWASP LLM06</a>).</td></tr>
+    <tr><td>Model and data supply chain</td><td>VLA backdoors (<a href="https://arxiv.org/abs/2505.16640">BadVLA</a>). PyTorch <code>torch.load(weights_only=True)</code> allowed remote code execution before 2.6.0 (<a href="https://www.cve.org/CVERecord?id=CVE-2025-32434">CVE-2025-32434</a>).</td><td>Signed models, safe formats, known training data (L2).</td></tr>
+    <tr><td>Policy server link</td><td>LeRobot ≤ 0.5.1 ran <code>pickle.loads()</code> on data "received over unauthenticated gRPC channels without TLS" (<a href="https://www.cve.org/CVERecord?id=CVE-2026-25874">CVE-2026-25874</a>, CVSS 9.3).</td><td>Mutual TLS, no pickle, keep the link inside the cell network.</td></tr>
+    <tr><td>Middleware (ROS 2 / DDS)</td><td>ROS 2 security is off by default; DDS implementations had 13 CVEs in one advisory (<a href="https://www.cisa.gov/news-events/ics-advisories/icsa-21-315-02">CISA, 2021</a>).</td><td>Turn security on (<code>ROS_SECURITY_ENABLE=true</code>) and refuse non-compliant nodes (<code>ROS_SECURITY_STRATEGY=Enforce</code>). Limit who may publish actuator topics. Patch DDS (<a href="https://docs.ros.org/en/kilted/Concepts/Intermediate/About-Security.html">ROS 2 docs</a>).</td></tr>
+    <tr><td>Wireless setup</td><td>UniPwn: a Wi-Fi setup string sent over Bluetooth ran commands as root on Unitree Go2, G1, H1 and B2. The attack can spread from robot to robot (<a href="https://www.cve.org/CVERecord?id=CVE-2025-35027">CVE-2025-35027</a>, <a href="https://github.com/Bin4ry/UniPwn">disclosure</a>).</td><td>Unique keys per device, strict input validation.</td></tr>
+    <tr><td>Cloud, fleet, remote access</td><td>Undocumented remote-access backdoor in Unitree Go1 (<a href="https://www.cve.org/CVERecord?id=CVE-2025-2894">CVE-2025-2894</a>). Unannounced telemetry from a G1 humanoid (<a href="https://arxiv.org/abs/2509.14096">Alias Robotics</a>, 2025, preprint).</td><td>Inventory all vendor connections. Per-device authorization. Allow only known outbound traffic.</td></tr>
+    <tr><td>The safety functions themselves</td><td>On the Raven II surgical robot, researchers could abuse the emergency stop with "single packet" attacks (<a href="https://arxiv.org/abs/1504.04339">2015</a>, preprint).</td><td>Protect safety signals and settings. Co-engineer safety and security (<a href="https://webstore.iec.ch/en/publication/69228">IEC TS 63074</a>).</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="rules">Standards and rules map</h2>
+<p>For an AI-driven robot arm cell. Standards are written for certain products; check each one's scope before you cite it to a client.</p>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Topic</th><th scope="col">International</th><th scope="col">EU</th><th scope="col">Japan</th></tr></thead>
+  <tbody>
+    <tr><td>Risk assessment</td><td><span class="std">ISO 12100:2010</span>: remove hazards, then protect, then inform</td><td>Machinery Regulation Annex III 1.1.2</td><td><span class="std">JIS B 9700:2013</span> (= ISO 12100:2010); risk assessment under the Industrial Safety and Health Act, Art. 28-2</td></tr>
+    <tr><td>Robot and robot cell</td><td><span class="std">ISO 10218-1:2025</span> (robot maker), <span class="std">ISO 10218-2:2025</span> (integrator). Collaborative rules from ISO/TS 15066 now inside; first cybersecurity clauses.</td><td>Machinery Regulation, applies from 20 January 2027</td><td><span class="std">JIS B 8433-1/-2:2015</span> (= ISO 10218:2011; the 2025 edition is not yet adopted). Ordinance Art. 150-4: a fence or other measures. A 2013 notice allows work without a fence after a risk assessment, or with ISO 10218:2011 robots plus a technical file and declaration of conformity.</td></tr>
+    <tr><td>Contact limits</td><td><span class="std">ISO/TS 15066:2016</span> (under revision); body-region limits now also in ISO 10218-2:2025, Annex M</td><td>—</td><td>TS B 0033 (Japan's version of ISO/TS 15066) withdrawn on 25 March 2025</td></tr>
+    <tr><td>Safety control systems</td><td><span class="std">ISO 13849-1:2023</span> (PL), <span class="std">IEC 62061</span> (SIL), <span class="std">IEC 61508</span> (Edition 3 expected 2027)</td><td>—</td><td><span class="std">JIS B 9705-1:2019</span> (= ISO 13849-1:2015); MHLW functional-safety guideline (2016)</td></tr>
+    <tr><td>AI and functional safety</td><td><span class="std">ISO/IEC TR 5469:2024</span> (guidance); ISO/IEC TS 22440-1 (draft)</td><td>Machinery Regulation Annex I Part A item 5 (third party for ML safety components). AI Act after the AI Omnibus: products from 2 August 2028.</td><td>AI Promotion Act (2025); AI Guidelines for Business v1.2 (March 2026); <a href="https://aisi.go.jp/output/output_information/260723/">J-AISI AI robotics safety guide</a> (July 2026)</td></tr>
+    <tr><td>Cybersecurity</td><td><span class="std">IEC 62443</span>; <span class="std">IEC TS 63074:2023</span> (IEC 62443 for machinery safety controls)</td><td>Cyber Resilience Act (reporting since 11 September 2026; full application 11 December 2027); Machinery Regulation Annex III 1.1.9</td><td>JC-STAR IoT labels (no robot category yet); METI factory security guideline v1.1; IPA risk analysis guide</td></tr>
+    <tr><td>Legged and mobile robots</td><td><span class="std">ISO 25785-1</span> (draft, legged and other dynamically stable robots); <span class="std">ISO 3691-4</span>; ANSI/A3 R15.08</td><td>—</td><td><span class="std">JIS D 6802:2022</span> (from ISO 3691-4:2020)</td></tr>
+    <tr><td>Safety case</td><td><span class="std">UL 4600</span> Edition 3 (2023); GSN Community Standard v3</td><td>—</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Sources: ISO committee records (<a href="https://committee.iso.org/standard/73934.html">ISO 10218-2</a>, <a href="https://committee.iso.org/standard/62996.html">ISO/TS 15066</a>, <a href="https://committee.iso.org/standard/91469.html">ISO 25785-1</a>); <a href="https://arxiv.org/abs/2602.17822">Hartmann et al.</a> for 2025 clause changes (preprint; the standard itself is paywalled); <a href="https://www.mhlw.go.jp/bunya/roudoukijun/dl/pamphlet_140115.pdf">MHLW leaflet on fence-free work</a>; <a href="https://webdesk.jsa.or.jp/books/W11M0090/index/?bunsyo_id=TS%20B%200033:2017">JSA catalogue</a>; <a href="https://www.ipa.go.jp/security/jc-star/index.html">IPA: JC-STAR</a>.</p>
+
+<h2 id="proof">Proving it is safe</h2>
+<p>A working demo is the start. To argue that a system is acceptably safe, the research describes these steps:</p>
+<ol>
+  <li><strong>Define the operating conditions</strong> (objects, lighting, people's access) and the safety bar for each hazard.</li>
+  <li><strong>Analyze hazards with more than one method:</strong> top-down (STPA) and bottom-up (FMEA). STPA assumes accidents can happen when components interact badly, "none of which may have failed".</li>
+  <li><strong>Design the architecture:</strong> non-AI safety functions that keep the AI-controlled equipment safe (ISO/IEC TR 5469).</li>
+  <li><strong>Assure the machine-learning part:</strong> requirements, data, training, verification and deployment (the AMLAS method).</li>
+  <li><strong>Verify and validate:</strong> test coverage, fault injection ("does the fault mitigation actually work"), and statistics.</li>
+  <li><strong>Write the safety case and have it assessed</strong> by someone independent of the team.</li>
+  <li><strong>Make a release decision</strong> with named people who accept any remaining risk.</li>
+  <li><strong>Operate and learn:</strong> monitor safety indicators, investigate incidents, and re-check the safety case after any retraining.</li>
+</ol>
+<p class="sources">Sources: <a href="https://www.york.ac.uk/media/assuring-autonomy/documents/guidancedocuments/SACE_v1_1.pdf">SACE v1.1</a> (University of York, 2026); <a href="https://psas.scripts.mit.edu/home/get_file.php?name=STPA_Handbook.pdf">STPA Handbook</a> (MIT, 2018); <a href="https://arxiv.org/abs/2102.01564">AMLAS</a>; <a href="https://users.ece.cmu.edu/~koopman/ul4600/191213_UL4600_VotingVersion.pdf">UL 4600 voting draft</a> (2019), which lists "use of a retrained neural network" as a trigger to re-analyze the safety case.</p>
+
+<h3>A minimal safety case for the running example</h3>
+<p>Written in the style of Goal Structuring Notation (GSN): a top claim, a strategy, and sub-claims that each point to evidence. This is a teaching sketch, not a complete case.</p>
+<ul>
+  <li><strong>G1 (claim):</strong> The pick-and-place cell is acceptably safe for its task under its defined operating conditions.
+    <ul>
+      <li><strong>Context:</strong> operating conditions (objects, lighting, work area, rules for people's access); acceptance criteria for each hazard.</li>
+      <li><strong>S1 (strategy):</strong> argue over every hazard found by STPA and FMEA.
+        <ul>
+          <li><strong>G2:</strong> In normal use, the VLA's grasp-hazard rate is below the target. <em>Evidence:</em> N failure-free trials and a 95% bound.</li>
+          <li><strong>G3:</strong> Wrong or faulty VLA output cannot cause harm, because non-AI speed, force and zone limits override it. <em>Evidence:</em> fault-injection and hardware-in-the-loop reports.</li>
+          <li><strong>G4:</strong> Input outside the operating conditions is detected and leads to a safe stop. <em>Evidence:</em> monitor validation with new objects.</li>
+          <li><strong>G5:</strong> Foreseeable misuse and attacks are handled. <em>Evidence:</em> threat model and penetration test.</li>
+          <li><strong>G6:</strong> Safety is maintained in operation; any retraining triggers an impact analysis. <em>(Not yet developed.)</em></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<p class="sources">GSN elements: <a href="https://scsc.uk/r1386.pdf">GSN Community Standard v3</a> (SCSC, 2021). Aurora's rule of thumb: "evidence without a claim is simply trivia and, conversely, a claim without evidence is baseless" (<a href="https://index.mirasmart.com/27esv/PDFfiles/27ESV-000345.pdf">ESV 2023 paper</a>).</p>
+
+<h2 id="vendors">Reading vendor claims: NVIDIA Halos as a case</h2>
+<p><strong>What it is.</strong> NVIDIA Halos for Robotics "unifies safety elements from platform hardware and software across three layers": platform safety (the IGX Thor computer with a separate safety island, plus a sensor bridge), Halos OS (a safety operating system with applications such as the Outside-In Safety Blueprint), and ecosystem safety (the AI Systems Inspection Lab).<span class="note"><a href="https://developer.nvidia.com/blog/inside-nvidia-halos-for-robotics-a-full-stack-functional-safety-system-for-physical-ai/">NVIDIA Technical Blog</a> (22 June 2026).</span> The design follows the doer/checker pattern: an AI input monitor plus a decision maker on the isolated safety island.</p>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Claim or product</th><th scope="col">What the evidence shows (October 2026)</th></tr></thead>
+  <tbody>
+    <tr><td>"Halos Certified" / Inspection Lab</td><td>Accredited by ANAB as a "TYPE C (SECOND PARTY) BODY", which means it is part of NVIDIA. Its method is "review of documentation". The scope (version 002, June 2025) covers functional-safety standards such as IEC 61508 and ISO 13849-1. The certificate expires on 2 January 2027. (<a href="https://search.anab.org/public/organization_files/NVIDIA-Corporation-Cert-and-Scope-File-06-06-2025_1749243349.pdf">ANAB certificate and scope</a>)</td></tr>
+    <tr><td>Third-party certification</td><td>"TÜV Rheinland is inspecting NVIDIA IGX Thor, Halos OS and Holoscan Sensor Bridge", which is a readiness check that is still in progress. (<a href="https://blogs.nvidia.com/blog/physical-ai-halos-safety/">NVIDIA blog</a>, 21 September 2026)</td></tr>
+    <tr><td>Outside-In Safety Blueprint</td><td>"No claims are made on compliance with any Functional Safety and Cybersecurity standards or on suitability for production use in Safety-Related systems." Deployment near people "requires your own independent, certified safety system". (<a href="https://github.com/NVIDIA/halos-outside-in-safety/blob/develop/SAFETY_NOTICE.md">Safety notice</a>)</td></tr>
+    <tr><td>Robot middleware and tools</td><td>"available but not yet for safety applications" (<a href="https://developer.nvidia.com/blog/inside-nvidia-halos-for-robotics-a-full-stack-functional-safety-system-for-physical-ai/">NVIDIA</a>)</td></tr>
+    <tr><td>Robot-arm standards</td><td>ISO 10218 and ISO/TS 15066 do not appear in the Halos sources reviewed. Plan them separately.</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>The general lesson:</strong> a safety platform can help, but it does not make your client's cell safe or compliant. The integrator still owns the risk assessment, the safety functions of the cell, and the safety case. NVIDIA's own GR00T robot model card says the model "is not tested or intended for use in mission critical applications that require functional safety".</p>
+
+<h2 id="questions">Questions for clients and vendors</h2>
+<p>A starting checklist for a review or assessment. Each question points to a layer.</p>
+<ol>
+  <li>Which functions protect people? Which of them are safety-rated, to what level (PL or SIL), and certified by whom? <em>(L4)</em></li>
+  <li>If the AI computer were fully taken over, what would still stop the arm? <em>(trust boundary)</em></li>
+  <li>Can the AI, the planner, or anyone on the robot network change safety limits or settings? How is that prevented and logged? <em>(L4, security)</em></li>
+  <li>What is the robot's motion range, and what limits it: mechanical or electrical stoppers, or safety-rated limits? <em>(L4, Japan)</em></li>
+  <li>Under which objects, lighting and camera positions was the policy tested, with how many trials, and how were failures counted? <em>(L2)</em></li>
+  <li>What happens when input is unfamiliar, the camera freezes, or an instruction is ambiguous? <em>(L1, L3)</em></li>
+  <li>How are instructions checked before execution, and can a user's prompt reach the guardrail? <em>(L1)</em></li>
+  <li>Is ROS 2 / DDS security enabled and enforced? What network zones surround the cell? <em>(security)</em></li>
+  <li>How are model files and updates signed, and which file formats are loaded? <em>(L2, security)</em></li>
+  <li>What remote access, telemetry and cloud links exist, and who can command the robot? <em>(security)</em></li>
+  <li>Which standards and rules apply where the system runs, and who signs the technical file and declaration of conformity? <em>(assurance)</em></li>
+  <li>Is there a safety case, and who assessed it independently? <em>(assurance)</em></li>
+  <li>What triggers re-validation: retraining, new objects, software updates? <em>(assurance)</em></li>
+  <li>How are incidents and near misses recorded and reported? <em>(assurance)</em></li>
+</ol>
+
+<div class="ask">
+  <p><strong>Ask your teacher.</strong> This page is a map, not a lesson. If any row is unclear, ask Claude to explain it or to turn it into the next lesson.</p>
+</div>
+
+</main>
+
+<nav class="pager" aria-label="Page navigation">
+  <a href="../index.html">← Course home</a>
+  <a href="glossary.html">Glossary →</a>
+</nav>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security · Field guide · Research as of 15 October 2026. Standards and rules change; check dates before you rely on them with a client. This page is a learning aid, not legal advice.</p>
+</footer>
+
+</div></div>
+</body>
+</html>
