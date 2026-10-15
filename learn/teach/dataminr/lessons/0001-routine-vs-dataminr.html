@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>routine で Dataminr は作れるか</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+JP:wght@400;500;700&family=Shippori+Mincho+B1:wght@700&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<main class="page">
+<article class="flow">
+
+<p class="eyebrow">LESSON 0001 ・ 2026-10-15 ・ 約 12 分</p>
+<h1>routine で Dataminr は作れるか</h1>
+<p class="lede">答えは「一部だけ」です。Dataminr の中で routine に近いのは、出来事を見つけた<strong>あと</strong>に、説明や裏づけを書き足す部分だけです。その前の「見つける」部分には、routine では越えられない 5 つの壁があります。</p>
+
+<div class="goal">
+  <p class="eyebrow">この回のゴール</p>
+  <p>監視したいことを 1 つ聞いたら、「routine で足りる」か「routine では不足」かを、<strong>どの壁が理由か</strong>をつけて言えるようになる。</p>
+</div>
+
+<h2><span class="num">1</span>Dataminr は何をしているか</h2>
+<p>Dataminr は、公開されている情報から、事件・事故・災害・サイバー攻撃などを<strong>起きた直後に見つけて知らせる</strong>ことを売りにする会社です<sup class="cite"><a href="#s1">1</a></sup>。同社の説明によると、次のとおりです。</p>
+<ul class="tight">
+  <li>100 万以上の公開情報源を、150 以上の言語で読む。文字だけでなく、画像・動画・音声・センサーの信号も読む<sup class="cite"><a href="#s2">2</a></sup>。</li>
+  <li>1 日に 43TB 以上のテキストを処理し、約 50 万件の出来事を見つける<sup class="cite"><a href="#s2">2</a></sup>。</li>
+  <li>見つけた出来事を顧客に関係するものにしぼり、Web・モバイル・メール・API で届ける<sup class="cite"><a href="#s3">3</a></sup>。優先度は Flash・Urgent・Alert の 3 段階<sup class="cite"><a href="#s4">4</a></sup>。</li>
+</ul>
+<p class="small">ここの数字はどれも Dataminr 自身の発表で、第三者がはかったものではありません。ページによって数字が少しずつ違うこともあります。</p>
+
+<h2><span class="num">2</span>中の流れと、routine の居場所</h2>
+<p>公開されている技術資料をつなぐと、Dataminr の中はおおよそ次の 5 段階で動いています。</p>
+
+<figure class="diagram wide">
+  <ol class="pipe">
+    <li class="detect"><span class="k">1</span><b>集める</b><span>100 万以上の情報源が、止まらずに流れ込む<sup class="cite"><a href="#s2">2</a></sup></span></li>
+    <li class="detect"><span class="k">2</span><b>ふるう</b><span>50 以上の小さな専用モデルが、言語・場所・固有名詞・画像の中の文字などを読み取り、入力の 95% 以上を落とす<sup class="cite"><a href="#s5">5</a></sup></span></li>
+    <li class="detect"><span class="k">3</span><b>見つけて、まとめる</b><span>「いつもの量」とのずれから異変を見つけ、同じ出来事の投稿を 1 つにまとめる<sup class="cite"><a href="#s6">6</a></sup></span></li>
+    <li class="after"><span class="k">4</span><b>書いて、足す</b><span>LLM が説明を書き、エージェントが裏づけや背景を調べて足す<sup class="cite"><a href="#s5">5</a></sup><sup class="cite"><a href="#s7">7</a></sup></span></li>
+    <li class="detect"><span class="k">5</span><b>届ける</b><span>優先度をつけて、すぐに通知する<sup class="cite"><a href="#s4">4</a></sup></span></li>
+  </ol>
+  <div class="legend">
+    <span><i class="detect"></i>止まらずに動く検知の仕組み</span>
+    <span><i class="after"></i>検知のあとで文脈を足す部分（routine に近い）</span>
+  </div>
+  <figcaption>出典の資料をもとにした模式図。各段階の中身は、公開資料から読み取れる範囲にとどめています。</figcaption>
+</figure>
+
+<p>Dataminr の主任科学者は 2023 年の講演スライドに「LLM "だけ" には（まだ）頼れない」と書き、課題として費用・速さ・ハルシネーションを挙げています<sup class="cite"><a href="#s8">8</a></sup>。LLM の出番は、小さなモデルが出来事を見つけた<strong>あと</strong>です。</p>
+<p>routine は「決まった時刻に起きて、検索して、読んで、書く」<strong>まとめ役</strong>です。これは 4 の部分によく似ています。しかし 1〜3 と 5 は、流れを見張り続ける<strong>警報役</strong>の仕事です。routine の実行間隔をいくら短くしても、まとめ役は警報役になりません。その理由が、次の 5 つの壁です。</p>
+
+<h2><span class="num">3</span>5 つの壁</h2>
+<p>壁は、警報役の仕事の順番（いつ見るか → 何が見えるか → どれだけ読めるか → 何と比べるか → 誰に何を送るか）に並べています。</p>
+
+<ol class="walls wide">
+  <li>
+    <div class="name"><span class="n">1</span><b>速さ</b><span class="q">いつ見るか</span></div>
+    <div class="side"><span class="lane clock">routine</span><p>起きるのは決まった時刻だけ。最短 1 時間ごとで、ちょうどの時刻だと数分遅れることもある<sup class="cite"><a href="#s9">9</a></sup>。1 時間ごとなら、出来事が起きてから次の実行まで平均 30 分待つ。</p></div>
+    <div class="side"><span class="lane stream">Dataminr</span><p>届いたそばから処理し続ける。航空機の信号を使う例では「検知から顧客への配信まで 5 秒未満」と説明している<sup class="cite"><a href="#s10">10</a></sup>。</p></div>
+    <p class="design"><span class="mono">設計の問い</span>何分以内に知る必要があるか？</p>
+  </li>
+  <li>
+    <div class="name"><span class="n">2</span><b>視野</b><span class="q">何が見えるか</span></div>
+    <div class="side"><span class="lane clock">routine</span><p>見えるのは検索エンジンに載ったものだけで、WebSearch が返すのはタイトルと URL<sup class="cite"><a href="#s11">11</a></sup>。X は Google と Bing 以外のクローラーを robots.txt で断っており、Anthropic のクローラーは robots.txt に従う<sup class="cite"><a href="#s12">12</a></sup>。</p></div>
+    <div class="side"><span class="lane stream">Dataminr</span><p>画像・音声・センサーまで含む 100 万以上の情報源を読む<sup class="cite"><a href="#s2">2</a></sup>。Twitter（現 X）の全投稿を受け取れることを強みにしてきた。2016 年の同社資料では 1 日 5 億件<sup class="cite"><a href="#s13">13</a></sup>、2023 年にも全投稿を受け取っていたと報じられている<sup class="cite"><a href="#s14">14</a></sup>。</p></div>
+    <p class="design"><span class="mono">設計の問い</span>最初の兆しはどこに出るか？ そのデータを使う権利はあるか？</p>
+  </li>
+  <li>
+    <div class="name"><span class="n">3</span><b>規模</b><span class="q">どれだけ読めるか</span></div>
+    <div class="side"><span class="lane clock">routine</span><p>1 回の実行で読めるのは数十ページ。X の投稿を API で買うと 1 件 0.005 ドルで、月 300 万件が上限<sup class="cite"><a href="#s15">15</a></sup>。1 日 1,000 万件読もうとすると 1 日 5 万ドル分になり、そもそも上限を超える。</p></div>
+    <div class="side"><span class="lane stream">Dataminr</span><p>小さな専用モデルで先にふるい、入力の 95% 以上を落としてから、大きなモデルに渡す<sup class="cite"><a href="#s5">5</a></sup>。</p></div>
+    <p class="design"><span class="mono">設計の問い</span>1 日に何件読む必要があるか？ 1 件あたりいくらで読めるか？</p>
+  </li>
+  <li>
+    <div class="name"><span class="n">4</span><b>記憶</b><span class="q">何と比べるか</span></div>
+    <div class="side"><span class="lane clock">routine</span><p>実行のたびに新しいセッションが立ち上がり、リポジトリも毎回 clone しなおす<sup class="cite"><a href="#s9">9</a></sup>。「いつもの量」を知らないので急な増加に気づけず、同じ件をくり返し報告しやすい。似た仕組みを自作した人も「いちばん難しいのは重複の排除」と書いている<sup class="cite"><a href="#s16">16</a></sup>。</p></div>
+    <div class="side"><span class="lane stream">Dataminr</span><p>2009 年に出願した特許の時点で、移動平均などの「いつもの量」とのずれで出来事を見つける仕組みだった<sup class="cite"><a href="#s6">6</a></sup>。続報は、前のアラートにつながる形で届く<sup class="cite"><a href="#s17">17</a></sup>。</p></div>
+    <p class="design"><span class="mono">設計の問い</span>「いつも」をどう覚えるか？ 同じ出来事をどうまとめるか？</p>
+  </li>
+  <li>
+    <div class="name"><span class="n">5</span><b>選別</b><span class="q">誰に何を送るか</span></div>
+    <div class="side"><span class="lane clock">routine</span><p>その場の LLM が検索結果を読んで判断する。AI アシスタントのニュースについての答えの 45% に重大な問題があった、という調査がある<sup class="cite"><a href="#s18">18</a></sup>。結果はセッションの記録に残り、知らせたいときは Slack などのコネクタで送らせる形になる<sup class="cite"><a href="#s9">9</a></sup>。</p></div>
+    <div class="side"><span class="lane stream">Dataminr</span><p>位置情報つきの投稿は 2〜3% しかないため、残りの投稿の場所を推定する（2016 年の資料で最大約 60%）<sup class="cite"><a href="#s13">13</a></sup>。推定した場所と誤差の半径<sup class="cite"><a href="#s17">17</a></sup>を、顧客の拠点のまわりの範囲と照らし合わせる<sup class="cite"><a href="#s19">19</a></sup>。むずかしい出来事は人の専門家が見る<sup class="cite"><a href="#s20">20</a></sup>。</p></div>
+    <p class="design"><span class="mono">設計の問い</span>誰に・何を・どの急ぎで送るか？ 誤報をどう止めるか？</p>
+  </li>
+</ol>
+
+<div class="callout">
+  <p class="eyebrow">自社サービスへのヒント</p>
+  <h3>高いのは AI ではなく、データ</h3>
+  <p>投稿を 1 日 1,000 万件、いちばん安い Claude のモデルで 1 件ずつ分類すると、試算で 1 日約 210 ドルです<sup class="cite"><a href="#s21">21</a></sup>。同じ量の X の投稿を API で読むと 1 日 5 万ドル分になり、しかも上限を超えるので買えません<sup class="cite"><a href="#s15">15</a></sup>。2021 年に米空軍は、Twitter の全投稿へのアクセスを重く見て、別の会社より 283% 高い Dataminr を選びました<sup class="cite"><a href="#s22">22</a></sup>。まねされにくいのは、モデルよりも先に「データと、それを使う権利」です。</p>
+  <p class="small">試算の前提（1 件 75 トークン、出力 15 トークン、思考なし、指示文はキャッシュ）は<a href="../reference/five-walls.html#cost">早見表</a>にあります。</p>
+</div>
+
+<h2><span class="num">4</span>練習 1：routine で足りる？</h2>
+<p>企業のリスク監視でよく出る 4 つの要望です。routine だけで作れるかを判定してください。押すとすぐに正解と解説が出ます。</p>
+
+<div class="scenario">
+  <p class="case"><span class="mono">要望 1</span>海外工場の半径 3km で火災や爆発が起きたら、10 分以内に現地の責任者のスマホに知らせたい。</p>
+  <div class="quiz" data-answer="b">
+    <div class="quiz-choices">
+      <button type="button" class="choice" data-choice="a"><span class="key">A</span><span>routine で足りる</span></button>
+      <button type="button" class="choice" data-choice="b"><span class="key">B</span><span>routine では不足</span></button>
+    </div>
+    <p class="quiz-verdict" hidden></p>
+    <div class="quiz-explain" hidden><p>「10 分以内」だけで、最短 1 時間ごとの routine は外れます（<span class="wall">速さ</span>）。最初の情報は現地の SNS 投稿であることが多く（<span class="wall">視野</span>）、工場から 3km 以内かどうかを判定するには場所の推定が要ります（<span class="wall">選別</span>）。</p></div>
+  </div>
+</div>
+
+<div class="scenario">
+  <p class="case"><span class="mono">要望 2</span>毎朝 8 時に、取引先 50 社についての前日のニュースをまとめて、部長にメールしたい。</p>
+  <div class="quiz" data-answer="a">
+    <div class="quiz-choices">
+      <button type="button" class="choice" data-choice="a"><span class="key">A</span><span>routine で足りる</span></button>
+      <button type="button" class="choice" data-choice="b"><span class="key">B</span><span>routine では不足</span></button>
+    </div>
+    <p class="quiz-verdict" hidden></p>
+    <div class="quiz-explain" hidden><p>1 日 1 回で間に合い、ニュース記事は検索で見つかります。まさに「まとめ役」の仕事です。</p></div>
+  </div>
+</div>
+
+<div class="scenario">
+  <p class="case"><span class="mono">要望 3</span>取引先の倒産や行政処分の公式発表を、その日のうちに知りたい。</p>
+  <div class="quiz" data-answer="a">
+    <div class="quiz-choices">
+      <button type="button" class="choice" data-choice="a"><span class="key">A</span><span>routine で足りる</span></button>
+      <button type="button" class="choice" data-choice="b"><span class="key">B</span><span>routine では不足</span></button>
+    </div>
+    <p class="quiz-verdict" hidden></p>
+    <div class="quiz-explain" hidden><p>公式発表は出る場所が決まっているので、その場所を 1 時間ごとに見に行けば「その日のうち」に間に合います。ただし、報告済みの件をリポジトリに記録するなど、同じ件をくり返さない工夫（<span class="wall">記憶</span>）は自分で作る必要があります。</p></div>
+  </div>
+</div>
+
+<div class="scenario">
+  <p class="case"><span class="mono">要望 4</span>東南アジアの工場の近くで洪水や道路の寸断が起きたら、報道より前に、地元の人の SNS 投稿から知りたい。</p>
+  <div class="quiz" data-answer="b">
+    <div class="quiz-choices">
+      <button type="button" class="choice" data-choice="a"><span class="key">A</span><span>routine で足りる</span></button>
+      <button type="button" class="choice" data-choice="b"><span class="key">B</span><span>routine では不足</span></button>
+    </div>
+    <p class="quiz-verdict" hidden></p>
+    <div class="quiz-explain" hidden><p>決め手は「報道より前」と「SNS 投稿から」です。SNS の投稿は検索ではほとんど見えず（<span class="wall">視野</span>）、報道より前に知るには止まらずに見張る仕組みが要ります（<span class="wall">速さ</span>）。</p></div>
+  </div>
+</div>
+
+<h2><span class="num">5</span>練習 2：どの壁？</h2>
+<p>routine で監視を作ったときに起きる困りごとです。いちばんの原因はどの壁でしょうか。同じ壁が 2 回出ることもあります。</p>
+
+<div class="scenario">
+  <p class="case"><span class="mono">困りごと 1</span>実行のたびに、同じ火事を「新しい事件」として報告してしまう。</p>
+  <div class="quiz" data-answer="d">
+    <div class="quiz-choices compact">
+      <button type="button" class="choice" data-choice="a"><span class="key">A</span><span>速さ</span></button>
+      <button type="button" class="choice" data-choice="b"><span class="key">B</span><span>視野</span></button>
+      <button type="button" class="choice" data-choice="c"><span class="key">C</span><span>規模</span></button>
+      <button type="button" class="choice" data-choice="d"><span class="key">D</span><span>記憶</span></button>
+      <button type="button" class="choice" data-choice="e"><span class="key">E</span><span>選別</span></button>
+    </div>
+    <p class="quiz-verdict" hidden></p>
+    <div class="quiz-explain" hidden><p>前の実行で何を報告したかを覚えていないためです。Dataminr では、続報が前のアラートにつながる形で届きます。</p></div>
+  </div>
+</div>
+
+<div class="scenario">
+  <p class="case"><span class="mono">困りごと 2</span>9:00 に routine が動いた 5 分後に、工場の近くで火事が起きた。次の実行は 10:00。</p>
+  <div class="quiz" data-answer="a">
+    <div class="quiz-choices compact">
+      <button type="button" class="choice" data-choice="a"><span class="key">A</span><span>速さ</span></button>
+      <button type="button" class="choice" data-choice="b"><span class="key">B</span><span>視野</span></button>
+      <button type="button" class="choice" data-choice="c"><span class="key">C</span><span>規模</span></button>
+      <button type="button" class="choice" data-choice="d"><span class="key">D</span><span>記憶</span></button>
+      <button type="button" class="choice" data-choice="e"><span class="key">E</span><span>選別</span></button>
+    </div>
+    <p class="quiz-verdict" hidden></p>
+    <div class="quiz-explain" hidden><p>起きるのが決まった時刻だけなので、この例では次の実行まで 55 分待ちます。</p></div>
+  </div>
+</div>
+
+<div class="scenario">
+  <p class="case"><span class="mono">困りごと 3</span>工場から 300km 離れた火事や、根拠のないうわさまで通知され、担当者が通知を読まなくなった。</p>
+  <div class="quiz" data-answer="e">
+    <div class="quiz-choices compact">
+      <button type="button" class="choice" data-choice="a"><span class="key">A</span><span>速さ</span></button>
+      <button type="button" class="choice" data-choice="b"><span class="key">B</span><span>視野</span></button>
+      <button type="button" class="choice" data-choice="c"><span class="key">C</span><span>規模</span></button>
+      <button type="button" class="choice" data-choice="d"><span class="key">D</span><span>記憶</span></button>
+      <button type="button" class="choice" data-choice="e"><span class="key">E</span><span>選別</span></button>
+    </div>
+    <p class="quiz-verdict" hidden></p>
+    <div class="quiz-explain" hidden><p>「自社に関係あるか」と「本当か」を選び分けられていません。実は Dataminr の利用者レビューでも「通知が多すぎる」がいちばん多い不満で、Dataminr にとっても難しい壁です<sup class="cite"><a href="#s23">23</a></sup>。</p></div>
+  </div>
+</div>
+
+<div class="scenario">
+  <p class="case"><span class="mono">困りごと 4</span>最初の目撃情報は SNS の投稿と写真だけで、その SNS は検索エンジンのクローラーを断っている。</p>
+  <div class="quiz" data-answer="b">
+    <div class="quiz-choices compact">
+      <button type="button" class="choice" data-choice="a"><span class="key">A</span><span>速さ</span></button>
+      <button type="button" class="choice" data-choice="b"><span class="key">B</span><span>視野</span></button>
+      <button type="button" class="choice" data-choice="c"><span class="key">C</span><span>規模</span></button>
+      <button type="button" class="choice" data-choice="d"><span class="key">D</span><span>記憶</span></button>
+      <button type="button" class="choice" data-choice="e"><span class="key">E</span><span>選別</span></button>
+    </div>
+    <p class="quiz-verdict" hidden></p>
+    <div class="quiz-explain" hidden><p>検索に載らないものは、routine からは見えません。</p></div>
+  </div>
+</div>
+
+<div class="scenario">
+  <p class="case"><span class="mono">困りごと 5</span>「爆発」という言葉を含む投稿が、今日はいつもより多いのか少ないのか判断できない。</p>
+  <div class="quiz" data-answer="d">
+    <div class="quiz-choices compact">
+      <button type="button" class="choice" data-choice="a"><span class="key">A</span><span>速さ</span></button>
+      <button type="button" class="choice" data-choice="b"><span class="key">B</span><span>視野</span></button>
+      <button type="button" class="choice" data-choice="c"><span class="key">C</span><span>規模</span></button>
+      <button type="button" class="choice" data-choice="d"><span class="key">D</span><span>記憶</span></button>
+      <button type="button" class="choice" data-choice="e"><span class="key">E</span><span>選別</span></button>
+    </div>
+    <p class="quiz-verdict" hidden></p>
+    <div class="quiz-explain" hidden><p>異変は「いつもの量」とのずれで見つけます。毎回まっさらから始まる routine は、比べる相手を持っていません。</p></div>
+  </div>
+</div>
+
+<div class="scenario">
+  <p class="case"><span class="mono">困りごと 6</span>対象地域の投稿は 1 日に数千万件ある。1 件ずつ LLM に読ませると、時間もお金も足りない。</p>
+  <div class="quiz" data-answer="c">
+    <div class="quiz-choices compact">
+      <button type="button" class="choice" data-choice="a"><span class="key">A</span><span>速さ</span></button>
+      <button type="button" class="choice" data-choice="b"><span class="key">B</span><span>視野</span></button>
+      <button type="button" class="choice" data-choice="c"><span class="key">C</span><span>規模</span></button>
+      <button type="button" class="choice" data-choice="d"><span class="key">D</span><span>記憶</span></button>
+      <button type="button" class="choice" data-choice="e"><span class="key">E</span><span>選別</span></button>
+    </div>
+    <p class="quiz-verdict" hidden></p>
+    <div class="quiz-explain" hidden><p>Dataminr は小さな専用モデルで先に 95% 以上を落とし、残りだけを大きなモデルに渡します。</p></div>
+  </div>
+</div>
+
+<div class="score-bar">
+  <span class="quiz-score" aria-live="polite"></span>
+  <button type="button" class="btn quiz-reset">もう一度解く</button>
+</div>
+
+<h2><span class="num">6</span>思い出す練習</h2>
+<p>上に戻らずに、思い出して書いてください。思い出そうとする手間そのものが、記憶を強くします。</p>
+<div class="recall" data-key="0001" data-label="0001 思い出す練習">
+  <label for="recall-0001">(1) 5 つの壁の名前　(2) それぞれを Dataminr がどう越えているか（1 行ずつ）　(3) Dataminr の中で routine に近いのはどの部分か</label>
+  <textarea id="recall-0001" placeholder="ここに書いてください"></textarea>
+  <div class="row">
+    <button type="button" class="btn recall-reveal">答えを見る</button>
+    <button type="button" class="btn primary recall-copy">コピー</button>
+    <span class="status" aria-live="polite"></span>
+  </div>
+  <div class="recall-answer" hidden>
+    <p>(1) 速さ・視野・規模・記憶・選別</p>
+    <p>(2) 速さ：届いたそばから処理し続ける（5 秒未満で届ける例も）／視野：画像やセンサーを含む 100 万以上の情報源と、X の全投稿を受け取る契約／規模：小さな専用モデルで先に 95% 以上を落とす／記憶：「いつもの量」とのずれで異変を見つけ、続報を 1 つの出来事につなぐ／選別：場所を推定して顧客の拠点と照らし、むずかしい件は人が見る</p>
+    <p>(3) 出来事を見つけたあとで、説明や裏づけを書き足す部分（ReGenAI や Intel Agents）</p>
+  </div>
+</div>
+<p>書いた答えは「コピー」を押して、チャットで Claude に送ってください。次のレッスンの難しさを合わせるのに使います。</p>
+
+<div class="pick">
+  <p class="eyebrow">次に読む一次資料</p>
+  <p><a href="https://aerospike.com/resources/customer-stories/dataminr/">Aerospike「Dataminr」導入事例</a>（英語、5 分ほど）</p>
+  <p class="small">Dataminr の技術責任者 2 人（Guy Dassa、Tony Du）が本番の仕組みを語っています。50 以上のモデル、95% 以上の削減、LLM の位置づけなど、公開資料の中で本番の流れをいちばんはっきり書いています。データベース会社の宣伝記事でもあるので、性能の話は割り引いて読んでください。読みながら、上の図の 1〜5 がどこに出てくるか探してみてください。もっと深く読むなら、主任科学者の講演スライド<sup class="cite"><a href="#s8">8</a></sup>がおすすめです。</p>
+</div>
+
+<h2><span class="num">7</span>次回</h2>
+<p><strong>0002　Dataminr の限界</strong>：通知の多さ、見えない場所、X への依存と規約、費用。Dataminr が越えきれていない壁は、そのまま自社サービスの入りどころの候補になります。</p>
+<p class="ask">わからないところや、もっと知りたいところは、そのままチャットで Claude に聞いてください。たとえば「smart radius はどう作られていると考えられる？」「routine と組み合わせた構成を描いて」などです。</p>
+
+<nav class="pager">
+  <a href="../index.html">コースのトップ</a>
+  <span><a href="../reference/five-walls.html">5 つの壁 早見表</a>　<a href="../reference/dataminr-facts.html">Dataminr ファクトシート</a></span>
+</nav>
+
+<h2><span class="num">8</span>出典</h2>
+<ol class="sources">
+  <li id="s1">Dataminr「Company」<a href="https://www.dataminr.com/company">https://www.dataminr.com/company</a>（2026-10-15 閲覧）</li>
+  <li id="s2">Dataminr「AI Platform」<a href="https://www.dataminr.com/ai-platform">https://www.dataminr.com/ai-platform</a>（2026-10-15 閲覧）</li>
+  <li id="s3">Dataminr「Corporate Security」<a href="https://www.dataminr.com/products/corporate-security/">https://www.dataminr.com/products/corporate-security/</a>（2026-10-15 閲覧）</li>
+  <li id="s4">Elastic「Dataminr Pulse integration」（優先度 Alert・Urgent・Flash）<a href="https://www.elastic.co/docs/reference/integrations/dataminr_pulse">https://www.elastic.co/docs/reference/integrations/dataminr_pulse</a>（2026-10-15 閲覧）</li>
+  <li id="s5">Aerospike「Dataminr」導入事例（Dataminr の Guy Dassa、Tony Du の発言を含む。日付なし）<a href="https://aerospike.com/resources/customer-stories/dataminr/">https://aerospike.com/resources/customer-stories/dataminr/</a>（2026-10-15 閲覧）</li>
+  <li id="s6">米国特許 US 8,719,302 B2（EBH Enterprises、現 Dataminr。2009-06-09 出願）<a href="https://patents.google.com/patent/US8719302B2/en">https://patents.google.com/patent/US8719302B2/en</a></li>
+  <li id="s7">Dataminr プレスリリース「Intel Agents for the physical world」（2025-09-29）<a href="https://www.dataminr.com/press/announcement/dataminr-intel-agents-for-the-physical-world/">https://www.dataminr.com/press/announcement/dataminr-intel-agents-for-the-physical-world/</a></li>
+  <li id="s8">Alex Jaimes（Dataminr 主任科学者）CEWIT 2023 基調講演スライド（2023-11-16）<a href="https://www.stonybrook.edu/cewit-conference-new/_media/cewit-keynote-november-2023-alex-jaimes-public.pdf">https://www.stonybrook.edu/cewit-conference-new/_media/cewit-keynote-november-2023-alex-jaimes-public.pdf</a></li>
+  <li id="s9">Claude Code Docs「Automate work with routines」<a href="https://code.claude.com/docs/en/routines">https://code.claude.com/docs/en/routines</a>（2026-10-15 閲覧）</li>
+  <li id="s10">Dataminr ブログ（Alex Jaimes、2019-10-25）<a href="https://www.dataminr.com/blog/multi-modal-understanding-and-summarization-of-critical-events-for-emergency-response">https://www.dataminr.com/blog/multi-modal-understanding-and-summarization-of-critical-events-for-emergency-response</a></li>
+  <li id="s11">Claude Code Docs「Tools reference」WebSearch の動き <a href="https://code.claude.com/docs/en/tools-reference">https://code.claude.com/docs/en/tools-reference</a>（2026-10-15 閲覧）</li>
+  <li id="s12">X の robots.txt <a href="https://x.com/robots.txt">https://x.com/robots.txt</a>（2026-10-15 閲覧）、Anthropic のクローラーについての説明 <a href="https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler">https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler</a></li>
+  <li id="s13">Dataminr が LAPD に出した 2016 年の資料（Brennan Center が情報公開請求で入手、2016-05-04）<a href="https://www.brennancenter.org/sites/default/files/2021-09/H.%20Dataminr%20Trial%202016.pdf">https://www.brennancenter.org/sites/default/files/2021-09/H.%20Dataminr%20Trial%202016.pdf</a></li>
+  <li id="s14">The Intercept（2024-03-25）<a href="https://theintercept.com/2024/03/25/elon-musk-x-dataminr-surveillance-privacy/">https://theintercept.com/2024/03/25/elon-musk-x-dataminr-surveillance-privacy/</a></li>
+  <li id="s15">X API 料金ページ（読み取り 1 件 0.005 ドル、月 300 万件まで）<a href="https://docs.x.com/x-api/getting-started/pricing">https://docs.x.com/x-api/getting-started/pricing</a>（2026-10-15 閲覧）</li>
+  <li id="s16">Show HN: IranWarLive（2026-02-28）<a href="https://news.ycombinator.com/item?id=47200316">https://news.ycombinator.com/item?id=47200316</a></li>
+  <li id="s17">ThreatConnect「Dataminr Pulse Alerts Engine Integration User Guide」（2026-05-07。linkedAlerts、estimatedEventLocation.probabilityRadius）<a href="https://knowledge.threatconnect.com/docs/dataminr-pulse-alerts-engine-integration-user-guide">https://knowledge.threatconnect.com/docs/dataminr-pulse-alerts-engine-integration-user-guide</a></li>
+  <li id="s18">EBU・BBC の調査（参加放送局 VRT の発表、2025-10-22）<a href="https://communication.vrt.be/largest-study-of-its-kind-shows-ai-assistants-misrepresent-news-content-45-of-the-time-regardless-of-language-or-territory">https://communication.vrt.be/largest-study-of-its-kind-shows-ai-assistants-misrepresent-news-content-45-of-the-time-regardless-of-language-or-territory</a></li>
+  <li id="s19">Dataminr「Physical Asset Security」（smart radius）<a href="https://www.dataminr.com/pulse/physical-asset-security">https://www.dataminr.com/pulse/physical-asset-security</a>（2026-10-15 閲覧）</li>
+  <li id="s20">AI Business「How Dataminr kept the human in the loop」（2026-05-19）<a href="https://www.aibusiness.com/generative-ai/how-dataminr-kept-the-human-in-the-loop">https://www.aibusiness.com/generative-ai/how-dataminr-kept-the-human-in-the-loop</a></li>
+  <li id="s21">Anthropic 料金ページ（Claude Haiku 5.5：入力 0.10 ドル、出力 0.50 ドル / 100 万トークン）<a href="https://platform.claude.com/docs/en/about-claude/pricing">https://platform.claude.com/docs/en/about-claude/pricing</a>（2026-10-15 閲覧）。試算は筆者による。</li>
+  <li id="s22">米国会計検査院（GAO）入札異議の決定 B-418730.5, B-418730.6（2021-06-15）<a href="https://www.gao.gov/products/b-418730.5%2Cb-418730.6">https://www.gao.gov/products/b-418730.5%2Cb-418730.6</a></li>
+  <li id="s23">AWS Marketplace「Dataminr First Alert」（G2 のレビューを転載）<a href="https://aws.amazon.com/marketplace/pp/prodview-7eav2xsxvnupy">https://aws.amazon.com/marketplace/pp/prodview-7eav2xsxvnupy</a>（2026-10-15 閲覧）</li>
+</ol>
+
+</article>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

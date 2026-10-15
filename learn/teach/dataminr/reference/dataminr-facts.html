@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dataminr ファクトシート</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+JP:wght@400;500;700&family=Shippori+Mincho+B1:wght@700&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<main class="page">
+<article class="flow">
+
+<p class="eyebrow">REFERENCE ・ 2026-10-15 時点</p>
+<h1>Dataminr ファクトシート</h1>
+<p class="lede">できること・限界・数字を 1 枚にまとめました。数字の多くは Dataminr 自身の発表で、第三者による検証はありません。</p>
+
+<h2>会社</h2>
+<dl class="facts">
+  <dt>ひとことで</dt>
+  <dd>「AI によるリアルタイムの出来事・脅威・リスク情報」の会社を名乗る<sup class="cite"><a href="#f1">1</a></sup>。2009 年創業、本社はニューヨーク<sup class="cite"><a href="#f2">2</a></sup>。</dd>
+  <dt>顧客（自己申告）</dt>
+  <dd>Fortune 50 の 3 分の 2 以上、米国の政府機関 100 以上<sup class="cite"><a href="#f3">3</a></sup>。ただし同じ会社の別ページには「Fortune 50 の半分」とある<sup class="cite"><a href="#f4">4</a></sup>。</dd>
+  <dt>お金</dt>
+  <dd>年間の経常収益は 2 億ドル近く（2025-03 発表）<sup class="cite"><a href="#f5">5</a></sup>。2023-11 に社員の約 20%（約 150 人）を削減<sup class="cite"><a href="#f6">6</a></sup>。</dd>
+  <dt>最近の動き</dt>
+  <dd>サイバー脅威情報の ThreatConnect を 2.9 億ドルで買収（2025-10 発表）<sup class="cite"><a href="#f7">7</a></sup>。米空軍から 5 年で 3.18 億ドルの契約（2026-08、報道で確認）<sup class="cite"><a href="#f8">8</a></sup>。</dd>
+  <dt>日本</dt>
+  <dd>日本語の公式サイトはない。2022 年に NEC ネッツエスアイが国内初のリセラー契約を結んだと報じられた（いまも続いているかは未確認）<sup class="cite"><a href="#f9">9</a></sup>。</dd>
+</dl>
+
+<h2>製品（2026 年）</h2>
+<dl class="facts">
+  <dt>Corporate Security</dt>
+  <dd>企業のセキュリティ部門向け。旧名 Pulse for Corporate Security。人を守る・拠点やイベントを守る・事業を止めない、の 3 つの用途<sup class="cite"><a href="#f10">10</a></sup>。</dd>
+  <dt>Cyber Defense</dt>
+  <dd>ThreatConnect をもとにしたサイバー向けの製品群（2026-03）<sup class="cite"><a href="#f11">11</a></sup>。</dd>
+  <dt>First Alert</dt>
+  <dd>公共機関向け。上位版の First Alert Advanced を 2026-08 に発表<sup class="cite"><a href="#f3">3</a></sup>。</dd>
+  <dt>News</dt>
+  <dd>報道機関向け。1,500 以上のニュース編集部が使うと説明<sup class="cite"><a href="#f12">12</a></sup>。</dd>
+</dl>
+
+<h2>企業のリスク監視でできること</h2>
+<ul class="tight">
+  <li>拠点の位置グループやジオフェンスを登録し、まわりの出来事を地図で見る<sup class="cite"><a href="#f13">13</a></sup>。</li>
+  <li>出来事を、拠点・取引先・出張者と照らし合わせる（アラートに「一致した資産」が載る）<sup class="cite"><a href="#f14">14</a></sup>。人事・出張のデータと連携し、社員が近くにいるかを調べる<sup class="cite"><a href="#f15">15</a></sup>。</li>
+  <li>SMS・メール・音声で、社員への一斉連絡を 60 秒以内に送る（2024 年の発表）<sup class="cite"><a href="#f16">16</a></sup>。安否を返事してもらう機能もある<sup class="cite"><a href="#f15">15</a></sup>。</li>
+  <li>出来事の説明を、進み具合に合わせて自動で書き直す（ReGenAI、2024）<sup class="cite"><a href="#f17">17</a></sup>。エージェントが、プロンプトなしで背景や裏づけを足す（Intel Agents、2025）<sup class="cite"><a href="#f18">18</a></sup>。数時間先にどう進みそうかを示す機能も発表（2026）<sup class="cite"><a href="#f3">3</a></sup>。</li>
+</ul>
+
+<h2>アラートの中身と届け方</h2>
+<dl class="facts">
+  <dt>見出し</dt>
+  <dd>1 文の見出しと出どころ。例：「…ヘリコプターの墜落で少なくとも 1 人の死亡を確認：Local News Outlet via Social Media」<sup class="cite"><a href="#f19">19</a></sup>。</dd>
+  <dt>優先度</dt>
+  <dd>Flash・Urgent・Alert の 3 段階<sup class="cite"><a href="#f20">20</a></sup>。</dd>
+  <dt>主な項目</dt>
+  <dd class="small">推定位置と誤差の半径、トピック・企業・業種、一致したリストや資産、裏づけ、Live Brief、Intel Agents の要約、関連アラート、元の投稿<sup class="cite"><a href="#f14">14</a></sup><sup class="cite"><a href="#f21">21</a></sup>。</dd>
+  <dt>届け方</dt>
+  <dd>Web・モバイル・メール・API<sup class="cite"><a href="#f10">10</a></sup>。Microsoft Teams<sup class="cite"><a href="#f22">22</a></sup>、Splunk<sup class="cite"><a href="#f23">23</a></sup>、STIX/TAXII など 200 以上の連携<sup class="cite"><a href="#f11">11</a></sup>。</dd>
+</dl>
+
+<h2>数字（自己申告）</h2>
+<dl class="facts">
+  <dt>情報源</dt>
+  <dd>100 万以上。150 以上の言語。画像・動画・音声・センサーを含む<sup class="cite"><a href="#f24">24</a></sup>。</dd>
+  <dt>処理量</dt>
+  <dd>テキストだけで 1 日 43TB 以上。見つける出来事は 1 日約 50 万件<sup class="cite"><a href="#f24">24</a></sup>。</dd>
+  <dt>モデル</dt>
+  <dd>自社の LLM が「50 以上」「55 以上」「60 以上」と、ページで違う<sup class="cite"><a href="#f24">24</a></sup><sup class="cite"><a href="#f11">11</a></sup><sup class="cite"><a href="#f3">3</a></sup>。巨大な汎用モデルだけには頼らず、作業ごとに調整した自社モデルを組み合わせると CTO が説明<sup class="cite"><a href="#f3">3</a></sup>。</dd>
+</dl>
+
+<h2>限界（0002 でくわしく）</h2>
+<ul class="tight">
+  <li><strong>通知が多い。</strong>利用者レビューで最も多い不満。調整に時間がかかり、2022 年のレビューでは、まちがったアラートを製品の中で指摘できないとの声もあった<sup class="cite"><a href="#f25">25</a></sup>。</li>
+  <li><strong>正確さと速さを保証しない。</strong>First Alert の利用規約に明記（2026-03 改定）<sup class="cite"><a href="#f26">26</a></sup>。</li>
+  <li><strong>見えるのは公開情報だけ。</strong>Facebook の非公開データや、暗号化されたチャットは読めない<sup class="cite"><a href="#f27">27</a></sup>。</li>
+  <li><strong>X への依存と規約。</strong>X の開発者規約は、抗議行動などの監視を禁じている<sup class="cite"><a href="#f28">28</a></sup>。First Alert の規約にも、X の投稿についての同じ趣旨の条項がある<sup class="cite"><a href="#f26">26</a></sup>。</li>
+  <li><strong>場所は推定。</strong>位置情報つきの投稿は 2〜3%<sup class="cite"><a href="#f27">27</a></sup>。</li>
+  <li><strong>地域と言語のかたより。</strong>低所得国でインターネットを使う人は 23%<sup class="cite"><a href="#f29">29</a></sup>。言語処理の研究は、世界の言語の 88% を扱っていない<sup class="cite"><a href="#f30">30</a></sup>。</li>
+  <li><strong>監視をめぐる批判。</strong>警察が抗議行動の情報を受け取っていたとの報道がある。同社は「First Alert を監視に使うことは許していない」と反論<sup class="cite"><a href="#f31">31</a></sup>。</li>
+  <li><strong>価格が見えにくい。</strong>公開の価格表はない。AWS の掲載価格は 1 ユーザー 1 年 3 万ドル<sup class="cite"><a href="#f25">25</a></sup>。購入データ会社 Vendr の中央値は年 2.2 万ドル（1.5 万〜6.25 万ドル）<sup class="cite"><a href="#f32">32</a></sup>。</li>
+</ul>
+
+<nav class="pager">
+  <a href="../index.html">コースのトップ</a>
+  <span><a href="../lessons/0001-routine-vs-dataminr.html">0001 routine で Dataminr は作れるか</a>　<a href="five-walls.html">5 つの壁 早見表</a></span>
+</nav>
+
+<h2>出典</h2>
+<ol class="sources">
+  <li id="f1">Dataminr「Company」<a href="https://www.dataminr.com/company">https://www.dataminr.com/company</a>（2026-10-15 閲覧）</li>
+  <li id="f2">Dataminr「Leadership」<a href="https://www.dataminr.com/company/leadership">https://www.dataminr.com/company/leadership</a>、Wikipedia「Dataminr」<a href="https://en.wikipedia.org/wiki/Dataminr">https://en.wikipedia.org/wiki/Dataminr</a>（2026-10-15 閲覧）</li>
+  <li id="f3">Dataminr プレスリリース（First Alert Advanced と米国防総省の契約、2026-08-26）<a href="https://www.dataminr.com/press/announcement/dataminr-launches-first-alert-advanced-awarded-dow-contract/">https://www.dataminr.com/press/announcement/dataminr-launches-first-alert-advanced-awarded-dow-contract/</a></li>
+  <li id="f4">Dataminr「Customers」<a href="https://www.dataminr.com/company/customers">https://www.dataminr.com/company/customers</a>（2026-10-15 閲覧）</li>
+  <li id="f5">Dataminr プレスリリース（2025-03-19）<a href="https://www.dataminr.com/press/announcement/dataminr-secures-funding/">https://www.dataminr.com/press/announcement/dataminr-secures-funding/</a></li>
+  <li id="f6">TechCrunch（2023-11-28）<a href="https://techcrunch.com/2023/11/28/dataminr-the-4b-big-data-startup-is-laying-off-20-of-staff-today-or-150-people-as-it-preps-to-double-down-on-ai/">https://techcrunch.com/2023/11/28/dataminr-the-4b-big-data-startup-is-laying-off-20-of-staff-today-or-150-people-as-it-preps-to-double-down-on-ai/</a></li>
+  <li id="f7">Dataminr プレスリリース（2025-10-21）<a href="https://www.dataminr.com/press/announcement/dataminr-to-acquire-threatconnect/">https://www.dataminr.com/press/announcement/dataminr-to-acquire-threatconnect/</a></li>
+  <li id="f8">DefenseScoop（2026-08-27）<a href="https://defensescoop.com/2026/08/27/pentagon-awards-dataminr-318m-contract/">https://defensescoop.com/2026/08/27/pentagon-awards-dataminr-318m-contract/</a></li>
+  <li id="f9">IT Leaders（2022-09-26）<a href="https://it.impress.co.jp/articles/-/23822">https://it.impress.co.jp/articles/-/23822</a></li>
+  <li id="f10">Dataminr「Corporate Security」<a href="https://www.dataminr.com/products/corporate-security/">https://www.dataminr.com/products/corporate-security/</a>（2026-10-15 閲覧）</li>
+  <li id="f11">Dataminr「Cyber Defense」<a href="https://www.dataminr.com/products/cyber-defense">https://www.dataminr.com/products/cyber-defense</a>、プレスリリース（2026-03-23）<a href="https://www.dataminr.com/press/announcement/dataminr-redefines-cyber-defense/">https://www.dataminr.com/press/announcement/dataminr-redefines-cyber-defense/</a></li>
+  <li id="f12">Dataminr「Dataminr for News」<a href="https://www.dataminr.com/products/dataminr-for-news">https://www.dataminr.com/products/dataminr-for-news</a>（2026-10-15 閲覧）</li>
+  <li id="f13">Dataminr「Pulse with Geovisualization」資料 <a href="https://dataminr.com/wp-content/uploads/2023/12/Pulse-with-Geovisualization-One-Pager.pdf">https://dataminr.com/wp-content/uploads/2023/12/Pulse-with-Geovisualization-One-Pager.pdf</a></li>
+  <li id="f14">Palo Alto Networks「Dataminr Pulse - ReGenAI」連携ドキュメント <a href="https://xsoar.pan.dev/docs/reference/integrations/dataminr-pulse-re-gen-ai">https://xsoar.pan.dev/docs/reference/integrations/dataminr-pulse-re-gen-ai</a>（2026-10-15 閲覧）</li>
+  <li id="f15">Dataminr プレスリリース（2023-04-05）<a href="https://www.dataminr.com/press/dataminr-pulse-for-corporate-security-expands-to-include-new-two-way-notification-tools-and-hr-travel-integrations/">https://www.dataminr.com/press/dataminr-pulse-for-corporate-security-expands-to-include-new-two-way-notification-tools-and-hr-travel-integrations/</a></li>
+  <li id="f16">Dataminr プレスリリース（2024-09-18）<a href="https://www.dataminr.com/press/announcement/dataminrs-regenai-expands-to-cover-hyperlocal-events-across-the-globe-delivering-10x-more-dynamically-updating-event-briefs/">https://www.dataminr.com/press/announcement/dataminrs-regenai-expands-to-cover-hyperlocal-events-across-the-globe-delivering-10x-more-dynamically-updating-event-briefs/</a></li>
+  <li id="f17">Dataminr プレスリリース（2024-04-18）<a href="https://www.dataminr.com/press/dataminr-unveils-regenai-the-first-generative-ai-that-automatically-regenerates-in-real-time/">https://www.dataminr.com/press/dataminr-unveils-regenai-the-first-generative-ai-that-automatically-regenerates-in-real-time/</a></li>
+  <li id="f18">Dataminr ブログ（2025-10-16）<a href="https://www.dataminr.com/resources/blog/intel-agents-have-arrived-for-physical-security-teams-no-prompts-just-context/">https://www.dataminr.com/resources/blog/intel-agents-have-arrived-for-physical-security-teams-no-prompts-just-context/</a></li>
+  <li id="f19">Dataminr「First Alert」紹介資料（2022）<a href="https://www.dataminr.com/wp-content/uploads/2023/10/FA-Overview-International-Defence-English-UK-2.pdf">https://www.dataminr.com/wp-content/uploads/2023/10/FA-Overview-International-Defence-English-UK-2.pdf</a></li>
+  <li id="f20">Elastic「Dataminr Pulse integration」<a href="https://www.elastic.co/docs/reference/integrations/dataminr_pulse">https://www.elastic.co/docs/reference/integrations/dataminr_pulse</a>、Mattermost「Dataminr plugin」<a href="https://mattermost.com/marketplace/dataminr-plugin/">https://mattermost.com/marketplace/dataminr-plugin/</a>（2026-10-15 閲覧）</li>
+  <li id="f21">ThreatConnect「Dataminr Pulse Alerts Engine Integration User Guide」（2026-05-07）<a href="https://knowledge.threatconnect.com/docs/dataminr-pulse-alerts-engine-integration-user-guide">https://knowledge.threatconnect.com/docs/dataminr-pulse-alerts-engine-integration-user-guide</a></li>
+  <li id="f22">Dataminr「Microsoft Teams」<a href="https://www.dataminr.com/partners/microsoft-teams">https://www.dataminr.com/partners/microsoft-teams</a>（2026-10-15 閲覧）</li>
+  <li id="f23">Splunkbase「Dataminr Threat Intelligence for Splunk」（2026-05-12）<a href="https://splunkbase.splunk.com/app/6520">https://splunkbase.splunk.com/app/6520</a></li>
+  <li id="f24">Dataminr「AI Platform」<a href="https://www.dataminr.com/ai-platform">https://www.dataminr.com/ai-platform</a>（2026-10-15 閲覧）</li>
+  <li id="f25">AWS Marketplace「Dataminr First Alert」（G2 のレビューを転載、掲載価格）<a href="https://aws.amazon.com/marketplace/pp/prodview-7eav2xsxvnupy">https://aws.amazon.com/marketplace/pp/prodview-7eav2xsxvnupy</a>（2026-10-15 閲覧）</li>
+  <li id="f26">Dataminr「First Alert Master Subscription Agreement」（2026-03 改定）<a href="https://www.dataminr.com/legal/firstalert-msa/">https://www.dataminr.com/legal/firstalert-msa/</a></li>
+  <li id="f27">Dataminr が LAPD に出した資料（2016-05-04、Brennan Center 公開）<a href="https://www.brennancenter.org/sites/default/files/2021-09/H.%20Dataminr%20Trial%202016.pdf">https://www.brennancenter.org/sites/default/files/2021-09/H.%20Dataminr%20Trial%202016.pdf</a></li>
+  <li id="f28">X「Developer Agreement」（2026-04-27 改定）<a href="https://docs.x.com/developer-terms/agreement">https://docs.x.com/developer-terms/agreement</a></li>
+  <li id="f29">ITU「Facts and Figures 2025: Internet use」<a href="https://www.itu.int/itu-d/reports/statistics/2025/10/15/ff25-internet-use/">https://www.itu.int/itu-d/reports/statistics/2025/10/15/ff25-internet-use/</a></li>
+  <li id="f30">Kraft &amp; Usbeck（arXiv 2210.03352、2022-10-07）<a href="https://arxiv.org/abs/2210.03352">https://arxiv.org/abs/2210.03352</a></li>
+  <li id="f31">The Intercept（2020-07-09）<a href="https://theintercept.com/2020/07/09/twitter-dataminr-police-spy-surveillance-black-lives-matter-protests/">https://theintercept.com/2020/07/09/twitter-dataminr-police-spy-surveillance-black-lives-matter-protests/</a></li>
+  <li id="f32">Vendr「Dataminr」<a href="https://www.vendr.com/marketplace/dataminr">https://www.vendr.com/marketplace/dataminr</a>（2026-10-15 閲覧）</li>
+</ol>
+
+</article>
+</main>
+</body>
+</html>

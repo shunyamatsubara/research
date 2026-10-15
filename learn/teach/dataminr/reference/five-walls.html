@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>5 つの壁 早見表</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+JP:wght@400;500;700&family=Shippori+Mincho+B1:wght@700&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<main class="page">
+<article class="flow">
+
+<p class="eyebrow">REFERENCE ・ 2026-10-15 更新 ・ 0001 で学んだこと</p>
+<h1>5 つの壁 早見表</h1>
+<p class="lede">routine（まとめ役）と Dataminr（警報役）のちがいを、自社サービスの設計に使える形でまとめた表です。</p>
+
+<div class="goal">
+  <p class="eyebrow">ひとことで</p>
+  <ul class="tight">
+    <li><strong>まとめ役</strong>（routine）：決まった時刻に起きて、検索して、読んで、書く。</li>
+    <li><strong>警報役</strong>（Dataminr）：流れを見張り続け、いつもとのずれを見つけ、関係する人にすぐ届ける。</li>
+    <li>Dataminr の中でも LLM は「見つけたあと」に使う（説明・裏づけ・背景）<sup class="cite"><a href="#r1">1</a></sup><sup class="cite"><a href="#r2">2</a></sup>。routine が再現できるのは、この後ろの部分。</li>
+  </ul>
+</div>
+
+<h2>壁ごとの比較</h2>
+<ol class="walls wide">
+  <li>
+    <div class="name"><span class="n">1</span><b>速さ</b><span class="q">いつ見るか</span></div>
+    <div class="side"><span class="lane clock">routine</span><p>最短 1 時間ごと。毎時ちょうどは数分遅れることも。API での起動は 1 つの routine につき 1 時間 30 回まで<sup class="cite"><a href="#r3">3</a></sup>。</p></div>
+    <div class="side"><span class="lane stream">Dataminr</span><p>届いたそばから処理。航空機の信号の例で「検知から配信まで 5 秒未満」（2019 年）<sup class="cite"><a href="#r4">4</a></sup>。</p></div>
+    <p class="design"><span class="mono">自作の手</span>常時動く小さな受信プログラムを別に置き、異変のときだけ routine を API で起こす。routine の公式文書も「監視ツールがしきい値を超えたら API で routine を起動する」使い方を例に挙げている<sup class="cite"><a href="#r3">3</a></sup>。</p>
+    <p class="design"><span class="mono">設計の問い</span>何分以内に知る必要があるか？</p>
+  </li>
+  <li>
+    <div class="name"><span class="n">2</span><b>視野</b><span class="q">何が見えるか</span></div>
+    <div class="side"><span class="lane clock">routine</span><p>検索エンジンに載ったものだけ。WebSearch が返すのはタイトルと URL<sup class="cite"><a href="#r5">5</a></sup>。X は Google と Bing 以外のクローラーを断っている<sup class="cite"><a href="#r6">6</a></sup>。</p></div>
+    <div class="side"><span class="lane stream">Dataminr</span><p>100 万以上の情報源、150 以上の言語、画像・音声・センサー<sup class="cite"><a href="#r7">7</a></sup>。Twitter（現 X）の全投稿へのアクセス（2016 年の資料<sup class="cite"><a href="#r8">8</a></sup>、2023 年の報道<sup class="cite"><a href="#r9">9</a></sup>）。</p></div>
+    <p class="design"><span class="mono">自作の手</span>開いたデータから始める。Bluesky の firehose は認証なしで使える<sup class="cite"><a href="#r10">10</a></sup>。GDELT は 15 分ごとに更新<sup class="cite"><a href="#r11">11</a></sup>。X の全投稿は Enterprise 契約のみで価格は非公開<sup class="cite"><a href="#r12">12</a></sup>。Reddit の API は事前の承認が必要で、商用利用には別の契約が要る<sup class="cite"><a href="#r13">13</a></sup>。</p>
+    <p class="design"><span class="mono">設計の問い</span>最初の兆しはどこに出るか？ そのデータを使う権利はあるか？</p>
+  </li>
+  <li>
+    <div class="name"><span class="n">3</span><b>規模</b><span class="q">どれだけ読めるか</span></div>
+    <div class="side"><span class="lane clock">routine</span><p>1 回の実行で数十ページ。X の投稿は API で 1 件 0.005 ドル、月 300 万件まで<sup class="cite"><a href="#r14">14</a></sup>。</p></div>
+    <div class="side"><span class="lane stream">Dataminr</span><p>50 以上の小さな専用モデル（言語・場所・固有名詞・OCR・ロゴ）で、入力の 95% 以上を落としてから大きなモデルへ<sup class="cite"><a href="#r1">1</a></sup>。</p></div>
+    <p class="design"><span class="mono">自作の手</span>キーワードや小さな分類モデルで先にふるい、LLM は急に増えたかたまりだけに使う。研究でも、専用に調整したモデルのほうが、調整なしの大きな LLM より分類が正確だった<sup class="cite"><a href="#r15">15</a></sup>。</p>
+    <p class="design"><span class="mono">設計の問い</span>1 日に何件読む必要があるか？ 1 件あたりいくらで読めるか？</p>
+  </li>
+  <li>
+    <div class="name"><span class="n">4</span><b>記憶</b><span class="q">何と比べるか</span></div>
+    <div class="side"><span class="lane clock">routine</span><p>実行ごとに新しいセッションで、リポジトリも毎回 clone しなおす<sup class="cite"><a href="#r3">3</a></sup>。残せるのは、ほぼ git に push したものだけ。</p></div>
+    <div class="side"><span class="lane stream">Dataminr</span><p>複数の時間幅で投稿をまとめ、移動平均などの基準とのずれで「高まり」「急な広がり」を判断する（2009 年出願の特許）<sup class="cite"><a href="#r16">16</a></sup>。続報は前のアラートにつながる<sup class="cite"><a href="#r17">17</a></sup>。</p></div>
+    <p class="design"><span class="mono">自作の手</span>件数の時系列を保存し、短い期間の平均と長い期間の平均を比べる。米国地質調査所がツイートから地震を見つけた方法と同じ考え方<sup class="cite"><a href="#r18">18</a></sup>。報告済みの出来事の一覧も持つ。</p>
+    <p class="design"><span class="mono">設計の問い</span>「いつも」をどう覚えるか？ 同じ出来事をどうまとめるか？</p>
+  </li>
+  <li>
+    <div class="name"><span class="n">5</span><b>選別</b><span class="q">誰に何を送るか</span></div>
+    <div class="side"><span class="lane clock">routine</span><p>その場の LLM の判断に頼る。AI アシスタントのニュースについての答えの 45% に重大な問題があった<sup class="cite"><a href="#r19">19</a></sup>。知らせるのは Slack などのコネクタ経由<sup class="cite"><a href="#r3">3</a></sup>。</p></div>
+    <div class="side"><span class="lane stream">Dataminr</span><p>位置情報つきの投稿は 2〜3%。残りの場所を推定（2016 年に最大約 60%）<sup class="cite"><a href="#r8">8</a></sup>。推定位置に誤差の半径<sup class="cite"><a href="#r17">17</a></sup>、拠点のまわりの smart radius<sup class="cite"><a href="#r20">20</a></sup>、人の専門家<sup class="cite"><a href="#r21">21</a></sup>、優先度は Flash・Urgent・Alert<sup class="cite"><a href="#r22">22</a></sup>。</p></div>
+    <p class="design"><span class="mono">自作の手</span>拠点・取引先・出張者の一覧を持ち、場所の推定と誤差を扱う。複数の情報源で裏づけ、送る前に人が確かめる段階を残す。</p>
+    <p class="design"><span class="mono">設計の問い</span>誰に・何を・どの急ぎで送るか？ 誤報をどう止めるか？</p>
+  </li>
+</ol>
+
+<h2 id="cost">費用の試算（前提つき）</h2>
+<p>2026-10-15 時点の公式料金<sup class="cite"><a href="#r23">23</a></sup>をもとにした筆者の試算です。前提を変えると結果も変わります。</p>
+<dl class="facts">
+  <dt>料金</dt>
+  <dd>Claude Haiku 5.5：入力 0.10 ドル、キャッシュ読み出し 0.01 ドル、出力 0.50 ドル（いずれも 100 万トークンあたり、プロンプト 10 万トークン以下）。Batch API は半額だが、結果は最大 24 時間後。</dd>
+  <dt>前提</dt>
+  <dd>投稿 1 件 75 トークン、指示文 600 トークン（キャッシュ）、出力 15 トークン、思考なし、1 件ずつ送る。</dd>
+  <dt>1 件あたり</dt>
+  <dd class="mono">75×0.10 + 600×0.01 + 15×0.50 = 21.0 → 0.000021 ドル</dd>
+  <dt>1,000 万件 / 日</dt>
+  <dd>約 210 ドル / 日（約 6,300 ドル / 月）。毎分約 6,944 件で、1 件 1 リクエストなら上位の利用枠が必要<sup class="cite"><a href="#r24">24</a></sup>。</dd>
+  <dt>1 億件 / 日</dt>
+  <dd>約 2,100 ドル / 日。</dd>
+  <dt>データの値段</dt>
+  <dd>X の投稿を API で 1,000 万件読むと 5 万ドル / 日。しかも月 300 万件の上限を超えるので、実際は Enterprise 契約が必要<sup class="cite"><a href="#r14">14</a></sup>。</dd>
+  <dt>結論</dt>
+  <dd>お金の壁は、モデルよりデータのほうがはるかに高い。</dd>
+</dl>
+
+<nav class="pager">
+  <a href="../index.html">コースのトップ</a>
+  <span><a href="../lessons/0001-routine-vs-dataminr.html">0001 routine で Dataminr は作れるか</a>　<a href="dataminr-facts.html">Dataminr ファクトシート</a></span>
+</nav>
+
+<h2>出典</h2>
+<ol class="sources">
+  <li id="r1">Aerospike「Dataminr」導入事例（日付なし）<a href="https://aerospike.com/resources/customer-stories/dataminr/">https://aerospike.com/resources/customer-stories/dataminr/</a>（2026-10-15 閲覧）</li>
+  <li id="r2">Dataminr プレスリリース「Intel Agents for the physical world」（2025-09-29）<a href="https://www.dataminr.com/press/announcement/dataminr-intel-agents-for-the-physical-world/">https://www.dataminr.com/press/announcement/dataminr-intel-agents-for-the-physical-world/</a></li>
+  <li id="r3">Claude Code Docs「Automate work with routines」<a href="https://code.claude.com/docs/en/routines">https://code.claude.com/docs/en/routines</a>（2026-10-15 閲覧）</li>
+  <li id="r4">Dataminr ブログ（Alex Jaimes、2019-10-25）<a href="https://www.dataminr.com/blog/multi-modal-understanding-and-summarization-of-critical-events-for-emergency-response">https://www.dataminr.com/blog/multi-modal-understanding-and-summarization-of-critical-events-for-emergency-response</a></li>
+  <li id="r5">Claude Code Docs「Tools reference」<a href="https://code.claude.com/docs/en/tools-reference">https://code.claude.com/docs/en/tools-reference</a>（2026-10-15 閲覧）</li>
+  <li id="r6">X の robots.txt <a href="https://x.com/robots.txt">https://x.com/robots.txt</a>（2026-10-15 閲覧）</li>
+  <li id="r7">Dataminr「AI Platform」<a href="https://www.dataminr.com/ai-platform">https://www.dataminr.com/ai-platform</a>（2026-10-15 閲覧）</li>
+  <li id="r8">Dataminr が LAPD に出した資料（2016-05-04、Brennan Center 公開）<a href="https://www.brennancenter.org/sites/default/files/2021-09/H.%20Dataminr%20Trial%202016.pdf">https://www.brennancenter.org/sites/default/files/2021-09/H.%20Dataminr%20Trial%202016.pdf</a></li>
+  <li id="r9">The Intercept（2024-03-25）<a href="https://theintercept.com/2024/03/25/elon-musk-x-dataminr-surveillance-privacy/">https://theintercept.com/2024/03/25/elon-musk-x-dataminr-surveillance-privacy/</a></li>
+  <li id="r10">Bluesky「Consuming the firehose」<a href="https://bsky.network/docs/consuming-the-firehose/">https://bsky.network/docs/consuming-the-firehose/</a>（2026-10-15 閲覧）</li>
+  <li id="r11">GDELT「Data」<a href="https://www.gdeltproject.org/data.html">https://www.gdeltproject.org/data.html</a>（2026-10-15 閲覧）</li>
+  <li id="r12">X「Enterprise API」<a href="https://docs.x.com/enterprise-api/introduction">https://docs.x.com/enterprise-api/introduction</a>（2026-10-15 閲覧）</li>
+  <li id="r13">Reddit「Data API Terms」<a href="https://redditinc.com/policies/data-api-terms">https://redditinc.com/policies/data-api-terms</a>（2026-07-20 改定）、Reddit「Responsible Builder Policy」<a href="https://support.reddithelp.com/hc/en-us/articles/42728983564564-Responsible-Builder-Policy">https://support.reddithelp.com/hc/en-us/articles/42728983564564-Responsible-Builder-Policy</a></li>
+  <li id="r14">X API 料金ページ <a href="https://docs.x.com/x-api/getting-started/pricing">https://docs.x.com/x-api/getting-started/pricing</a>（2026-10-15 閲覧）</li>
+  <li id="r15">Bucher &amp; Martini（arXiv 2406.08660、2024-06-12）<a href="https://arxiv.org/abs/2406.08660">https://arxiv.org/abs/2406.08660</a></li>
+  <li id="r16">米国特許 US 8,719,302 B2 <a href="https://patents.google.com/patent/US8719302B2/en">https://patents.google.com/patent/US8719302B2/en</a></li>
+  <li id="r17">ThreatConnect「Dataminr Pulse Alerts Engine Integration User Guide」（2026-05-07）<a href="https://knowledge.threatconnect.com/docs/dataminr-pulse-alerts-engine-integration-user-guide">https://knowledge.threatconnect.com/docs/dataminr-pulse-alerts-engine-integration-user-guide</a></li>
+  <li id="r18">Earle, Bowden, Guy「Twitter earthquake detection: earthquake monitoring in a social world」（USGS、2011）<a href="https://www.usgs.gov/publications/twitter-earthquake-detection-earthquake-monitoring-a-social-world">https://www.usgs.gov/publications/twitter-earthquake-detection-earthquake-monitoring-a-social-world</a></li>
+  <li id="r19">EBU・BBC の調査（VRT の発表、2025-10-22）<a href="https://communication.vrt.be/largest-study-of-its-kind-shows-ai-assistants-misrepresent-news-content-45-of-the-time-regardless-of-language-or-territory">https://communication.vrt.be/largest-study-of-its-kind-shows-ai-assistants-misrepresent-news-content-45-of-the-time-regardless-of-language-or-territory</a></li>
+  <li id="r20">Dataminr「Physical Asset Security」<a href="https://www.dataminr.com/pulse/physical-asset-security">https://www.dataminr.com/pulse/physical-asset-security</a>（2026-10-15 閲覧）</li>
+  <li id="r21">AI Business「How Dataminr kept the human in the loop」（2026-05-19）<a href="https://www.aibusiness.com/generative-ai/how-dataminr-kept-the-human-in-the-loop">https://www.aibusiness.com/generative-ai/how-dataminr-kept-the-human-in-the-loop</a></li>
+  <li id="r22">Elastic「Dataminr Pulse integration」<a href="https://www.elastic.co/docs/reference/integrations/dataminr_pulse">https://www.elastic.co/docs/reference/integrations/dataminr_pulse</a>（2026-10-15 閲覧）</li>
+  <li id="r23">Anthropic 料金ページ <a href="https://platform.claude.com/docs/en/about-claude/pricing">https://platform.claude.com/docs/en/about-claude/pricing</a>（2026-10-15 閲覧）</li>
+  <li id="r24">Anthropic「Rate limits」<a href="https://platform.claude.com/docs/en/api/rate-limits">https://platform.claude.com/docs/en/api/rate-limits</a>（2026-10-15 閲覧）</li>
+</ol>
+
+</article>
+</main>
+</body>
+</html>

@@ -75,7 +75,6 @@ a:hover{ text-decoration-thickness:2px; }
   font-size:.78rem;
   letter-spacing:.08em;
   color:var(--muted);
-  margin:0;
 }
 h1,h2,h3{ text-wrap:balance; word-break:auto-phrase; font-feature-settings:"palt" 1; }
 h1{
@@ -100,7 +99,7 @@ p{ margin:0; }
 .small, .note{ font-size:.88rem; color:var(--muted); line-height:1.75; }
 strong{ font-weight:700; }
 .mono{ font-family:var(--font-mono); font-size:.92em; }
-ul.tight, ol.tight{ margin:0; padding-left:1.4em; display:flex; flex-direction:column; gap:.35rem; }
+ul.tight, ol.tight{ margin-block:0; padding-left:1.4em; display:flex; flex-direction:column; gap:.35rem; }
 
 sup.cite{ font-family:var(--font-mono); font-size:.68em; line-height:0; margin-left:.1em; }
 sup.cite a{ text-decoration:none; padding:0 .1em; }
@@ -150,7 +149,7 @@ table.grid th.col-stream{ color:var(--stream); }
 .quiz{ display:flex; flex-direction:column; gap:.55rem; }
 .quiz-q{ font-size:.95rem; color:var(--muted); }
 .quiz-choices{ display:grid; grid-template-columns:repeat(auto-fit, minmax(12rem, 1fr)); gap:.5rem; }
-.quiz-choices.three{ grid-template-columns:repeat(auto-fit, minmax(9rem, 1fr)); }
+.quiz-choices.compact{ grid-template-columns:repeat(auto-fit, minmax(5.2rem, 1fr)); }
 .choice{
   font:inherit; color:var(--ink); text-align:left;
   display:flex; align-items:baseline; gap:.6rem;
@@ -193,10 +192,70 @@ table.grid th.col-stream{ color:var(--stream); }
 .pick{ border:1px solid var(--rule); border-radius:6px; padding:1rem 1.15rem; background:var(--surface); display:flex; flex-direction:column; gap:.4rem; }
 .pick .eyebrow{ color:var(--stream); }
 .ask{ font-size:.95rem; }
-ol.sources{ font-size:.84rem; color:var(--muted); line-height:1.7; padding-left:1.8em; margin:0; display:flex; flex-direction:column; gap:.45rem; }
+ol.sources{ font-size:.84rem; color:var(--muted); line-height:1.7; padding-left:1.8em; margin-block:0; display:flex; flex-direction:column; gap:.45rem; }
 ol.sources li::marker{ font-family:var(--font-mono); }
 ol.sources a{ word-break:break-all; }
 nav.pager{ display:flex; flex-wrap:wrap; gap:.5rem 1.2rem; justify-content:space-between; font-size:.9rem; border-top:1px solid var(--rule); padding-top:1rem; }
+.callout{ border:1px solid var(--rule); border-radius:6px; padding:1rem 1.15rem; background:var(--surface); display:flex; flex-direction:column; gap:.45rem; }
+.callout .eyebrow{ color:var(--clock); }
+.callout h3, .goal h3, .pick h3{ margin:0; }
+
+/* ---------- pipeline strip: the inside of a system, step by step ---------- */
+ol.pipe{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:.9rem; }
+ol.pipe > li{
+  position:relative; min-width:0;
+  display:flex; flex-direction:column; gap:.3rem;
+  border-radius:6px; padding:.65rem .7rem .75rem;
+  font-size:.84rem; line-height:1.65;
+}
+ol.pipe > li .k{ font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em; color:var(--muted); }
+ol.pipe > li b{ font-size:.95rem; line-height:1.4; }
+ol.pipe > li.detect{ background:var(--stream-wash); }
+ol.pipe > li.after{ background:var(--clock-wash); outline:1.5px dashed var(--clock); outline-offset:-1.5px; }
+ol.pipe > li:not(:last-child)::after{
+  content:"→"; position:absolute; top:50%; right:-.9rem; width:.9rem; text-align:center;
+  transform:translateY(-50%); color:var(--muted); font-family:var(--font-mono); font-size:.85rem;
+}
+.legend{ display:flex; flex-wrap:wrap; gap:.4rem 1.4rem; font-size:.82rem; color:var(--muted); margin-top:.75rem; }
+.legend span{ display:inline-flex; align-items:center; gap:.4em; }
+.legend i{ display:inline-block; width:.9em; height:.9em; border-radius:2px; }
+.legend i.detect{ background:var(--stream-wash); box-shadow:inset 0 0 0 1px var(--stream); }
+.legend i.after{ background:var(--clock-wash); box-shadow:inset 0 0 0 1px var(--clock); }
+@media (max-width: 760px){
+  ol.pipe{ grid-template-columns:1fr; gap:1.1rem; }
+  ol.pipe > li:not(:last-child)::after{ content:"↓"; top:auto; bottom:-1.1rem; right:auto; left:1rem; transform:none; width:auto; }
+}
+
+/* ---------- walls: one row per wall, routine vs Dataminr ---------- */
+ol.walls{ list-style:none; margin-block:0; padding:0; border-top:1px solid var(--rule); }
+ol.walls > li{
+  display:grid; grid-template-columns:7.5rem minmax(0,1fr) minmax(0,1fr);
+  gap:.55rem 1.4rem; padding:1.1rem 0; border-bottom:1px solid var(--rule);
+}
+.walls .name{ display:flex; flex-direction:column; gap:.15rem; }
+.walls .name .n{ font-family:var(--font-mono); font-size:.75rem; color:var(--muted); }
+.walls .name b{ font-family:var(--font-display); font-size:1.55rem; line-height:1.2; letter-spacing:.04em; }
+.walls .name .q{ font-size:.82rem; color:var(--muted); }
+.walls .side{ display:flex; flex-direction:column; align-items:flex-start; gap:.3rem; font-size:.9rem; line-height:1.75; min-width:0; }
+.walls .design{ grid-column:2 / -1; font-size:.87rem; color:var(--muted); }
+.walls .design .mono{ color:var(--ink); margin-right:.6em; }
+@media (max-width: 760px){
+  ol.walls > li{ grid-template-columns:minmax(0,1fr); }
+  .walls .name{ flex-direction:row; align-items:baseline; gap:.6rem; }
+  .walls .design{ grid-column:auto; }
+}
+
+/* ---------- reference sheets ---------- */
+dl.facts{ margin-block:0; display:grid; grid-template-columns:9rem minmax(0,1fr); gap:.55rem 1.2rem; font-size:.92rem; line-height:1.75; }
+dl.facts dt{ font-weight:700; }
+dl.facts dd{ margin:0; min-width:0; }
+@media (max-width: 640px){ dl.facts{ grid-template-columns:minmax(0,1fr); gap:.15rem; } dl.facts dd{ margin-bottom:.6rem; } }
+.course-list{ list-style:none; margin-block:0; padding:0; border-top:1px solid var(--rule); }
+.course-list li{ display:grid; grid-template-columns:4.2rem minmax(0,1fr); gap:.2rem 1rem; padding:.85rem 0; border-bottom:1px solid var(--rule); }
+.course-list .no{ font-family:var(--font-mono); font-size:.85rem; color:var(--muted); padding-top:.15rem; }
+.course-list .t{ font-weight:700; }
+.course-list .d{ grid-column:2; font-size:.88rem; color:var(--muted); }
+.course-list .planned .t{ color:var(--muted); font-weight:500; }
 
 @media (prefers-reduced-motion: no-preference){
   .choice, .btn{ transition:border-color .15s ease, background-color .15s ease; }
