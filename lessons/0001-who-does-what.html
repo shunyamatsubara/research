@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Lesson 1 · Who Does What</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+<main class="page">
+
+<nav class="crumbs" aria-label="Course navigation">
+  <a href="../index.html">Inside Volvo's Driving Stack</a>
+  <span>Lesson 1 of the course</span>
+  <a href="../reference/stack-map.html">Reference: Stack map</a>
+</nav>
+
+<p class="eyebrow">Lesson 1 · about 12 minutes</p>
+<h1>Who does what in Volvo's new driving stack</h1>
+<p class="lede">On 15&nbsp;October 2026, Volvo Cars and NVIDIA announced that future Volvo cars will drive “from door to door” on three NVIDIA parts. Each part has its own job. After this lesson you can take any job in the system and say which part owns it.</p>
+
+<h2>What Volvo announced</h2>
+
+<aside class="side">“Eyes-off” means the driver may look away from the road. “Mind-off” means the driver does not need to watch the system at all. The release gives no date. Volvo's head of software told TechCrunch the first car will “debut within the decade.”<sup class="cite"><a href="#s2">2</a></sup></aside>
+
+<p>The press release names the three parts in one sentence: “the Hyperion sensor and compute architecture, Halos&nbsp;OS, and Alpamayo Stack driving software.”<sup class="cite"><a href="#s1">1</a></sup> Volvo adds its own “vehicle safety systems and engineering expertise.” The goal is “a gradual introduction of eyes-off and mind-off driving,” first in a next-generation Volvo car.<sup class="cite"><a href="#s1">1</a></sup></p>
+
+<p>The release says almost nothing about what each part does. For that we need NVIDIA's own pages. Here is the short version.</p>
+
+<h2>Three parts, three kinds of job</h2>
+
+<p>You already know robots, so start there. A robot has hardware (sensors and a computer), a base layer of software that keeps it safe, and a policy that decides what to do. Volvo's stack splits along the same lines.</p>
+
+<h3><span class="layer hw">Hyperion</span> &nbsp;the hardware: sensors and computers</h3>
+
+<aside class="side">TOPS means trillions of operations per second. INT8 means 8-bit whole-number math, a common format for running neural networks in cars. A reference set is a starting point: Volvo's software head said Volvo will “standardize more on Hyperion,” also “from a sensor set perspective.”<sup class="cite"><a href="#s2">2</a></sup></aside>
+
+<p>NVIDIA calls Hyperion&nbsp;10 “a reference production computer and sensor set architecture.”<sup class="cite"><a href="#s3">3</a></sup> In plain words: a tested design for which sensors go on the car and which computers process their data. The reference set has 14 cameras, 9 radars, 1 lidar and 12 ultrasonic sensors, plus two DRIVE AGX Thor computers, each with “1,000 TOPS of INT8” compute.<sup class="cite"><a href="#s3">3</a></sup> A carmaker that uses it does not have to design and test this hardware from zero.</p>
+
+<h3><span class="layer safe">Halos OS</span> &nbsp;the safety base: certified software and fixed rules</h3>
+
+<aside class="side">ISO&nbsp;26262 is the main safety standard for car electronics and software. It has four risk levels, ASIL&nbsp;A (lowest) to ASIL&nbsp;D (highest). A hypervisor is software that splits one computer into walled-off parts, so a crash in one part cannot spread to another.</aside>
+
+<p>Halos&nbsp;OS is the software layer that keeps the car safe even when the AI is wrong. NVIDIA describes it in layers.<sup class="cite"><a href="#s4">4</a></sup> Three of them matter for this lesson:</p>
+<ul>
+  <li><strong>A protected core.</strong> Halos Core is “the next generation of NVIDIA DriveOS” and meets ISO&nbsp;26262 ASIL&nbsp;D. Its hypervisor “isolates safety-critical functions so failures can't reach vehicle controls.”<sup class="cite"><a href="#s4">4</a></sup></li>
+  <li><strong>A classical stack.</strong> Halos&nbsp;OS “combines system services with classical perception and planning capabilities”:<sup class="cite"><a href="#s5">5</a></sup> an engineered way to see and plan that does not depend on the AI driver.</li>
+  <li><strong>Fixed rules.</strong> Halos Applications are “rule-based safety guardrails for AI.”<sup class="cite"><a href="#s6">6</a></sup></li>
+</ul>
+
+<h3><span class="layer ai">Alpamayo</span> &nbsp;the AI driver</h3>
+
+<aside class="side">Alpamayo&nbsp;1, the open research model: 4 cameras with 0.4&nbsp;s of history go in; a 6.4&nbsp;s path (64 points at 10&nbsp;Hz) and reasoning text come out. About 10 billion parameters.<sup class="cite"><a href="#s8">8</a></sup></aside>
+
+<p>Inside the car, NVIDIA describes Alpamayo as “an in-vehicle reasoning model that interprets road scenes and generates driving trajectories.”<sup class="cite"><a href="#s5">5</a></sup> It is a vision-language-action (VLA) model, the same kind of model you know from robot policies. One difference: it also writes out its reasons in words. NVIDIA calls this text “Chain-of-Causation.”<sup class="cite"><a href="#s8">8</a></sup></p>
+
+<h3><span class="layer oem">Volvo</span> &nbsp;the car and its own safety know-how</h3>
+
+<p>Volvo builds the car, joins the parts together, and brings its own safety systems and “nearly a century of real-world safety research.”<sup class="cite"><a href="#s1">1</a></sup></p>
+
+<figure class="wide">
+  <div class="scroll">
+  <svg class="dg" viewBox="0 0 920 428" style="min-width: 760px" role="img" aria-label="Sensor data from Hyperion flows to two paths at once: the Alpamayo AI driver and the Halos OS classical stack, separated by a hypervisor wall. Both send a path to a runtime safety check, which passes the chosen trajectory to the Volvo car. Everything runs on Halos Core and two DRIVE AGX Thor computers.">
+    <defs>
+      <marker id="ah1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" class="head"/>
+      </marker>
+    </defs>
+
+    <path class="bracket" d="M246,42 V32 H696 V42"/>
+    <text class="tag muted" x="471" y="22" text-anchor="middle">ALPAMAYO STACK · THE IN-CAR DRIVING SOFTWARE</text>
+
+    <rect class="box hw" x="16" y="56" width="130" height="244" rx="6"/>
+    <text class="tag hw" x="30" y="78">HYPERION</text>
+    <text class="title" x="30" y="100">Sensors</text>
+    <text x="30" y="130">14 cameras</text>
+    <text x="30" y="152">9 radars</text>
+    <text x="30" y="174">1 lidar</text>
+    <text x="30" y="196">12 ultrasonics</text>
+    <text class="small" x="30" y="224">(reference set)</text>
+
+    <path class="flow" d="M146,104 H240" marker-end="url(#ah1)"/>
+    <text class="flow-label" x="194" y="96" text-anchor="middle">video</text>
+    <path class="flow" d="M146,252 H240" marker-end="url(#ah1)"/>
+    <text class="flow-label" x="194" y="244" text-anchor="middle">camera + radar</text>
+
+    <rect class="box ai" x="246" y="56" width="200" height="96" rx="6"/>
+    <text class="tag ai" x="260" y="78">ALPAMAYO MODEL</text>
+    <text class="title" x="260" y="100">AI driver (VLA)</text>
+    <text class="small" x="260" y="122">reads camera video,</text>
+    <text class="small" x="260" y="140">proposes a path + reason</text>
+
+    <path class="wall" d="M236,178 H456"/>
+    <text class="small safe" x="446" y="171" text-anchor="end">hypervisor wall</text>
+
+    <rect class="box safe" x="246" y="204" width="200" height="96" rx="6"/>
+    <text class="tag safe" x="260" y="226">HALOS OS</text>
+    <text class="title" x="260" y="248">Classical stack</text>
+    <text class="small" x="260" y="270">perception + planning,</text>
+    <text class="small" x="260" y="288">rule-based guardrails</text>
+
+    <path class="flow" d="M446,104 H530" marker-end="url(#ah1)"/>
+    <text class="flow-label" x="491" y="96" text-anchor="middle">path + reason</text>
+    <path class="flow" d="M446,252 H530" marker-end="url(#ah1)"/>
+    <text class="flow-label" x="491" y="244" text-anchor="middle">backup path</text>
+
+    <rect class="box plain" x="536" y="56" width="160" height="244" rx="6"/>
+    <text class="tag muted" x="550" y="78">RUNTIME CHECK</text>
+    <text class="title" x="550" y="100">Safety check</text>
+    <text class="small" x="550" y="126">Policy evaluator +</text>
+    <text class="small" x="550" y="144">safety monitors</text>
+    <text x="550" y="176">evaluate actions,</text>
+    <text x="550" y="196">help choose the</text>
+    <text x="550" y="216">trajectory</text>
+
+    <path class="flow" d="M696,178 H760" marker-end="url(#ah1)"/>
+    <text class="flow-label" x="729" y="170" text-anchor="middle">trajectory</text>
+
+    <rect class="box oem" x="766" y="56" width="138" height="244" rx="6"/>
+    <text class="tag oem" x="780" y="78">VOLVO</text>
+    <text class="title" x="780" y="100">The car</text>
+    <text x="780" y="130">steer, brake,</text>
+    <text x="780" y="150">accelerate</text>
+    <text class="small" x="780" y="184">+ Volvo's own</text>
+    <text class="small" x="780" y="202">safety systems</text>
+
+    <rect class="box safe" x="16" y="322" width="888" height="40" rx="6"/>
+    <text class="tag safe" x="30" y="347">HALOS OS</text>
+    <text x="114" y="347">Halos Core: next-generation DriveOS, meets ISO 26262 ASIL D, runs the hypervisor</text>
+
+    <rect class="box hw" x="16" y="372" width="888" height="40" rx="6"/>
+    <text class="tag hw" x="30" y="397">HYPERION</text>
+    <text x="114" y="397">Compute: 2 × DRIVE AGX Thor, each 1,000 INT8 TOPS. Every box above runs here.</text>
+  </svg>
+  </div>
+  <figcaption><b>Figure 1. How one driving decision moves through the stack.</b> Sensor data goes to two paths at once: the AI driver and the classical stack. A runtime check, which NVIDIA calls “Policy Evaluator and Safety Monitors,” evaluates the driving actions and helps choose the trajectory.<sup class="cite"><a href="#s5">5</a></sup> The classical stack uses camera and radar perception.<sup class="cite"><a href="#s2">2</a></sup> The dashed line is the hypervisor wall. NVIDIA has not published exactly how the final path is chosen, so read the arrows as roles, not as wiring.</figcaption>
+</figure>
+
+<h2>Two stacks at the same time</h2>
+
+<p>The most important idea in this lesson is the pattern in Figure&nbsp;1. NVIDIA's head of automotive, Ali Kani, said it simply: “The point is we run these two stacks at the same time.”<sup class="cite"><a href="#s2">2</a></sup> NVIDIA uses the same design in the Mercedes-Benz CLA: “an AI end-to-end stack for core driving, alongside a parallel classical safety stack.”<sup class="cite"><a href="#s7">7</a></sup></p>
+
+<p>Why both? The AI driver is flexible but hard to prove safe. The classical stack and its fixed rules are less flexible but easier to test and certify. Running both gives a second, independent path when the AI is wrong.</p>
+
+<div class="box bridge">
+  <p class="eyebrow">Compare with your robot</p>
+  <p>Your pick-and-place design splits <strong>by phase</strong>: rule-based motion planning moves the arm close, then a VLA does the grasp. One part is in charge at any moment. Volvo's stack splits <strong>by role</strong>: the AI and the classical stack run at the same moment, and a checker decides what reaches the wheels. Keep this difference in mind. A later lesson asks what it would take to run such a checker during your grasp.</p>
+  <p>NVIDIA has already brought this design to robots. Halos for Robotics (June 2026) uses Halos&nbsp;OS as “the software stack for robotics safety” on IGX Thor.<sup class="cite"><a href="#s11">11</a></sup></p>
+</div>
+
+<h2>“Alpamayo” means two things</h2>
+
+<aside class="side">Older news says “NVIDIA DRIVE Hyperion.” NVIDIA renamed it “NVIDIA Hyperion” in September 2026.<sup class="cite"><a href="#s9">9</a></sup> It is the same product.</aside>
+
+<p>News stories use one name for two different things:</p>
+<ul>
+  <li>The <strong>open Alpamayo models</strong> (Alpamayo&nbsp;1, 1.5 and 2&nbsp;Super) are large models for research and development. In NVIDIA's words: “Rather than running directly in-vehicle, Alpamayo models serve as large-scale teacher models that developers can fine-tune and distill into the backbones of their complete AV stacks.”<sup class="cite"><a href="#s9">9</a></sup></li>
+  <li>The <strong>Alpamayo Stack</strong> is the software in the car. It contains a compact model that runs on DRIVE AGX Thor,<sup class="cite"><a href="#s5">5</a></sup> plus the safety parts above.</li>
+</ul>
+
+<figure class="wide">
+  <div class="scroll">
+  <svg class="dg" viewBox="0 0 920 168" style="min-width: 680px" role="img" aria-label="Open Alpamayo models in the cloud are fine-tuned and distilled into a compact model that runs in the car on DRIVE AGX Thor as part of the Alpamayo Stack.">
+    <defs>
+      <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" class="head"/>
+      </marker>
+    </defs>
+    <rect class="box ai" x="16" y="30" width="300" height="118" rx="6"/>
+    <text class="tag ai" x="30" y="52">IN THE CLOUD</text>
+    <text class="title" x="30" y="76">Open Alpamayo models</text>
+    <text x="30" y="102">Alpamayo 1: about 10B parameters</text>
+    <text x="30" y="122">Alpamayo 2 Super: 34B parameters</text>
+
+    <path class="flow" d="M316,89 H598" marker-end="url(#ah2)"/>
+    <text class="flow-label" x="457" y="80" text-anchor="middle">fine-tune + distill</text>
+    <text class="small" x="457" y="112" text-anchor="middle">also used for auto-labeling and</text>
+    <text class="small" x="457" y="130" text-anchor="middle">model critiquing</text>
+
+    <rect class="box ai" x="604" y="30" width="300" height="118" rx="6"/>
+    <text class="tag ai" x="618" y="52">IN THE CAR</text>
+    <text class="title" x="618" y="76">Compact in-car model</text>
+    <text x="618" y="102">part of the Alpamayo Stack</text>
+    <text x="618" y="122">runs on DRIVE AGX Thor</text>
+  </svg>
+  </div>
+  <figcaption><b>Figure 2. The open models teach; a smaller model drives.</b> Alpamayo&nbsp;2&nbsp;Super has 34 billion parameters and “can be distilled into compact models” that run on DRIVE AGX Thor “inside the vehicle.”<sup class="cite"><a href="#s10">10</a></sup> Volvo has not said which Alpamayo model its car will learn from. The next lesson follows this path step by step.</figcaption>
+</figure>
+
+<h2>Practice: who owns this job?</h2>
+
+<p>Pick the owner of each job. A wrong answer gives a hint, and you can try again. The score counts first tries only, so answer from memory before you scroll up.</p>
+
+<div class="sorter" data-title="Eight jobs, four owners" data-bins="hw:Hyperion,safe:Halos OS,ai:Alpamayo,oem:Volvo">
+  <div class="item" data-answer="hw"
+       data-why="Hyperion is the “sensor and compute architecture”: a tested hardware design that the carmaker builds on. <a href='#s3'>[3]</a>"
+       data-hint-ai="The AI driver uses the sensor data, but it does not supply the sensors."
+       data-hint-safe="Halos OS is software. Sensors are hardware."
+       data-hint-oem="Volvo builds the car, but this exact sensor set comes from NVIDIA's reference design.">Supply a tested set of 14 cameras, 9 radars, 1 lidar and 12 ultrasonic sensors.</div>
+  <div class="item" data-answer="hw"
+       data-why="The two Thor computers are part of Hyperion's reference design. Every other part of the stack runs on them. <a href='#s3'>[3]</a>"
+       data-hint-safe="Halos OS runs on these computers. It is not the computers."
+       data-hint-ai="The AI driver needs this compute, but it is not the compute."
+       data-hint-oem="Volvo chose these computers, but they come from NVIDIA's reference design.">Provide two DRIVE AGX Thor computers with 1,000 INT8 TOPS each.</div>
+  <div class="item" data-answer="ai"
+       data-why="This is the AI driver: “an in-vehicle reasoning model that interprets road scenes and generates driving trajectories.” <a href='#s5'>[5]</a>"
+       data-hint-safe="Halos OS has a classical planner, but this job says “learned vision-language-action model”."
+       data-hint-hw="Hyperion supplies the video and the compute. Something else turns them into a path."
+       data-hint-oem="Volvo did not build this model. It comes from NVIDIA.">Use a learned vision-language-action model to turn camera video into a planned path.</div>
+  <div class="item" data-answer="ai"
+       data-why="Alpamayo models write reasoning text called “Chain-of-Causation” next to the path. <a href='#s8'>[8]</a>"
+       data-hint-safe="Rule-based guardrails apply fixed rules. They do not write explanations."
+       data-hint-hw="Hardware does not explain decisions."
+       data-hint-oem="This explanation comes from the AI model itself.">Write out in words why the car chose its path, for example that a cyclist is about to enter the lane.</div>
+  <div class="item" data-answer="safe"
+       data-why="Halos Core's hypervisor “isolates safety-critical functions so failures can't reach vehicle controls.” <a href='#s4'>[4]</a>"
+       data-hint-hw="This wall is built in software (a hypervisor) on top of the hardware."
+       data-hint-ai="The AI is what gets walled off. It is not the wall."
+       data-hint-oem="In this stack, NVIDIA's certified software provides this wall.">Keep safety-critical functions walled off, so a fault in the AI cannot reach the steering and brakes.</div>
+  <div class="item" data-answer="safe"
+       data-why="Halos Applications are “rule-based safety guardrails for AI.” <a href='#s6'>[6]</a>"
+       data-hint-ai="The AI is what the guardrails limit."
+       data-hint-hw="Guardrails are rules in software, not hardware."
+       data-hint-oem="Volvo has its own safety systems, but these AI guardrails are a named part of NVIDIA's safety software.">Apply fixed, rule-based guardrails that limit what the AI is allowed to do.</div>
+  <div class="item" data-answer="safe"
+       data-why="Halos OS “combines system services with classical perception and planning capabilities,” and NVIDIA runs this classical stack next to the AI. <a href='#s5'>[5]</a>"
+       data-hint-ai="This path is classical (engineered), not a learned end-to-end model."
+       data-hint-hw="Hyperion runs this software, but it is not the software."
+       data-hint-oem="NVIDIA supplies this classical stack as part of Halos OS.">Run a classical perception and planning stack at the same time as the AI, as a second path.</div>
+  <div class="item" data-answer="oem"
+       data-why="The release says Volvo “will combine its industry-leading vehicle safety systems and engineering expertise” with NVIDIA's technology. <a href='#s1'>[1]</a>"
+       data-hint-safe="Halos is NVIDIA's safety system. This job is about the carmaker's own work."
+       data-hint-ai="An AI model does not bring decades of crash research."
+       data-hint-hw="This is knowledge and systems, not sensors or computers.">Bring the carmaker's own vehicle safety systems and decades of real-world crash research.</div>
+</div>
+
+<h2>Check yourself</h2>
+
+<div class="mcq" data-correct="2">
+  <p class="q">In NVIDIA's own words, what are the open Alpamayo models (like Alpamayo&nbsp;1) mainly for?</p>
+  <ol class="opts">
+    <li><button type="button" class="opt" data-why="NVIDIA says the open models work “rather than running directly in-vehicle.”">Running unchanged inside every car sold</button></li>
+    <li><button type="button" class="opt" data-why="NVIDIA keeps a classical safety stack running next to the AI.">Replacing the classical safety stack fully</button></li>
+    <li><button type="button" class="opt" data-why="">Teaching the smaller models inside cars</button></li>
+    <li><button type="button" class="opt" data-why="Certification belongs to Halos and NVIDIA's inspection lab, not to the AI model.">Certifying the sensors and the computers</button></li>
+  </ol>
+  <template class="explain">NVIDIA: “Rather than running directly in-vehicle, Alpamayo models serve as large-scale teacher models that developers can fine-tune and distill into the backbones of their complete AV stacks.” <a href="#s9">[9]</a></template>
+</div>
+
+<div class="mcq" data-correct="0">
+  <p class="q">Why does NVIDIA run a classical stack at the same time as the AI driver?</p>
+  <ol class="opts">
+    <li><button type="button" class="opt" data-why="">It gives a second, rule-based safety path</button></li>
+    <li><button type="button" class="opt" data-why="Smoothness is not the reason NVIDIA gives.">Classical planning always gives a smoother ride</button></li>
+    <li><button type="button" class="opt" data-why="NVIDIA cites no such rule.">Regulators ban AI from steering any car</button></li>
+    <li><button type="button" class="opt" data-why="Training happens in the cloud, not in the car's safety stack.">It teaches the AI model while driving</button></li>
+  </ol>
+  <template class="explain">NVIDIA pairs “an AI end-to-end stack for core driving” with “a parallel classical safety stack” <a href="#s7">[7]</a>, and Halos adds “rule-based safety guardrails for AI” <a href="#s6">[6]</a>. If the AI makes a mistake, a second path with fixed rules can catch it.</template>
+</div>
+
+<details class="recall">
+  <summary>Before you leave: say one sentence for each part from memory, then open this</summary>
+  <ul>
+    <li><span class="layer hw">Hyperion</span> The tested hardware: the sensor set and two DRIVE AGX Thor computers.</li>
+    <li><span class="layer safe">Halos OS</span> The certified safety software: a walled-off core, a classical stack, and fixed rules for the AI.</li>
+    <li><span class="layer ai">Alpamayo</span> The AI driver: a VLA that turns camera video into a path plus a written reason. The big open models are teachers; a compact model drives.</li>
+    <li><span class="layer oem">Volvo</span> The car, the integration, and Volvo's own safety systems and research.</li>
+  </ul>
+</details>
+
+<div class="primary">
+  <p class="eyebrow">Read this next</p>
+  <p><a href="https://blogs.nvidia.com/blog/halos-os-robotaxi-safety/">NVIDIA blog: Halos&nbsp;OS (10 June 2026)</a>. The clearest official explanation of the safety layer, with one heading per layer. This is the part with the least robot-world experience behind it for you, so it repays a careful read. About 10 minutes. It uses a few terms without explaining them (middleware, TensorRT); ask me about any of them.</p>
+  <p>Want to go deeper on the AI driver first? The <a href="https://arxiv.org/abs/2511.00088">Alpamayo-R1 paper</a> is the main source for the next lesson.</p>
+</div>
+
+<div class="box">
+  <p class="eyebrow">Ask me anything</p>
+  <p>I am your teacher for this course. If a sentence here is unclear, if you want to know how a part compares to something in your robot work, or if you got a practice question wrong and want to know why, ask me in our chat. Your questions also shape the next lesson.</p>
+</div>
+
+<section class="sources" aria-labelledby="sources-h">
+  <h2 id="sources-h">Sources</h2>
+  <ol>
+    <li id="s1"><a href="https://nvidianews.nvidia.com/news/volvo-cars-and-nvidia-expand-partnership-to-advance-safe-automated-driving">“Volvo Cars and NVIDIA Expand Partnership to Advance Safe Automated Driving”</a> <span class="kind">NVIDIA Newsroom (joint release), 15 Oct 2026</span></li>
+    <li id="s2"><a href="https://techcrunch.com/2026/10/15/volvo-makes-a-bigger-bet-on-nvidia/">“Volvo makes a bigger bet on Nvidia”</a> <span class="kind">TechCrunch, 15 Oct 2026 (press)</span></li>
+    <li id="s3"><a href="https://nvidianews.nvidia.com/news/nvidia-uber-robotaxi">Hyperion 10 and Uber robotaxi announcement</a> <span class="kind">NVIDIA Newsroom, 28 Oct 2025</span></li>
+    <li id="s4"><a href="https://blogs.nvidia.com/blog/halos-os-robotaxi-safety/">Halos OS blog post</a> <span class="kind">NVIDIA Blog, 10 Jun 2026</span></li>
+    <li id="s5"><a href="https://www.nvidia.com/en-us/solutions/autonomous-vehicles/alpamayo/">NVIDIA Alpamayo Stack product page</a> <span class="kind">NVIDIA, read 16 Oct 2026</span></li>
+    <li id="s6"><a href="https://www.nvidia.com/en-us/ai-trust-center/halos/autonomous-vehicles/">NVIDIA Halos for autonomous vehicles</a> <span class="kind">NVIDIA AI Trust Center, read 16 Oct 2026</span></li>
+    <li id="s7"><a href="https://blogs.nvidia.com/blog/drive-av-software-mercedes-benz-cla/">DRIVE AV software in the Mercedes-Benz CLA</a> <span class="kind">NVIDIA Blog, 5 Jan 2026</span></li>
+    <li id="s8"><a href="https://huggingface.co/nvidia/Alpamayo-R1-10B">Model card: nvidia/Alpamayo-R1-10B (Alpamayo 1)</a> <span class="kind">Hugging Face</span></li>
+    <li id="s9"><a href="https://nvidianews.nvidia.com/news/alpamayo-autonomous-vehicle-development">Alpamayo family announcement</a> <span class="kind">NVIDIA Newsroom, 5 Jan 2026 (editor's note on the Hyperion rename)</span></li>
+    <li id="s10"><a href="https://nvidianews.nvidia.com/news/nvidia-alpamayo-2-super-robotaxis">Alpamayo 2 Super announcement</a> <span class="kind">NVIDIA Newsroom, 31 May 2026</span></li>
+    <li id="s11"><a href="https://nvidianews.nvidia.com/news/nvidia-announces-halos-for-robotics-the-industrys-first-full-stack-safety-system-for-physical-ai">Halos for Robotics announcement</a> <span class="kind">NVIDIA Newsroom, 22 Jun 2026</span></li>
+  </ol>
+</section>
+
+<nav class="next" aria-label="Next steps">
+  <a href="../index.html">← Course home</a>
+  <a href="../reference/stack-map.html">Reference: Stack map</a>
+  <span>Next: Lesson 2, from teacher model to car (coming soon)</span>
+</nav>
+
+</main>
+</body>
+</html>
