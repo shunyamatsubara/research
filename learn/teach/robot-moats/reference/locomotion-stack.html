@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Locomotion Stack</title>
+<meta name="description" content="Reference sheet R1 of Robot Startup Moats: the four layers of locomotion, their status in 2026, and how to judge a startup claim at each layer.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<main class="sheet">
+
+  <nav class="crumbs" aria-label="Course">
+    <a href="../index.html">← Course home</a>
+    <a href="../lessons/0001-is-locomotion-a-commodity.html">Lesson 0001: Is locomotion a commodity?</a>
+  </nav>
+
+  <p class="eyebrow">Reference R1 · sources checked 16 Oct 2026</p>
+  <h1>The locomotion stack</h1>
+  <p class="lead">Four layers, their status in 2026, and how to judge a startup’s claim at each one.</p>
+
+  <div class="table-wrap wide">
+    <table class="data">
+      <thead>
+        <tr>
+          <th scope="col">Layer</th>
+          <th scope="col">What it is</th>
+          <th scope="col">Status</th>
+          <th scope="col">Key evidence</th>
+          <th scope="col">Where a moat could be</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>L4</strong> Whole-body loco-manipulation</td>
+          <td>Arms and legs working together while walking; staying safe near people</td>
+          <td><span class="badge open">Open</span></td>
+          <td>Frontier is “dexterous interaction” (<a href="https://arxiv.org/abs/2607.28952">Frey 2026</a>); safety standard <a href="https://iss.rs/en/project/show/iso:proj:91469">ISO 25785-1</a> still a draft</td>
+          <td>Safety record and certification; real interaction data</td>
+        </tr>
+        <tr>
+          <td><strong>L3</strong> Navigation and autonomy</td>
+          <td>Where to go and whether it is safe, with no map, GPS or marked path</td>
+          <td><span class="badge open">Open</span></td>
+          <td>Frontier is “semantic understanding” (<a href="https://arxiv.org/abs/2607.28952">Frey 2026</a>); Field AI’s whole pitch</td>
+          <td>Field hours, intervention rate, data from hard sites, fleet operations</td>
+        </tr>
+        <tr>
+          <td><strong>L2</strong> Perceptive locomotion</td>
+          <td>Cameras or LiDAR used to place each foot</td>
+          <td><span class="badge maturing">Maturing</span></td>
+          <td>2.2 km mountain hike in 78 min, but snow, grass and water fool the sensors (<a href="https://arxiv.org/abs/2201.08117">Miki 2022</a>)</td>
+          <td>Perception that holds up in bad conditions; field data</td>
+        </tr>
+        <tr>
+          <td><strong>L1</strong> Gait control</td>
+          <td>Speed command to joint targets, body sensors only, firm ground</td>
+          <td><span class="badge commodity">Near-commodity</span></td>
+          <td>Flat ground in under 4 min on one GPU (<a href="https://arxiv.org/abs/2109.11978">Rudin 2021</a>); humanoids in under 30 min (<a href="https://arxiv.org/abs/2502.08844">MuJoCo Playground</a>); <a href="https://www.unitree.com/go2">Go2 from $1,600</a></td>
+          <td>Not in the walking policy. If anywhere, in hardware cost and sales volume.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Two questions for any claim</h2>
+  <ol>
+    <li><strong>Which layer is it?</strong> L1 on firm ground: assume a public recipe can match it.</li>
+    <li><strong>What evidence goes beyond a demo?</strong></li>
+  </ol>
+  <div class="split">
+    <div class="yes">
+      <h3>Strong evidence</h3>
+      <ul>
+        <li>Field hours, and how often a human had to step in</li>
+        <li>Falls per hour or per km, measured over months</li>
+        <li>Paying customers who come back for more robots</li>
+        <li>Data from sites that others cannot reach</li>
+      </ul>
+    </div>
+    <div class="no">
+      <h3>Weak evidence</h3>
+      <ul>
+        <li>A viral video or a race win</li>
+        <li>Training speed (“walks after 20 minutes”)</li>
+        <li>The size of the model or the reward</li>
+        <li>A long list of robot bodies it “supports”</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>The two common arguments, in one line each</h2>
+  <ul>
+    <li><strong>“The reward is simple.”</strong> The task reward is; the style reward is not (<a href="https://arxiv.org/abs/2104.02180">Peng 2021</a>). Real setups use 9 active terms for a quadruped and 15 to 16 for a humanoid, tuned per robot. A cost, not a moat.</li>
+    <li><strong>“It is easy to simulate.”</strong> The rigid body is. Motors (<a href="https://arxiv.org/abs/1901.08652">Hwangbo 2019</a>), sensors (<a href="https://arxiv.org/abs/2211.07638">Agarwal 2022</a>) and soft ground (<a href="https://doi.org/10.1126/scirobotics.ade2256">Choi 2023</a>) are not. Still far easier than manipulation (<a href="https://news.berkeley.edu/2025/08/27/are-we-truly-on-the-verge-of-the-humanoid-robot-revolution/">Goldberg 2025</a>).</li>
+  </ul>
+
+  <h2>Numbers worth remembering</h2>
+  <div class="table-wrap">
+    <table class="data">
+      <tbody>
+        <tr><td class="num">&lt; 4 min / 20 min</td><td>Flat / rough-terrain walking policy on one GPU</td><td><a href="https://arxiv.org/abs/2109.11978">Rudin 2021</a></td></tr>
+        <tr><td class="num">9 / 15–16</td><td>Active reward terms: quadruped / humanoid</td><td><a href="https://raw.githubusercontent.com/leggedrobotics/legged_gym/master/legged_gym/envs/base/legged_robot_config.py">legged_gym</a>, Isaac Lab, Unitree</td></tr>
+        <tr><td class="num">2,000+ h / week</td><td>Spot’s test fleet before its learned controller shipped</td><td><a href="https://bostondynamics.com/blog/starting-on-the-right-foot-with-reinforcement-learning/">Boston Dynamics 2024</a></td></tr>
+        <tr><td class="num">1 per 50 km</td><td>Spot’s average fall rate</td><td><a href="https://spectrum.ieee.org/boston-dynamics-research-spot">IEEE Spectrum 2024</a></td></tr>
+        <tr><td class="num">200,000 vs 500</td><td>Simulation steps per second, without vs with depth images</td><td><a href="https://arxiv.org/abs/2211.07638">Agarwal 2022</a></td></tr>
+        <tr><td class="num">3 m</td><td>Brooks’s advice: keep this far from a full-size walking robot</td><td><a href="https://rodneybrooks.com/why-todays-humanoids-wont-learn-dexterity/">Brooks 2025</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Field AI in one paragraph</h2>
+  <p>Field AI sells L3: risk-aware navigation “without prior maps, GPS, or predefined paths,” across many robot bodies (<a href="https://www.fieldai.com/news/fieldai-announces-over-400m-in-funds-raised-to-advance-embodied-ai-at-scale">2025 release</a>). On Spot, Boston Dynamics does the walking and Field AI does the deciding (<a href="https://www.fieldai.com/news/boston-dynamics-and-fieldai-partner-to-bring-robots-into-uncharted-and-dynamic-environments">2026 release</a>). It is hiring to build its own locomotion for humanoids (<a href="https://jobs.lever.co/field-ai/00be5e27-c434-4cde-b367-f1688aa7bd2b">job post</a>). Its numbers are company claims; no independent field data is public.</p>
+
+  <h2>Words from lesson 0001</h2>
+  <ul>
+    <li><strong>Gait control</strong>: the lowest layer, turning a speed command into joint targets from body sensors.</li>
+    <li><strong>Perceptive locomotion</strong>: walking that uses cameras or LiDAR to choose where each foot goes.</li>
+    <li><strong>Task reward vs style reward</strong>: the part that says what to achieve vs the many terms that say how to move.</li>
+    <li><strong>Actuator network</strong>: a neural network that learns how the real motors respond, because they are hard to model by hand.</li>
+    <li><strong>Teacher–student training</strong>: train a “teacher” with perfect simulator data, then copy its behavior into a “student” that only has real sensors.</li>
+    <li><strong>Intervention</strong>: a moment when a human must step in to help the robot; the rate per hour is a key field metric.</li>
+  </ul>
+
+  <p class="foot">Reference R1 · Robot Startup Moats. Print it, or look at it again 3 days after lesson 0001.</p>
+</main>
+</body>
+</html>

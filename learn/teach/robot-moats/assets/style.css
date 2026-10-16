@@ -180,9 +180,10 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 2.4rem 0; }
 /* ---------- Header figure: gait strip ---------- */
 
 .gait { margin: 1.4rem 0 0.4rem; }
-.gait svg { display: block; width: 100%; max-width: 100%; height: auto; }
+.gait svg { display: block; width: 100%; max-width: 440px; height: auto; }
 .gait .lane { fill: var(--rule); }
 .gait .stance { fill: var(--ink); }
+.gait .tick { fill: none; stroke: var(--ink-soft); stroke-width: 1; }
 .gait .lbl { fill: var(--ink-soft); font-family: var(--font-mono); font-size: 9px; }
 
 figure { margin: 1.5rem 0; }

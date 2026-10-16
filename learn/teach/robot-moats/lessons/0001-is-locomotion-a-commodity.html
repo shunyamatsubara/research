@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Is Locomotion a Commodity?</title>
+<meta name="description" content="Lesson 0001 of Robot Startup Moats: split locomotion into four layers, then test the claims that the reward is simple and the simulation is easy.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<main class="sheet" data-lesson="0001">
+
+  <nav class="crumbs" aria-label="Course">
+    <a href="../index.html">← Course home</a>
+    <a href="../reference/locomotion-stack.html">Reference: the locomotion stack</a>
+  </nav>
+
+  <p class="eyebrow">Lesson 0001 · about 15 minutes · Mission: judge robot startups</p>
+  <h1>Is locomotion a commodity?</h1>
+  <p class="lead">Half yes. Learning to walk on firm ground is close to a commodity. Locomotion as a product is not. Before you judge any startup’s claim, split “locomotion” into layers.</p>
+
+  <figure class="gait" aria-labelledby="gait-cap">
+    <svg viewBox="0 0 340 96" role="img" aria-label="Gait diagram of a trot. The left front and right hind feet touch the ground together, then the right front and left hind feet.">
+      <text class="lbl" x="0" y="14.5">LF</text>
+      <rect class="lane" x="30" y="6" width="306" height="10"></rect>
+      <rect class="stance" x="30" y="6" width="84" height="10"></rect>
+      <rect class="stance" x="183" y="6" width="84" height="10"></rect>
+
+      <text class="lbl" x="0" y="32.5">RF</text>
+      <rect class="lane" x="30" y="24" width="306" height="10"></rect>
+      <rect class="stance" x="99" y="24" width="84" height="10"></rect>
+      <rect class="stance" x="252" y="24" width="84" height="10"></rect>
+
+      <text class="lbl" x="0" y="50.5">LH</text>
+      <rect class="lane" x="30" y="42" width="306" height="10"></rect>
+      <rect class="stance" x="99" y="42" width="84" height="10"></rect>
+      <rect class="stance" x="252" y="42" width="84" height="10"></rect>
+
+      <text class="lbl" x="0" y="68.5">RH</text>
+      <rect class="lane" x="30" y="60" width="306" height="10"></rect>
+      <rect class="stance" x="30" y="60" width="84" height="10"></rect>
+      <rect class="stance" x="183" y="60" width="84" height="10"></rect>
+
+      <path class="tick" d="M30 78 V84 H183 V78"></path>
+      <text class="lbl" x="106.5" y="94" text-anchor="middle">one stride</text>
+    </svg>
+    <figcaption id="gait-cap">A trot, drawn as a gait diagram (a schematic, not measured data). Each lane is one foot: LF is left front, RH is right hind. Dark bars show when that foot is on the ground, and diagonal feet land together. Learning a stable pattern like this on firm ground is the part that is now close to a commodity.</figcaption>
+  </figure>
+
+  <section class="answer" aria-labelledby="short-answer">
+    <p class="eyebrow" id="short-answer">Short answer</p>
+    <p class="big">You are right about the bottom layer and wrong about the stack. The step controller is close to a commodity. Seeing the ground, choosing where to go, carrying things, and staying safe near people are not.</p>
+    <div class="split">
+      <div class="yes">
+        <h3>Where you are right</h3>
+        <ul>
+          <li>A flat-ground walking policy trains <a href="https://arxiv.org/abs/2109.11978">“in under four minutes”</a> on one GPU, from public code.</li>
+          <li>A robot dog that walks well costs <a href="https://www.unitree.com/go2">from $1,600</a>.</li>
+          <li>A July 2026 review calls quadruped walking <a href="https://arxiv.org/abs/2607.28952">“an approachable problem”</a>, especially on known terrain.</li>
+        </ul>
+      </div>
+      <div class="no">
+        <h3>Where it breaks</h3>
+        <ul>
+          <li>The goal is simple; the reward is not. Real setups use 9 reward terms for a robot dog and about 15 for a humanoid.</li>
+          <li>The hard parts of simulation are the motors, the sensors and soft ground, not the robot’s rigid body.</li>
+          <li>The same review says the frontier “has now shifted toward semantic understanding and dexterous interaction.” That is where Field AI plays.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <h2>Locomotion is four jobs, not one</h2>
+  <p>When a startup says “locomotion”, it can mean any of four jobs. In 2026 they are at very different stages, and most arguments about whether locomotion is “solved” come from mixing them up. This four-layer split is the tool for this course, not an industry standard.</p>
+
+  <figure>
+    <ol class="stack" aria-label="The four layers of locomotion, from top to bottom">
+      <li>
+        <span class="lvl">L4</span>
+        <span class="name">Whole-body loco-manipulation</span>
+        <span class="badge open">Open</span>
+        <span class="desc">Walking while the arms carry, push or open things, and staying safe if a full-size robot falls near people.</span>
+      </li>
+      <li>
+        <span class="lvl">L3</span>
+        <span class="name">Navigation and autonomy</span>
+        <span class="badge open">Open</span>
+        <span class="desc">Deciding where to go and whether it is safe, in places with no map, no GPS and no marked path.</span>
+      </li>
+      <li>
+        <span class="lvl">L2</span>
+        <span class="name">Perceptive locomotion</span>
+        <span class="badge maturing">Maturing</span>
+        <span class="desc">Using cameras or LiDAR to place each foot on stairs, gaps and rough ground.</span>
+      </li>
+      <li>
+        <span class="lvl">L1</span>
+        <span class="name">Gait control</span>
+        <span class="badge commodity">Near-commodity</span>
+        <span class="desc">Turning a speed command into joint targets, using only the robot’s own body sensors, on firm ground.</span>
+      </li>
+    </ol>
+    <figcaption>Status as of October 2026, based on the sources in this lesson. Manipulation is a separate branch. L4 is where the two branches meet.</figcaption>
+  </figure>
+
+  <div class="row">
+    <p><strong>L1 is the part you described, and it is close to a commodity.</strong> The recipe is public, training takes minutes, and cheap robots ship with it. Even humanoids now learn flat-floor walking in under 30 minutes and then work on the real robot without changes.</p>
+    <aside class="note">Rudin et al., <a href="https://arxiv.org/abs/2109.11978">CoRL 2021</a>: flat ground “in under four minutes”, rough ground “in twenty minutes”, one workstation GPU. <a href="https://arxiv.org/abs/2502.08844">MuJoCo Playground</a> (2025): Unitree G1 and Booster T1 humanoids in under 30 minutes, zero-shot to hardware. <a href="https://isaac-sim.github.io/IsaacLab/main/source/overview/environments.html">Isaac Lab</a> ships ready-made walking tasks for ANYmal, Unitree Go2, H1, G1 and more.</aside>
+  </div>
+
+  <div class="row">
+    <p><strong>L2 works, but its sensors can lie.</strong> ETH Zurich’s robot ANYmal hiked a 2.2 km mountain trail in 78 minutes, close to the 76 minutes a hiking planner gives a person. Yet to its cameras and LiDAR, snow, tall grass and water can look like walls, or like nothing at all.</p>
+    <aside class="note">Miki et al., <a href="https://arxiv.org/abs/2201.08117">Science Robotics 2022</a>: “Snow, vegetation, and water visually appear as obstacles… or are missing altogether due to high reflectance.”</aside>
+  </div>
+
+  <div class="row">
+    <p><strong>L3 and L4 are open.</strong> The 2026 review puts the frontier there, and adds that “verifying and certifying the safety of control policies for legged robots remains an open problem.” The safety standard being written for legged industrial robots, ISO 25785-1, is still a draft.</p>
+    <aside class="note">Frey et al., <a href="https://arxiv.org/abs/2607.28952">Science Robotics 2026</a>. <a href="https://iss.rs/en/project/show/iso:proj:91469">ISO 25785-1</a> reached the committee-draft stage in July 2026. Rodney Brooks (<a href="https://rodneybrooks.com/why-todays-humanoids-wont-learn-dexterity/">2025</a>): “not come closer than 3 meters to a full size walking robot.”</aside>
+  </div>
+
+  <h2>Your two arguments, tested</h2>
+
+  <div class="argument">
+    <h3>1 · “The reward design is simple”</h3>
+    <p class="you">Body above ground, less motor jerk, get from A to B. Reinforcement learning should work fairly directly.</p>
+  </div>
+
+  <div class="row">
+    <p><strong>The goal is simple. The reward is not.</strong> The authors of AMP put it well: the task reward “can be relatively intuitive and simple to design. However, it can be exceptionally difficult to design a style-reward.” The style reward is the part that makes the motion natural, efficient and safe on real hardware.</p>
+    <aside class="note">Peng et al., <a href="https://arxiv.org/abs/2104.02180">SIGGRAPH 2021</a>. Written for animated characters; the same method was later used on real robots.</aside>
+  </div>
+
+  <div class="row">
+    <p>With only the task reward, the policy cheats. In one study it learned “to exploit inaccurate simulator dynamics” and “violently vibrates” its feet. At a slow walk it used about nine times more energy per meter than a policy with a tuned reward.</p>
+    <aside class="note">Escontrela et al., <a href="https://arxiv.org/abs/2203.15103">IROS 2022</a>, Table II: cost of transport 14.03 with the task reward only, 1.37–1.65 with a hand-tuned reward.</aside>
+  </div>
+
+  <p>So real setups add a term to block each cheat. This is the default reward in <a href="https://raw.githubusercontent.com/leggedrobotics/legged_gym/master/legged_gym/envs/base/legged_robot_config.py">legged_gym</a>, the public code behind the “walk in minutes” paper. Your three ideas are in it, split into seven terms. Two terms are not on your list.</p>
+
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr><th scope="col">Term</th><th scope="col">Weight</th><th scope="col">What it asks for</th><th scope="col">Your idea</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>tracking_lin_vel</code></td><td class="num">+1.0</td><td>Follow the commanded speed</td><td>A to B</td></tr>
+        <tr><td><code>tracking_ang_vel</code></td><td class="num">+0.5</td><td>Follow the commanded turn rate</td><td>A to B</td></tr>
+        <tr><td><code>lin_vel_z</code></td><td class="num">−2.0</td><td>Don’t bounce up and down</td><td>Body up</td></tr>
+        <tr><td><code>ang_vel_xy</code></td><td class="num">−0.05</td><td>Don’t rock or tilt the body</td><td>Body up</td></tr>
+        <tr><td><code>collision</code></td><td class="num">−1.0</td><td>Don’t touch the ground with thighs or shins</td><td>Body up</td></tr>
+        <tr><td><code>dof_acc</code></td><td class="num">−0.00000025</td><td>Avoid sudden joint acceleration</td><td>Less jerk</td></tr>
+        <tr><td><code>action_rate</code></td><td class="num">−0.01</td><td>Avoid sudden changes in commands</td><td>Less jerk</td></tr>
+        <tr><td><code>torques</code></td><td class="num">−0.00001</td><td>Use less motor torque (energy)</td><td>Not on your list</td></tr>
+        <tr><td><code>feet_air_time</code></td><td class="num">+1.0</td><td>Lift the feet and take real steps</td><td>Not on your list</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="row">
+    <p>The weights also need tuning for each robot: before tuning, the paper saw “artifacts in the behavior, such as a dragging leg.” And humanoids need more terms: 15 in Isaac Lab’s G1 setup, and 16 in Unitree’s own, including a fixed walking rhythm of 0.8 seconds per gait cycle.</p>
+    <aside class="note">Rudin et al., <a href="https://arxiv.org/abs/2109.11978">CoRL 2021</a>. Humanoid configs: <a href="https://github.com/isaac-sim/IsaacLab">Isaac Lab</a> (<code>config/g1/rough_env_cfg.py</code>) and <a href="https://github.com/unitreerobotics/unitree_rl_gym">unitree_rl_gym</a> (<code>g1_config.py</code>), read on 16 Oct 2026. The survey by <a href="https://arxiv.org/abs/2406.01152">Ha et al.</a> (§3.3.1): “There is no general set of rules one can follow to define the components of the reward function.”</aside>
+  </div>
+
+  <p class="verdict-line">Verdict: right in spirit, wrong in size. For judging startups, the key point is that once a reward recipe works for a robot, it gets published. Reward tuning is a cost, not a moat.</p>
+
+  <div class="argument">
+    <h3>2 · “It is easy to simulate”</h3>
+    <p class="you">Manipulation needs soft, deformable objects. Locomotion doesn’t, if the robot goes where people go: solid ground.</p>
+  </div>
+
+  <div class="row">
+    <p><strong>Right, compared with manipulation.</strong> Ken Goldberg of UC Berkeley says simulation “actually does work pretty well for robots running and performing acrobatics,” while for dexterity it “has been very elusive.” In one test, four physics engines simulated a cloth as badly as, or worse than, the difference between two different real rags.</p>
+    <aside class="note">Goldberg in <a href="https://news.berkeley.edu/2025/08/27/are-we-truly-on-the-verge-of-the-humanoid-robot-revolution/">Berkeley News</a>, Aug 2025, and in a <a href="https://autolab.berkeley.edu/assets/publications/media/GOFE-Can-Close-the-100000-Year-Robot-Data-Gap-Science-Robotics-Aug-2025-scirobotics.aea7390.pdf">Science Robotics editorial</a>: “simulation is notoriously unreliable for robot manipulation.” Cloth: Blanco-Mulero et al., <a href="https://arxiv.org/abs/2310.09543">RA-L 2024</a>.</aside>
+  </div>
+
+  <p><strong>But the gap is not in the rigid body.</strong> It is in three other places.</p>
+
+  <div class="row">
+    <p><strong>Motors.</strong> ANYmal’s legs behave like an ideal rigid body, but its motors do not. With an ideal or hand-tuned motor model, the trained robot “could not make a single step without falling.” After more than a week of hand-tuning failed, the team learned the motors’ behavior from data with a neural network, an <em>actuator network</em>.</p>
+    <aside class="note">Hwangbo et al., <a href="https://arxiv.org/abs/1901.08652">Science Robotics 2019</a>. Tan et al. (<a href="https://arxiv.org/abs/1804.10332">RSS 2018</a>) name “inaccurate actuator models and lack of latency modeling” as two major causes of the sim-to-real gap.</aside>
+  </div>
+
+  <div class="row">
+    <p><strong>Sensors.</strong> Depth sensors misread snow, grass, water and shiny floors, as above. Simulating cameras is also slow: one team measured about 200,000 simulation steps per second without depth images and 500 with them.</p>
+    <aside class="note">Agarwal et al., <a href="https://arxiv.org/abs/2211.07638">CoRL 2022</a>. This is why most camera-based walking work first trains a “teacher” that gets perfect terrain data, then copies its behavior into a camera-based “student”.</aside>
+  </div>
+
+  <div class="row">
+    <p><strong>Soft ground that people do walk on.</strong> Here your argument partly survives: a policy trained only on rigid terrain still walked through mud, snow and thick vegetation. But running on sand at speed needed a new sand model. And for two-legged robots, the 2026 review says “purely reactive behaviors are insufficient,” because many tasks “require precise foot placement and nuanced environment understanding.”</p>
+    <aside class="note">Lee et al., <a href="https://arxiv.org/abs/2010.11251">Science Robotics 2020</a>. Choi et al., <a href="https://doi.org/10.1126/scirobotics.ade2256">Science Robotics 2023</a>: policies are “still not applicable on soft and deformable terrains, especially at high speed”; a granular-media model let the robot run on beach sand at 3.03 m/s. Frey et al., <a href="https://arxiv.org/abs/2607.28952">2026</a>.</aside>
+  </div>
+
+  <p class="verdict-line">Verdict: right that walking is much easier to simulate than manipulation. Wrong that it is easy. The 2026 review even suggests the field may need to move “beyond rigid-body simulation.”</p>
+
+  <h2>So what is Field AI building?</h2>
+
+  <div class="row">
+    <p><strong>Mostly L3, not L1.</strong> Field AI’s models are built for “navigating dynamic, unstructured environments without prior maps, GPS, or predefined paths,” and they run on “quadrupeds, humanoids, wheeled robots, and passenger-scale vehicles.” Investors are paying for that layer: $405 million raised in 2025, and a reported $10 billion valuation in October 2026.</p>
+    <aside class="note"><a href="https://www.fieldai.com/news/fieldai-announces-over-400m-in-funds-raised-to-advance-embodied-ai-at-scale">FieldAI press release</a>, 20 Aug 2025. The $10B figure is a signed term sheet, not a closed round (Business Insider, via <a href="https://thenextweb.com/news/fieldai-10b-europe-robot-brains">TNW</a>, 2 Oct 2026).</aside>
+  </div>
+
+  <div class="row">
+    <p><strong>On Spot, the split is explicit.</strong> Their joint release describes “Spot’s rugged mobility, combined with FFMs’ risk-aware decision-making.” Boston Dynamics does the walking; Field AI decides where to walk. Its founder, Ali Agha, built the same split at NASA JPL for the DARPA Subterranean Challenge.</p>
+    <aside class="note"><a href="https://www.fieldai.com/news/boston-dynamics-and-fieldai-partner-to-bring-robots-into-uncharted-and-dynamic-environments">Boston Dynamics and FieldAI release</a>, 12 Mar 2026. FFM means Field Foundation Model. Team CoSTAR paper (<a href="https://arxiv.org/abs/2010.09259">2020</a>): a “Spot interface module, which includes Spot’s internal locomotion system.”</aside>
+  </div>
+
+  <div class="row">
+    <p><strong>One twist.</strong> Field AI is now hiring engineers to build its own “terrain-aware (perceptive) locomotion behaviors for quadruped and humanoid platforms,” plus whole-body skills for humanoids. My reading: a robot brain that depends on one maker’s legs is weaker, so they want to own the lower layers too, at least for humanoids. That is a plan, not a shipped product.</p>
+    <aside class="note">FieldAI job post <a href="https://jobs.lever.co/field-ai/00be5e27-c434-4cde-b367-f1688aa7bd2b">“Robotics Autonomy Engineer, Locomotion”</a>, open in Oct 2026. The 2025 funding also names “product development across locomotion and manipulation.”</aside>
+  </div>
+
+  <h2>Two questions for any startup claim</h2>
+  <p>This is the skill this lesson is for.</p>
+  <ol>
+    <li><strong>Which layer is it?</strong> If the claim is L1 on firm ground, assume a public recipe can match it, and look for the moat somewhere else.</li>
+    <li><strong>What evidence goes beyond a demo?</strong></li>
+  </ol>
+
+  <div class="split">
+    <div class="yes">
+      <h3>Strong evidence</h3>
+      <ul>
+        <li>Field hours, and how often a human had to step in</li>
+        <li>Falls per hour or per km, measured over months</li>
+        <li>Paying customers who come back for more robots</li>
+        <li>Data from sites that others cannot reach</li>
+      </ul>
+    </div>
+    <div class="no">
+      <h3>Weak evidence</h3>
+      <ul>
+        <li>A viral video or a race win</li>
+        <li>Training speed (“walks after 20 minutes”)</li>
+        <li>The size of the model or the reward</li>
+        <li>A long list of robot bodies it “supports”</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row">
+    <p>For scale, this is what deployment-grade evidence looked like for Spot. Boston Dynamics trained the policy with “over a million simulations,” then ran test robots “24/7 for a cumulative runtime of over 2,000 hours a week” before release. In 2024, Spot fell about once every 50 km.</p>
+    <aside class="note"><a href="https://bostondynamics.com/blog/starting-on-the-right-foot-with-reinforcement-learning/">Boston Dynamics blog</a>, Mar 2024; the learned policy works alongside a classic model-based controller. <a href="https://spectrum.ieee.org/boston-dynamics-research-spot">IEEE Spectrum</a>, Mar 2024.</aside>
+  </div>
+
+  <div class="row">
+    <p>This is what demo-grade looks like. At the 2025 Beijing humanoid half marathon, the winner needed three battery changes and fell once, and every robot had human operators running beside it. Yet Alan Fern of Oregon State said before the race, fairly: “Until five years ago or so, we didn’t really know how to get robots to walk reliably. And now we do.”</p>
+    <aside class="note"><a href="https://www.wired.com/story/beijing-half-marathon-humanoid-robots/">WIRED</a>, Apr 2025. Progress is fast: in 2026 the winner ran the distance on its own in 50:26 (<a href="https://english.news.cn/20260419/74fc74a78dc64d959fbd4c1f244f6561/c.html">Xinhua</a>).</aside>
+  </div>
+
+  <h2>Practice</h2>
+  <p>Only your first answer counts, so don’t scroll up. Struggling a little is what makes it stick.</p>
+
+  <section class="practice" aria-labelledby="p1">
+    <h3 id="p1">1 · Place each claim on the stack</h3>
+    <p class="task">Each line is a claim a startup could make. Choose its layer.</p>
+    <div class="sorter" data-id="l1-sort" data-categories="L1 Gait control|L2 Perceptive|L3 Navigation|L4 Whole-body|Manipulation">
+      <div class="sort-item" data-answer="L1 Gait control">
+        <p class="claim">“Our robot dog walks at 1.5 m/s on flat warehouse floors, with a policy we trained in Isaac Lab.”</p>
+        <p class="why">Firm ground, body sensors only, and Isaac Lab ships this task ready-made. Near-commodity: ask what else they have.</p>
+      </div>
+      <div class="sort-item" data-answer="L3 Navigation">
+        <p class="claim">“Any robot running our model can explore a mine with no map and no GPS, and it decides which paths are too risky.”</p>
+        <p class="why">This is about where to go, not how to step. It is Field AI’s pitch. The layer is open, so a moat is possible: ask for field hours and how often humans step in.</p>
+      </div>
+      <div class="sort-item" data-answer="Manipulation">
+        <p class="claim">“Our robot folds T-shirts that it pulls from a pile of laundry.”</p>
+        <p class="why">Not a locomotion claim. Cloth is hard to simulate, so progress needs real-world data. Open.</p>
+      </div>
+      <div class="sort-item" data-answer="L2 Perceptive">
+        <p class="claim">“Our robot climbs stairs it has never seen, using a depth camera to map each step.”</p>
+        <p class="why">It must see the ground to place its feet. This works today, but sensors still misread snow, grass and shiny floors. Maturing.</p>
+      </div>
+      <div class="sort-item" data-answer="L4 Whole-body">
+        <p class="claim">“Our humanoid carries a 15 kg box up a ramp and pushes a door open on the way.”</p>
+        <p class="why">Arms and legs work together, and the box and the door push back on the body. Open.</p>
+      </div>
+      <div class="sort-item" data-answer="L1 Gait control">
+        <p class="claim">“Our robot dog stays on its feet when kicked from the side, and stands up again if it falls.”</p>
+        <p class="why">Blind policies learn this from random pushes in simulation (legged_gym pushes the robot every 15 seconds by default), and MuJoCo Playground’s fall-recovery policy worked on a real Go1. Near-commodity.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="practice" aria-labelledby="p2">
+    <h3 id="p2">2 · Quick check</h3>
+    <div class="quiz" data-id="l1-q1">
+      <p class="q">legged_gym’s default reward has nine active terms. What do most of them do?</p>
+      <ol class="choices">
+        <li><button class="choice">Reward the robot for reaching goals</button></li>
+        <li><button class="choice">Copy motions recorded from real animals</button></li>
+        <li><button class="choice" data-correct="true">Penalize shortcuts and rough, wasteful motion</button></li>
+        <li><button class="choice">Describe the terrain ahead of time</button></li>
+      </ol>
+      <p class="why">Only two follow the speed command. Six are penalties and one rewards lifting the feet. Most terms of this kind “penalize behaviors that emerge from an under-specified reward function” (Escontrela et al., 2022).</p>
+    </div>
+    <div class="quiz" data-id="l1-q2">
+      <p class="q">Why did ETH’s team learn an “actuator network” for ANYmal (Hwangbo et al., 2019)?</p>
+      <ol class="choices">
+        <li><button class="choice" data-correct="true">Its motors could not be modeled accurately</button></li>
+        <li><button class="choice">Its cameras failed in bright outdoor sunlight</button></li>
+        <li><button class="choice">Its reward needed fewer weighted penalty terms</button></li>
+        <li><button class="choice">Its legs were too heavy to simulate</button></li>
+      </ol>
+      <p class="why">With an ideal or hand-tuned motor model, the trained robot “could not make a single step without falling.” The rigid body was easy to simulate; the motors were not.</p>
+    </div>
+    <div class="quiz" data-id="l1-q3">
+      <p class="q">What does Field AI mainly sell today?</p>
+      <ol class="choices">
+        <li><button class="choice">Walking controllers for other companies’ robots</button></li>
+        <li><button class="choice" data-correct="true">Risk-aware navigation in places without maps</button></li>
+        <li><button class="choice">Low-cost robot dogs for construction sites</button></li>
+        <li><button class="choice">Manipulation datasets for training home robots</button></li>
+      </ol>
+      <p class="why">On Spot, Boston Dynamics supplies the walking and Field AI supplies the decisions. It is hiring for its own humanoid locomotion, but that is a plan, not its main product.</p>
+    </div>
+    <div class="quiz" data-id="l1-q4">
+      <p class="q">A startup says its locomotion is a moat. Which evidence should convince you most?</p>
+      <ol class="choices">
+        <li><button class="choice">A viral video of the robot’s backflips</button></li>
+        <li><button class="choice">A walking policy trained in twenty minutes</button></li>
+        <li><button class="choice">A reward function with fifteen careful terms</button></li>
+        <li><button class="choice" data-correct="true">Many field hours with few human interventions</button></li>
+      </ol>
+      <p class="why">Training speed and reward size are public recipes. Field hours with few human interventions need customers, robots and time, which rivals cannot copy quickly.</p>
+    </div>
+    <div class="quiz" data-id="l1-q5">
+      <p class="q">Which ground needed a new contact model, beyond standard rigid-body simulation?</p>
+      <ol class="choices">
+        <li><button class="choice">Flat concrete floors inside a warehouse</button></li>
+        <li><button class="choice">Indoor stairs with evenly spaced steps</button></li>
+        <li><button class="choice" data-correct="true">Soft beach sand at running speed</button></li>
+        <li><button class="choice">Smooth asphalt in a parking lot</button></li>
+      </ol>
+      <p class="why">Choi et al. (2023) built a granular-media model so a robot could run on beach sand at 3.03 m/s. A counterpoint: a policy trained only on rigid ground still handled mud and snow (Lee et al., 2020).</p>
+    </div>
+  </section>
+
+  <section class="practice" aria-labelledby="p3">
+    <h3 id="p3">3 · From memory</h3>
+    <div class="recall" data-id="l1-r1">
+      <label for="l1-r1-input">Without scrolling up: name the four layers, from bottom to top, and the 2026 status of each.</label>
+      <textarea id="l1-r1-input" placeholder="L1 …"></textarea>
+      <button class="btn reveal">Show the model answer</button>
+      <div class="model">
+        <p>L1 Gait control: near-commodity. L2 Perceptive locomotion: maturing. L3 Navigation and autonomy: open. L4 Whole-body loco-manipulation: open.</p>
+      </div>
+    </div>
+    <hr>
+    <div class="recall" data-id="l1-r2">
+      <label for="l1-r2-input">A friend says: “Locomotion is solved, so Field AI has no moat.” Write your reply in two or three sentences.</label>
+      <textarea id="l1-r2-input" placeholder="Your reply…"></textarea>
+      <button class="btn reveal">Show the model answer</button>
+      <div class="model">
+        <p>Gait control on firm ground is close to a commodity, so a moat can’t be there, and Field AI isn’t trying to put one there. It mainly sells L3: deciding where to go and what is safe in unmapped sites, on many robot bodies. Whether that is a moat depends on field evidence: hours deployed, how often humans step in, and customers who come back.</p>
+      </div>
+    </div>
+    <p class="score" data-for="0001"></p>
+  </section>
+
+  <p><strong>Report back.</strong> Send me your score and your reply to the last question in the chat. I’ll use them to plan lesson 2.</p>
+
+  <div class="callout">
+    <p class="eyebrow">Read next · about 20 minutes</p>
+    <p><strong>Frey, Mattamala, Park, Mittal, Martius, Osborne, Sparrow &amp; Hutter, <a href="https://arxiv.org/abs/2607.28952">“Advances, challenges, and opportunities for legged robots”</a>, <em>Science Robotics</em>, July 2026</strong> (free version on arXiv). Start with the Conclusion on the last page, then the Locomotion section. It is the most recent peer-reviewed verdict on this exact question, from ETH Zurich and NVIDIA researchers.</p>
+    <p>Prefer video? Watch <a href="https://www.youtube.com/watch?v=-Znp4JrFu8I">Marco Hutter’s IROS 2025 plenary</a> from 11:37 to 26:03. Want more on rewards? Read <a href="https://arxiv.org/abs/2406.01152">Ha et al. (IJRR 2025)</a>, §3.3.1 and §8.</p>
+  </div>
+
+  <div class="callout">
+    <p class="eyebrow">Test your view with people who build this</p>
+    <p>Post a question in <a href="https://github.com/isaac-sim/IsaacLab/discussions">Isaac Lab’s GitHub Discussions</a> (English), or join a hands-on meetup at <a href="https://robostadion.connpass.com/">ロボ☆スタディオン</a> in Akihabara (Japanese; they ran an RL hands-on with mjlab on 2 Oct 2026). A good question to ask: “Which part of your locomotion stack took the longest to make reliable?”</p>
+  </div>
+
+  <div class="callout">
+    <p class="eyebrow">Next</p>
+    <p>Come back in 3 days. Redo the two “from memory” questions without looking, then check the <a href="../reference/locomotion-stack.html">locomotion stack reference sheet</a>.</p>
+    <p>Lesson 0002 (planned): judging an L3 claim. What would prove Field AI’s moat, and which of its public numbers are claims rather than measurements? See the <a href="../index.html">course home</a>.</p>
+    <p><strong>Anything unclear? Ask me in the chat.</strong> I’m your teacher for this course. Good follow-ups: “What is a teacher–student policy?” or “Why does rendering depth slow simulation so much?”</p>
+  </div>
+
+  <p class="foot">Lesson 0001 · Robot Startup Moats · sources checked on 16 Oct 2026. Company statements are claims, not measurements.</p>
+</main>
+<script src="../assets/exercises.js"></script>
+</body>
+</html>
