@@ -35,4 +35,10 @@
 ## Workspace and publishing
 - The teaching workspace is the repo root. `learn/` holds an unrelated robotics explainer from another skill; leave it alone.
 - `index.html` is the course home. It is a page fragment (no doctype) because the Artifact host wraps the main page; lessons and reference pages are full HTML documents.
-- The course is published as one private Artifact: main page `index.html`, with `lessons/`, `reference/` and `assets/` as supporting files at the same paths. Artifact URL: (filled in after first publish). In a new session, republish to that URL with `url` after adding a lesson.
+- The course is published as one private Artifact: main page `index.html`, with `lessons/`, `reference/` and `assets/` as supporting files at the same paths. Artifact URL: https://claude.ai/artifact/M2NS69sNkJBeyp2FLdnh2n (Version 1, 2026-10-16). In a new session, read it with the Artifact tool, then republish to that URL with `url` (passing every changed file in `files`) after adding a lesson.
+
+## Waiting on the user (after Lesson 1)
+- Quiz score and which cases they missed.
+- Which link the AI found weakest in their rally, and how the 3 rounds went.
+- Whether they want to join a community (none proposed in detail yet; see RESOURCES.md).
+- Whether they own Ataka's 『イシューからはじめよ』 (would let us verify its wording for Lesson 2).
