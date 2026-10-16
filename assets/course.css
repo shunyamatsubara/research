@@ -479,7 +479,7 @@ details.recall p:last-child, details.recall ol:last-child { margin-bottom: 0; }
   border-radius: 3px;
   padding: 0.15rem 0.45rem;
 }
-.rally-out {
+.rally .rally-out {
   font-family: var(--font-mono);
   font-size: 0.82rem;
   line-height: 1.55;
