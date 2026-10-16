@@ -17,21 +17,21 @@
 
 <nav class="topnav" aria-label="Course">
   <a href="../index.html">Course home</a>
-  <a href="../lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a>
-  <a href="../lessons/0002-threat-model-the-cell.html">Lesson 2</a>
   <a class="here" href="field-guide.html">Field guide</a>
+  <a href="assessment-template.html">Assessment template</a>
+  <a href="extension-vs-new.html">Extension vs New</a>
   <a href="glossary.html">Glossary</a>
 </nav>
 
 <header class="masthead">
-  <p class="eyebrow"><span class="tag tag-plain">Reference</span> Research as of 15 October 2026</p>
+  <p class="eyebrow"><span class="tag tag-plain">Reference</span> Research as of 16 October 2026</p>
   <h1>Field Guide</h1>
   <p class="lede">What the research says about making physical AI safe and secure, on one page. Read the seven findings first. Use the tables when you work on a client's system. Each lesson teaches one part in depth.</p>
 </header>
 
 <main class="prose">
 
-<p><strong>On this page:</strong> <a href="#findings">Seven findings</a> · <a href="#layers">The five layers</a> · <a href="#threats">Threat model</a> · <a href="#rules">Standards and rules</a> · <a href="#proof">Proving it is safe</a> · <a href="#vendors">Reading vendor claims</a> · <a href="#questions">Questions for clients and vendors</a></p>
+<p><strong>On this page:</strong> <a href="#findings">Seven findings</a> · <a href="#layers">The five layers</a> · <a href="#threats">Threat model</a> · <a href="#data">Data, models and know-how</a> · <a href="#video">Camera data, remote operation and the cloud</a> · <a href="#rules">Standards and rules</a> · <a href="#proof">Proving it is safe</a> · <a href="#vendors">Reading vendor claims</a> · <a href="#questions">Questions for clients and vendors</a></p>
 
 <p>How to read the sources: links go to the primary source. Company figures are marked "company-reported". Papers without a confirmed peer review are marked "preprint".</p>
 
@@ -55,11 +55,11 @@
 <h3>6. The rules are changing, and dates matter for clients</h3>
 <ul>
   <li><strong>EU:</strong> the Machinery Regulation applies from 20 January 2027. Under it, machine-learning safety components need third-party assessment, safety software must be protected against corruption, and safety decisions must be logged. Cyber Resilience Act reporting has applied since 11 September 2026: an early warning within 24 hours and a full notification within 72 hours. After the AI Omnibus, AI Act high-risk duties start on 2 December 2027 (Annex III systems) and 2 August 2028 (AI in regulated products).<span class="note"><a href="https://single-market-economy.ec.europa.eu/sectors/mechanical-engineering/machinery_en">Commission: machinery</a>; <a href="https://digital-strategy.ec.europa.eu/en/policies/cra-reporting">Commission: CRA reporting</a>; <a href="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai">Commission: AI Act</a>.</span></li>
-  <li><strong>Japan:</strong> machines that use physical AI are, in the labour ministry's words (our translation), "not currently subject to specific regulation" under safety law, and a review is under way. JIS still follows the 2011 edition of ISO 10218. Japan's AI Safety Institute published an AI robotics safety evaluation guide (v1.0, July 2026). It covers LLM, image and speech AI, and adds VLA models in the next edition.<span class="note"><a href="https://www.mhlw.go.jp/stf/newpage_74141.html">MHLW interim summary</a> (29 June 2026); <a href="https://www.jisc.go.jp/app/jis/general/GnrJISNumberNameSearchList?show&amp;jisStdNo=B8433">JISC: JIS B 8433</a>; <a href="https://aisi.go.jp/output/output_information/260723/">J-AISI guide</a>.</span></li>
+  <li><strong>Japan:</strong> machines that use physical AI are, in the labour ministry's words (our translation), "not currently subject to specific regulation" under safety law, and a review is under way. JIS still follows the 2011 edition of ISO 10218. Japan's AI Safety Institute published an AI robotics safety evaluation guide (v1.0, July 2026). It covers LLM, image and speech AI, and adds VLA models in the next edition. The Personal Information Protection Act was amended in July 2026, with new rules for biometric data such as face features; it takes effect within two years.<span class="note"><a href="https://www.ppc.go.jp/personalinfo/legal/r8kaiseihogohou/">PPC: 2026 amendment</a>; <a href="https://www.mhlw.go.jp/stf/newpage_74141.html">MHLW interim summary</a> (29 June 2026); <a href="https://www.jisc.go.jp/app/jis/general/GnrJISNumberNameSearchList?show&amp;jisStdNo=B8433">JISC: JIS B 8433</a>; <a href="https://aisi.go.jp/output/output_information/260723/">J-AISI guide</a>.</span></li>
 </ul>
 
 <h3>7. Read vendor claims with care</h3>
-<p>Model makers rule out safety-critical use of their own robot models. NVIDIA's "Halos Certified" lab is accredited as a <em>second-party</em> inspection body that reviews documentation. Third-party certification of the robotics stack is still in progress. Several physical-AI startups publish little or no safety engineering. Always ask who certified what, to which standard, at which level, and for which use. → <a href="#vendors">Reading vendor claims</a></p>
+<p>Model makers rule out safety-critical use of their own robot models. NVIDIA's "Halos Certified" lab is accredited as a <em>second-party</em> inspection body that reviews documentation. Third-party certification of the robotics stack is still in progress. Several physical-AI startups publish little or no safety engineering. Always ask who certified what, to which standard, at which level, and for which use. → <a href="#vendors">Reading vendor claims</a>, <a href="../lessons/0007-conventional-robots-vs-physical-ai.html">Lesson 7</a></p>
 
 <h2 id="layers">The five layers</h2>
 
@@ -103,6 +103,40 @@
 </table>
 </div>
 
+<h2 id="data">Data, models and know-how</h2>
+<p>Taught in <a href="../lessons/0004-protect-data-models-and-know-how.html">Lesson 4</a>. In a physical AI cell, the factory's skill moves into demonstrations, datasets and trained models. In Japan, they are protected only if they are managed as trade secrets (営業秘密) or as shared data with limited access (限定提供データ), and data "cannot be owned", so contracts decide who may use what.<span class="note"><a href="https://laws.e-gov.go.jp/law/405AC0000000047">不正競争防止法</a> Art. 2(6)–(7); METI <a href="https://www.meti.go.jp/policy/mono_info_service/connected_industries/sharing_and_utilization/20180615001-3.pdf">契約ガイドライン（AI編）</a> (2018).</span></p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Way to lose it</th><th scope="col">Control</th><th scope="col">Source</th></tr></thead>
+  <tbody>
+    <tr><td>Stolen from storage, servers or the cloud</td><td>Access limits, ㊙ marking, encryption, logs</td><td>METI <a href="https://www.meti.go.jp/policy/economy/chizai/chiteki/guideline/r7ts.pdf">営業秘密管理指針</a> (March 2025)</td></tr>
+    <tr><td>Published by default</td><td>Turn off uploads (<code>--dataset.push_to_hub=False</code>); make the organization's default private</td><td><a href="https://huggingface.co/docs/lerobot/il_robots">LeRobot docs</a>; <a href="https://huggingface.co/docs/huggingface_hub/package_reference/hf_api">Hugging Face Hub API</a></td></tr>
+    <tr><td>Copied by watching (model extraction)</td><td>Keep the policy server in the cell zone; limit and log queries; treat motion logs as secret</td><td><a href="https://arxiv.org/abs/2006.05032">Chen et al. (2020)</a>; <a href="https://arxiv.org/abs/2405.07004">Stealthy Imitation</a> (ICML 2024); <a href="https://csrc.nist.gov/pubs/ai/100/2/e2025/final">NIST AI 100-2</a></td></tr>
+    <tr><td>Reused by the vendor</td><td>Contract terms before recording; name fine-tuning and distillation</td><td>METI <a href="https://www.meti.go.jp/policy/mono_info_service/connected_industries/sharing_and_utilization/20250218003-ar.pdf">AI contract checklist</a> (2025)</td></tr>
+    <tr><td>Poisoned</td><td>Dataset hashes, change records, review before training</td><td><a href="https://arxiv.org/abs/2510.09269">GoBA</a> (2025, preprint)</td></tr>
+  </tbody>
+</table>
+</div>
+<p>For configuration management, keep an AIBOM next to the SBOM (Japan's AI Guidelines for Business v1.2 now ask for one), sign model releases, load safetensors instead of pickle, and treat every retraining as a change that needs re-validation.</p>
+
+<h2 id="video">Camera data, remote operation and the cloud</h2>
+<p>Taught in <a href="../lessons/0005-camera-data-remote-and-cloud.html">Lesson 5</a>.</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Topic</th><th scope="col">Rule or guidance</th><th scope="col">What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Camera images in Japan</td><td>Identifiable images are personal information: specify and publish the purpose (PPC Q&amp;A Q1-13); name face recognition (Q1-14); deleting at once at the edge still counts as acquisition (Camera Guidebook ver3.0)</td><td>Write each camera's purposes, including AI training. Signs, internal rules, talks with the workers or union</td></tr>
+    <tr><td>Camera images in the EU</td><td>"For your safety" is not specific enough; erase after a few days (EDPB 3/2019). Emotion recognition at work is banned except for medical or safety reasons (AI Act Art. 5(1)(f))</td><td>Specific purposes, short retention, no emotion inference</td></tr>
+    <tr><td>Vendors and clouds</td><td>An entrusted vendor may use data only for the client's purpose (Q7-38, Q7-39). A foreign operator handling the data means a transfer abroad, even with a server in Japan (Q12-4; APPI Art. 28)</td><td>Contract limits on training; know the countries involved</td></tr>
+    <tr><td>Link loss</td><td>Failure "shall not lead to a hazardous situation" (EU MR 1.2.1). Automatic stop, and no restart when the link returns (IEC 60204-1, 9.2.4). MHLW 2026: stop automatically on loss or long delay</td><td>Safety functions on the robot or in the cell. Test link loss</td></tr>
+    <tr><td>Remote and autonomous modes</td><td>MHLW 2026: switch modes by explicit human action; one remote operator per machine</td><td>Show the current mode; written procedures</td></tr>
+    <tr><td>Vendor remote access</td><td>Jump host, recorded sessions, just-in-time access (CISA 2026); outbound-only connections (NCSC 2026); two-factor authentication and time windows (METI factory guideline, 3-6)</td><td>No remote path to the safety settings</td></tr>
+    <tr><td>Data to the cloud</td><td>Push-based design; ask whether vendors train on your data and whether they can run on premises (CISA et al., December 2025)</td><td>List all telemetry, and check it with a network capture</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="sources">Sources: <a href="https://www.ppc.go.jp/files/pdf/250701_APPI_QA.pdf">PPC Q&amp;A</a> (July 2025); <a href="https://www.soumu.go.jp/main_content/000803603.pdf">カメラ画像利活用ガイドブック ver3.0</a>; <a href="https://www.edpb.europa.eu/system/files/documents/files/file1/edpb_guidelines_201903_video_devices_en_0.pdf">EDPB 3/2019</a>; <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng">AI Act</a>; <a href="https://www.mhlw.go.jp/content/11201250/001717896.pdf">MHLW summary</a> (June 2026); <a href="https://www.cisa.gov/resources-tools/resources/adapting-zero-trust-principles-operational-technology">CISA zero trust for OT</a>; <a href="https://www.ncsc.gov.uk/collection/operational-technology/secure-connectivity/principle-2">NCSC</a>; <a href="https://www.meti.go.jp/policy/netsecurity/wg1/factorysystems_guideline_ver1.1.pdf">METI factory guideline v1.1</a>; <a href="https://www.cisa.gov/resources-tools/resources/principles-secure-integration-artificial-intelligence-operational-technology">CISA et al., AI in OT</a>.</p>
+
 <h2 id="rules">Standards and rules map</h2>
 <p>For an AI-driven robot arm cell. Standards are written for certain products; check each one's scope before you cite it to a client.</p>
 
@@ -118,13 +152,17 @@
     <tr><td>Cybersecurity</td><td><span class="std">IEC 62443</span>; <span class="std">IEC TS 63074:2023</span> (IEC 62443 for machinery safety controls)</td><td>Cyber Resilience Act (reporting since 11 September 2026; full application 11 December 2027); Machinery Regulation Annex III 1.1.9</td><td>JC-STAR IoT labels (no robot category yet); METI factory security guideline v1.1; IPA risk analysis guide</td></tr>
     <tr><td>Legged and mobile robots</td><td><span class="std">ISO 25785-1</span> (draft, legged and other dynamically stable robots); <span class="std">ISO 3691-4</span>; ANSI/A3 R15.08</td><td>—</td><td><span class="std">JIS D 6802:2022</span> (from ISO 3691-4:2020)</td></tr>
     <tr><td>Safety case</td><td><span class="std">UL 4600</span> Edition 3 (2023); GSN Community Standard v3</td><td>—</td><td>—</td></tr>
+    <tr><td>AI and OSS inventory</td><td>CycloneDX ML-BOM (v1.5 and later); SPDX 3.0 AI profile</td><td>Cyber Resilience Act SBOM, Annex I Part II(1)</td><td>AI Guidelines for Business v1.2 (AIBOM, March 2026); J-AISI guide (versions of software, models and settings)</td></tr>
+    <tr><td>Trade secrets and data rights</td><td>—</td><td>Data Act (connected products placed on the market after 12 September 2026)</td><td>Unfair Competition Prevention Act, Art. 2(6) and 2(7); METI trade-secret guideline (March 2025); METI AI contract guideline (2018) and checklist (2025)</td></tr>
+    <tr><td>Camera data and privacy</td><td>—</td><td>GDPR with EDPB Guidelines 3/2019; AI Act Art. 5(1)(f) (since 2 February 2025)</td><td>APPI with the PPC Q&amp;A (July 2025); amendment of July 2026 (in force within two years); Camera Guidebook ver3.0 (2022)</td></tr>
+    <tr><td>Remote and wireless control</td><td><span class="std">IEC 60204-1:2016</span>, 9.2.4 (cableless control)</td><td>Machinery Regulation Annex III 1.2.1 and 1.2.6</td><td>MHLW interim summary on unmanned operation (June 2026)</td></tr>
   </tbody>
 </table>
 </div>
 <p>Sources: ISO committee records (<a href="https://committee.iso.org/standard/73934.html">ISO 10218-2</a>, <a href="https://committee.iso.org/standard/62996.html">ISO/TS 15066</a>, <a href="https://committee.iso.org/standard/91469.html">ISO 25785-1</a>); <a href="https://arxiv.org/abs/2602.17822">Hartmann et al.</a> for 2025 clause changes (preprint; the standard itself is paywalled); <a href="https://www.mhlw.go.jp/bunya/roudoukijun/dl/pamphlet_140115.pdf">MHLW leaflet on fence-free work</a>; <a href="https://webdesk.jsa.or.jp/books/W11M0090/index/?bunsyo_id=TS%20B%200033:2017">JSA catalogue</a>; <a href="https://www.ipa.go.jp/security/jc-star/index.html">IPA: JC-STAR</a>.</p>
 
 <h2 id="proof">Proving it is safe</h2>
-<p>A working demo is the start. To argue that a system is acceptably safe, the research describes these steps:</p>
+<p>A working demo is the start. To argue that a system is acceptably safe, the research describes these steps (taught in <a href="../lessons/0006-from-poc-to-production.html">Lesson 6</a>):</p>
 <ol>
   <li><strong>Define the operating conditions</strong> (objects, lighting, people's access) and the safety bar for each hazard.</li>
   <li><strong>Analyze hazards with more than one method:</strong> top-down (STPA) and bottom-up (FMEA). STPA assumes accidents can happen when components interact badly, "none of which may have failed".</li>
@@ -191,7 +229,13 @@
   <li>Is there a safety case, and who assessed it independently? <em>(assurance)</em></li>
   <li>What triggers re-validation: retraining, new objects, software updates? <em>(assurance)</em></li>
   <li>How are incidents and near misses recorded and reported? <em>(assurance)</em></li>
+  <li>Which data and models hold the client's know-how? Does the contract say who may use them, including fine-tuning and distillation? <em>(data)</em></li>
+  <li>Does any tool upload data or models by default, and to where? <em>(data)</em></li>
+  <li>What do the cameras record, for which purposes, and how were the workers told? <em>(privacy)</em></li>
+  <li>What happens when a remote link drops, and when it comes back? <em>(L4, remote operation)</em></li>
+  <li>How do vendors connect, and can a remote session reach the safety settings? <em>(security)</em></li>
 </ol>
+<p>For a full assessment, use the <a href="assessment-template.html">assessment template</a>. To practice first, do the <a href="../lessons/0008-capstone-assess-a-client-cell.html">capstone</a>.</p>
 
 <div class="ask">
   <p><strong>Ask your teacher.</strong> This page is a map, not a lesson. If any row is unclear, ask Claude to explain it or to turn it into the next lesson.</p>
@@ -201,11 +245,11 @@
 
 <nav class="pager" aria-label="Page navigation">
   <a href="../index.html">← Course home</a>
-  <a href="glossary.html">Glossary →</a>
+  <a href="assessment-template.html">Assessment template →</a>
 </nav>
 
 <footer class="foot">
-  <p>Physical AI Safety &amp; Security · Field guide · Research as of 15 October 2026. Standards and rules change; check dates before you rely on them with a client. This page is a learning aid, not legal advice.</p>
+  <p>Physical AI Safety &amp; Security · Field guide · Research as of 16 October 2026. Standards and rules change; check dates before you rely on them with a client. This page is a learning aid, not legal advice.</p>
 </footer>
 
 </div></div>

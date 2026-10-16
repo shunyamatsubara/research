@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lesson 5 · Camera Data, Remote Operation and the Cloud</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/widgets.js" defer></script>
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a href="../index.html">Course home</a>
+  <a href="0004-protect-data-models-and-know-how.html">← Lesson 4</a>
+  <a class="here" href="0005-camera-data-remote-and-cloud.html">Lesson 5</a>
+  <a href="0006-from-poc-to-production.html">Lesson 6 →</a>
+  <a href="../reference/field-guide.html">Field guide</a>
+  <a href="../reference/glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-hazard">Lesson 5</span> About 25 minutes · Running example: an AI pick-and-place cell</p>
+  <h1>Camera Data, Remote Operation and the Cloud</h1>
+  <p class="lede">The cell's cameras film workers as well as parts. Operators may run the robot from far away. Data and vendor access cross the factory's boundary. This lesson covers the rules for camera data in Japan and the EU, what keeps remote operation safe when the link fails, and how to control remote access and data sent to the cloud.</p>
+  <div class="goal">
+    <span class="tag tag-act">Your goal</span>
+    <p>For an AI robot cell, map every camera, remote connection and outbound data flow. For each one, write its purpose, the rule that applies, and the control, including what happens when the link drops.</p>
+  </div>
+</header>
+
+<main class="prose">
+
+<h2>Warm-up: Lessons 2 to 4 from memory</h2>
+
+<div class="widget" data-widget="quiz" data-title="Three quick questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "From Lesson 4: once information is absorbed into a trained model, what does METI's 2025 contract checklist say?",
+   "options": ["It becomes the vendor's property",
+               "It is deleted after training",
+               "Removing it is generally difficult",
+               "It loses all legal protection"],
+   "answer": 2,
+   "why": ["Data cannot be owned under Japanese law. The contract decides who may use what.",
+           "Training deletes nothing. The information stays in the model's weights.",
+           "So the basic advice is to keep unneeded information out of the inputs, and to agree on use before sharing data.",
+           "Protection depends on secrecy measures and contracts. It is not lost automatically, but it may not follow the data into the model."]},
+  {"prompt": "From Lesson 2: which entry point covers vendor remote access and the cloud?",
+   "options": ["E4 The policy server link",
+               "E1 The scene in view",
+               "E6 The wireless setup process",
+               "E7 Cloud and remote access"],
+   "answer": 3,
+   "why": ["E4 is the link between the robot and its policy server, usually inside the site.",
+           "E1 is what the cameras see. It matters for privacy, but it is not a remote connection.",
+           "E6 is the radio setup path, such as Bluetooth during Wi-Fi setup.",
+           "E7 covers cloud services, fleet management and vendor remote access."]},
+  {"prompt": "From Lesson 3: under the EU Machinery Regulation, which machines must keep data on safety decisions for one year?",
+   "options": ["Robots exceeding eighty watts",
+               "Machines with self-evolving behavior",
+               "Every camera-equipped industrial robot",
+               "Only remotely operated machines"],
+   "answer": 1,
+   "why": ["The 80 W line is a Japanese legal threshold, not an EU record-keeping rule.",
+           "Annex III 1.2.1: for machines with self-evolving behavior, data on safety decisions is kept for one year after collection.",
+           "Cameras do not decide this. The rule is about machines whose behavior can change as they learn.",
+           "The rule is about learning machines, not about remote operation."]}
+ ]}
+</script>
+</div>
+
+<h2>The camera has more than one job</h2>
+
+<p>In a conventional cell, a camera usually has one job, such as inspection or security. In the running example, the same cameras let the VLA see the parts, record demonstrations and new training data, and may also feed safety monitoring. They also film the operators and anyone who walks past. Each job is a purpose, and privacy law is built on purpose.</p>
+
+<div class="keyrule">
+  <span class="tag tag-hazard">Key rule</span>
+  <p class="big">Write a specific purpose for every camera, including AI training.</p>
+  <p>Workers cannot guess that a picking camera also records training data. Tell them. In the EU, a purpose of only "safety" or "for your safety" is not specific enough.<span class="note">EDPB, <a href="https://www.edpb.europa.eu/system/files/documents/files/file1/edpb_guidelines_201903_video_devices_en_0.pdf">Guidelines 3/2019 on video devices</a> (v2.0, January 2020), para. 15.</span></p>
+</div>
+
+<h2>Camera data in Japan</h2>
+
+<h3>When video is personal information</h3>
+<p>The Personal Information Protection Commission (PPC) says that if a camera captures images that can identify a person, you are handling personal information. You must "利用目的をできる限り特定し" (specify the purpose as far as possible), use the images only for that purpose, and notify or publish the purpose.<span class="note">PPC, <a href="https://www.ppc.go.jp/files/pdf/250701_APPI_QA.pdf">ガイドラインに関するＱ＆Ａ</a> (updated 1 July 2025), Q1-13.</span> If a system uses face recognition, the purpose must say so: "顔識別機能を用いていることも明らかにして" (Q1-14).</p>
+<p>Video becomes 個人データ (personal data in a database) only when it is organized so that you can search for a specific person. Video you can search only by date and time is not (Q1-41). This matters because duties such as security measures, third-party provision and transfers abroad attach to personal data. A training dataset that is labelled by operator would usually be searchable by person.</p>
+
+<h3>Why AI cameras need more explanation</h3>
+<ul>
+  <li><strong>The "obvious purpose" exception may not fit.</strong> A PPC expert panel warned that as cameras with purposes other than crime prevention spread, even ordinary security cameras might no longer count as "取得の状況からみて利用目的が明らか" (purpose obvious from the situation).<span class="note">PPC, <a href="https://www.ppc.go.jp/files/pdf/cameragazou_yushikisyakentoukai_houkokusyo.pdf">犯罪予防や安全確保のためのカメラ画像利用に関する有識者検討会 報告書</a> (March 2023), footnote 56.</span> A camera that records training data has a purpose nobody can guess.</li>
+  <li><strong>Deleting at once still counts.</strong> The government's camera guidebook says that even if images are deleted immediately at the edge or in the cloud, it is still "個人情報の取得に当たる" (acquisition of personal information). If images are used as training data for AI retraining, it recommends saying so.<span class="note">IoT Acceleration Consortium, MIC and METI, <a href="https://www.soumu.go.jp/main_content/000803603.pdf">カメラ画像利活用ガイドブック ver3.0</a> (March 2022).</span></li>
+  <li><strong>Workers are not customers.</strong> The same guidebook asks whether the employer is "優越的地位を利用して強制をしていないか" (using its stronger position to force it) and says to talk with the workers, their representatives or the union.</li>
+  <li><strong>Monitoring rules apply.</strong> For monitoring employees, the PPC says to specify the purpose in advance, put it in internal rules and tell the staff; to name a responsible person; and ideally to notify and consult the union first (Q5-7).</li>
+</ul>
+
+<h3>Vendors and clouds</h3>
+<ul>
+  <li><strong>A vendor that processes your data for you</strong> (委託先) may use it to improve its own analysis technology only "委託元の利用目的の達成に必要な範囲内である限りにおいて" (only as far as your purpose needs) (Q7-39). Statistics it makes outside the entrusted work it "自社のために用いることはできません" (cannot use for itself) (Q7-38).</li>
+  <li><strong>Transfers abroad.</strong> Giving personal data to a third party in a foreign country needs the person's prior consent, with information about that country's rules, unless an exception applies: an approved country, or a recipient with an equivalent system.<span class="note"><a href="https://laws.e-gov.go.jp/law/415AC0000000057">個人情報保護法</a>, Art. 28.</span> If a foreign company running the cloud handles the data, this applies "サーバが国内にある場合であっても" (even if the server is in Japan) (Q12-4). If the provider does not handle the data, set by contract and "適切にアクセス制御を行っている場合等" (with proper access control), it is not a provision (Q7-53).</li>
+  <li><strong>Cloud AI services.</strong> Before entering personal data into a generative-AI service, the PPC says to confirm that the provider will not use it for machine learning ("機械学習に利用しないこと等を十分に確認すること").<span class="note">PPC, <a href="https://www.ppc.go.jp/files/pdf/230602_kouhou_houdou.pdf">生成AIサービスの利用に関する注意喚起等</a> (2 June 2023).</span> Our inference: the same check applies to camera frames sent to a cloud vision-language model.</li>
+</ul>
+
+<h3>A change is coming</h3>
+<p>An amendment to the Personal Information Protection Act passed on 10 July 2026 and was promulgated on 17 July 2026. In principle it takes effect within two years.<span class="note">PPC, <a href="https://www.ppc.go.jp/personalinfo/legal/r8kaiseihogohou/">令和８年改正個人情報保護法について</a>; <a href="https://www.ppc.go.jp/files/pdf/260717_kaiseihounitsuite.pdf">overview</a> (July 2026).</span> Three parts matter here:</p>
+<ul>
+  <li>A new category, 特定生体個人情報, for biometric data that can be collected without special technology or high cost, such as face features, with a duty to tell people certain things in advance (new Art. 21-2). The Diet asked the PPC to make sure notices are posted clearly "監視カメラやセンサー等の機器の周辺に" (around cameras and sensors).</li>
+  <li>Third-party provision without consent when data is used only to make statistics, "統計作成等であると整理できるAI開発等を含む" (including AI development that counts as making statistics).</li>
+  <li>Entrusted vendors must not handle data "委託を受けた業務の遂行に必要な範囲を超えて" (beyond what the entrusted work needs).</li>
+</ul>
+<p>The detailed rules are still being drafted. Check their status on every project.</p>
+
+<h2>If the cell is in the EU</h2>
+<ul>
+  <li><strong>Video baseline.</strong> "An employee in his/her workplace is in most cases not likely expecting to be monitored by his or her employer." Video should usually be erased "after a few days"; keeping it beyond 72 hours needs more justification. And: "Functions provided, but not necessary, must be deactivated."<span class="note">EDPB Guidelines 3/2019, paras. 37, 121 and 129.</span></li>
+  <li><strong>Emotion recognition at work is banned.</strong> The AI Act prohibits AI systems that "infer emotions of a natural person in the areas of workplace and education institutions", except for medical or safety reasons. This has applied since 2 February 2025.<span class="note"><a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng">AI Act (EU) 2024/1689</a>, Art. 5(1)(f) and Art. 113.</span> The Commission reads "workplace" to include "factories and warehouses", and the safety exception as applying "only in relation to the protection of life and health".<span class="note">European Commission, <a href="https://ec.europa.eu/newsroom/dae/redirection/document/112367">Guidelines on prohibited AI practices</a>, C(2025) 5052 (29 July 2025), non-binding.</span> Pain and fatigue are not emotions under the Act: "It does not include physical states, such as pain or fatigue" (Recital 18). The point for physical AI: the ban depends on what the model infers, not on the camera. A vision-language model in the cell could cross the line with the same frames.</li>
+  <li><strong>The factory gets rights to the robot's data.</strong> For connected products placed on the market after 12 September 2026, product data must be available to the user "by default, easily, securely, free of charge". The maker may use non-personal data only "on the basis of a contract with the user", and may not use it "to derive insights about the economic situation, assets and production methods of" the user.<span class="note"><a href="https://eur-lex.europa.eu/eli/reg/2023/2854/oj/eng">Data Act (EU) 2023/2854</a>, Art. 3(1), Art. 4(13) and Art. 50. Recital 14 names "industrial machinery".</span> This is EU law, but it is a useful model for contracts in Japan too (<a href="0004-protect-data-models-and-know-how.html">Lesson 4</a>).</li>
+</ul>
+
+<h2>Remote operation: safe when the link fails</h2>
+
+<h3>Japan's new way of thinking</h3>
+<p>A Japanese government expert panel on machines that run without an operator on board set out two terms in June 2026:<span class="note">MHLW, <a href="https://www.mhlw.go.jp/content/11201250/001716203.pdf">機械の無人運転における安全確保等に関する専門家検討会 中間とりまとめ</a> (29 June 2026).</span></p>
+<ul>
+  <li><strong>自律運転 (autonomous operation):</strong> in normal operation the machine is in control, and the human role is limited to starting or restarting, monitoring and emergency stop.</li>
+  <li><strong>遠隔運転 (remote operation):</strong> in normal operation a human is in control, operating from a distance.</li>
+</ul>
+<p>The panel says modes should switch "人による明示的な操作など明確な条件と手順で" (by clear conditions and procedures, such as an explicit human action). For machines covered by Japan's safety law, one remote operator should run only one machine at a time: "一人が同時に運転可能な機械は１台のみ". The measures in the panel's summary include stopping the machine automatically when communication fails, for example a lost link or a long delay.<span class="note">MHLW, <a href="https://www.mhlw.go.jp/content/11201250/001717896.pdf">中間とりまとめ（概要）</a> (June 2026).</span> The panel also says that machines using "フィジカルＡＩやＡＩロボティクス" that no specific rule covers yet will be examined with the same approach.</p>
+
+<h3>What the standards and EU law say</h3>
+<ul>
+  <li><strong>EU Machinery Regulation:</strong> "For wireless control, a failure of the communication or connection or a faulty connection shall not lead to a hazardous situation." The interruption or re-establishment of a "communication network connection" must not lead to hazardous situations either.<span class="note"><a href="https://eur-lex.europa.eu/eli/reg/2023/1230/oj/eng">EU Machinery Regulation 2023/1230</a>, Annex III, 1.2.1 and 1.2.6.</span></li>
+  <li><strong>IEC 60204-1 (cableless control):</strong> when the control signal has been lost for a time set by risk assessment, "an automatic stop of the machine shall be initiated". And: "Restoration of the ability of a CCS to control a machine shall not restart the machine."<span class="note">IEC 60204-1:2016, 9.2.4, as quoted in an <a href="https://www.jmf.or.jp/jmf/wp-content/uploads/2024/04/IEC-60204-1_2016.pdf">IDEC seminar deck for the Japan Machinery Federation</a> (November 2016). The standard itself is paywalled.</span></li>
+</ul>
+
+<h3>A real lesson from a humanoid maker</h3>
+<p>Agility Robotics first put the safety controller for its Digit humanoid outside the robot. "If there were communication issues with the robot it would fall." It then added a safety PLC on the robot and "category 1 stop functionality so that Digit could come to a controlled stop before power fully cut or if communication with the robot was lost". Even so, each Digit deployed in the field "operates behind a set of physical safety barriers".<span class="note">Agility Robotics, <a href="https://www.agilityrobotics.com/content/built-for-the-real-world">"Built for the real world"</a> (22 June 2026). A company blog: first-hand, but promotional.</span></p>
+
+<div class="keyrule">
+  <span class="tag tag-hazard">Key rule</span>
+  <p class="big">The safe state must not depend on the network.</p>
+  <p>When the link drops, the robot stops by itself, with safety functions that run on the robot or in the cell. When the link returns, nothing restarts until a person decides.</p>
+</div>
+
+<div class="bridge">
+  <span class="tag tag-act">You already know this</span>
+  <p>Fail closed. A lost connection leads to a safe state, and a restored one does not resume old work by itself, just as a dropped session must log in again. The difference here: "safe" means the arm stops moving, and it must be designed so it stops without falling or dropping a load.</p>
+</div>
+
+<h3>Teleoperation to record demonstrations</h3>
+<p>In Japan, 教示等 (teaching) means setting, changing or checking the manipulator's motion order, position or speed within its motion range. It requires special education, and Art. 150-3 requires measures to stop the robot at once in an abnormal situation.<span class="note">Ordinance on Industrial Safety and Health, <a href="https://laws.e-gov.go.jp/law/347M50002000032">Art. 36(31) and Art. 150-3</a>.</span> Whether teleoperation to record demonstrations counts as teaching is not settled: we found no official interpretation. Until it is, apply the teaching rules, and ask the local Labour Standards Inspection Office.</p>
+<p>The operator is also a data source. A study of virtual-reality users found that a person "can be uniquely identified amongst the entire pool of 50,000+ with 94.33% accuracy from 100 seconds of motion".<span class="note"><a href="https://arxiv.org/abs/2302.08927">"Unique Identification of 50,000+ Virtual Reality Users from Head &amp; Hand Motion Data"</a> (2023).</span> Our inference: motion recorded with a VR teleoperation rig can identify the operator. Treat teleoperation recordings as personal data.</p>
+
+<h2>Vendor remote access</h2>
+
+<p>Vendor support is entry point E7. Government guidance for operational technology (OT) is clear and recent:</p>
+<ul>
+  <li>"The authoring agencies strongly recommend a jump host for adding user authentication to legacy networks and enforcing segmentation." "Log all privileged sessions for audit and forensic purposes." Give just-in-time access for maintenance windows.<span class="note">CISA and partners, <a href="https://www.cisa.gov/resources-tools/resources/adapting-zero-trust-principles-operational-technology">Adapting Zero Trust Principles to Operational Technology</a> (29 April 2026).</span></li>
+  <li>"All connections with the OT environment should be initiated as outbound connections from within the OT environment." Break-glass access "should not be used as a standard remote access method".<span class="note">UK NCSC, <a href="https://www.ncsc.gov.uk/collection/operational-technology/secure-connectivity/principle-2">Secure connectivity principles for OT</a>, Principles 2 and 7 (January 2026).</span></li>
+  <li>"Remote access should not circumvent or negate safety or security controls." Make sure "operations personnel are aware of planned remote activity".<span class="note">NIST <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-82r3.pdf">SP 800-82r3</a> (September 2023).</span></li>
+  <li>Japan's factory security guideline asks for two-factor authentication, limits on which devices each remote user can reach, limits on connection times, and detection of connections outside maintenance periods.<span class="note">METI, <a href="https://www.meti.go.jp/policy/netsecurity/wg1/factorysystems_guideline_ver1.1.pdf">工場システムにおけるサイバー・フィジカル・セキュリティ対策ガイドライン Ver1.1</a> (11 April 2025), checklist item 3-6.</span></li>
+</ul>
+<p>The physical AI twist: a vendor's remote path may reach the policy server, the training pipeline and the cameras, not just a controller. Keep the safety settings off the remote path entirely, and make safety changes on site, by an authorized person (<a href="0003-control-permissions-and-motion-range.html">Lesson 3</a>).</p>
+
+<h2>Data to the cloud</h2>
+
+<p>The best single guide here comes from CISA and agencies in six other countries:<span class="note">CISA and partners, <a href="https://www.cisa.gov/resources-tools/resources/principles-secure-integration-artificial-intelligence-operational-technology">Principles for the Secure Integration of Artificial Intelligence in Operational Technology</a> (3 December 2025).</span></p>
+<ul>
+  <li>"Encourage push-based architectures where data is pushed out of the OT network for AI systems to use without persistent access into the OT network."</li>
+  <li>"Operators may not want vendors to train AI on operational data as it could include IP or be sensitive."</li>
+  <li>"Ask if vendors can operate on premises or without continuous access to the internet/vendor cloud."</li>
+  <li>Find out how the vendor will store and use the data, "especially if it involves remote, cloud, or offshore access".</li>
+</ul>
+<p>Robots can send more than you expect. A security analysis of the Unitree G1 humanoid reports that it sends sensor and service-state telemetry to outside servers "every 300 seconds without operator notice".<span class="note"><a href="https://arxiv.org/abs/2509.14139">"Cybersecurity AI: Humanoid Robots as Attack Vectors"</a> (2025, preprint by authors from a robot-security company).</span> Ask every vendor for a list of what is sent, where and how often, and check it with a network capture. From 11 December 2027, the EU Cyber Resilience Act requires products to "process only data, personal or other, that are adequate, relevant and limited to what is necessary in relation to the intended purpose".<span class="note"><a href="https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng">Cyber Resilience Act</a>, Annex I, Part I(2)(g), and Art. 71.</span></p>
+
+<h2>Practice: name the area</h2>
+
+<div class="widget" data-widget="sorter" data-title="Which area does this control belong to?">
+<script type="application/json">
+{"buckets": [
+  {"id": "PRIV", "short": "Camera", "label": "Camera data and privacy"},
+  {"id": "SAFE", "short": "Link", "label": "Safe behavior when the link fails"},
+  {"id": "ACC", "short": "Access", "label": "Who can connect into the cell"},
+  {"id": "DATA", "short": "Cloud", "label": "What data leaves the site, and its use"}
+ ],
+ "missDefault": "Ask: is this about filming people (Camera), the robot's behavior when the link fails (Link), connections into the cell (Access), or data that leaves the site (Cloud)?",
+ "items": [
+  {"text": "Signs at the cell say the cameras also record images to train the AI.",
+   "answer": "PRIV",
+   "why": "A specific purpose, made known to the people filmed. AI training is a purpose nobody can guess.",
+   "miss": {"DATA": "The signs tell workers how they are filmed on site. Cloud is about data that leaves the site."}},
+  {"text": "If the operator's link is lost or delayed too long, the robot stops by itself and does not restart when the link returns.",
+   "answer": "SAFE",
+   "why": "Stop on link loss, and no restart on reconnection, as IEC 60204-1 and the EU Machinery Regulation require.",
+   "miss": {"ACC": "This is about the robot's behavior when the link fails, not about who may connect."}},
+  {"text": "Vendor engineers connect through a jump host, with MFA, only in agreed maintenance windows, and every session is recorded.",
+   "answer": "ACC",
+   "why": "Classic OT remote-access control: jump host, MFA, just-in-time access and session logs.",
+   "miss": {"DATA": "This controls connections into the cell, not data that leaves it."}},
+  {"text": "The contract says the vendor may use the cell's video only to provide the service, not to train its other products.",
+   "answer": "DATA",
+   "why": "It limits what the vendor may do with data that leaves the site. In Japan, an entrusted vendor's use is limited to the client's purpose anyway.",
+   "miss": {"PRIV": "This is about the vendor's use of data after it leaves the site, so it belongs under Cloud."}},
+  {"text": "Video from the cell is erased after a set period, unless a demonstration is selected for training.",
+   "answer": "PRIV",
+   "why": "A retention rule for video of people. Set periods, and delete what you do not need.",
+   "miss": {"DATA": "Retention on site is a camera-data rule. Cloud is about data that leaves the site."}},
+  {"text": "The cell pushes summaries out to the vendor's cloud, and nothing outside can open a connection into the cell.",
+   "answer": "ACC",
+   "why": "Outbound-only, push-based design: no standing inbound path into the cell.",
+   "miss": {"DATA": "The key point is the connection direction. Nothing outside can connect in."}},
+  {"text": "Switching from autonomous to remote operation needs an explicit action by the operator, and the robot shows its current mode.",
+   "answer": "SAFE",
+   "why": "MHLW's 2026 summary: modes should switch by clear conditions and procedures, such as an explicit human action.",
+   "miss": {"ACC": "This is about safe control of the robot, not about network access."}},
+  {"text": "Before choosing a cloud vision-language model service, the team confirms in writing that frames will not be used for training.",
+   "answer": "DATA",
+   "why": "The PPC's advice for generative-AI services: confirm the provider will not use the data for machine learning.",
+   "miss": {"PRIV": "The frames are personal data, but the control is about what the cloud provider may do with them."}}
+ ]}
+</script>
+</div>
+
+<h2>Check yourself</h2>
+
+<div class="widget" data-widget="quiz" data-title="Four questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "A camera in a Japanese cell records operators' faces as part of the training data. Which statement is right?",
+   "options": ["Factory images are never personal information in Japan",
+               "Deleting images at the edge avoids all rules",
+               "The images are personal information; state the purpose",
+               "Only face recognition systems fall under the law"],
+   "answer": 2,
+   "why": ["If a person can be identified, the images are personal information wherever they are taken.",
+           "The camera guidebook says that even immediate deletion at the edge or in the cloud is still acquisition of personal information.",
+           "Identifiable images are personal information. Specify the purpose, including AI training, and notify or publish it.",
+           "Any image that identifies a person counts. Face recognition adds a duty to say so in the purpose."]},
+  {"prompt": "The robot's remote operator loses the connection for two seconds. What should happen?",
+   "options": ["The robot repeats the last command it received",
+               "The VLA takes over and finishes the task",
+               "It resumes the motion as soon as reconnected",
+               "It stops, and restarts only by deliberate action"],
+   "answer": 3,
+   "why": ["Repeating old commands is how a dropped link turns into a collision.",
+           "A switch from remote to autonomous operation should happen by clear conditions and procedures, such as an explicit human action, not silently.",
+           "IEC 60204-1: restoring the link \"shall not restart the machine\".",
+           "After a risk-assessed time the robot stops automatically, and a restart needs a deliberate action."]},
+  {"prompt": "A robot vendor needs remote access for support. Which design follows the OT guidance?",
+   "options": ["Jump host, MFA, set windows, recorded sessions",
+               "An always-open VPN from the vendor's office",
+               "A shared admin password for all engineers",
+               "Direct access to the robot's safety settings"],
+   "answer": 0,
+   "why": ["CISA recommends a jump host and logged privileged sessions. NCSC and METI add outbound-only connections and time limits.",
+           "Standing inbound access is what the guidance says to remove. Use just-in-time access instead.",
+           "Shared accounts make it impossible to trace a session to a person. Every engineer needs their own identity with MFA.",
+           "\"Remote access should not circumvent or negate safety or security controls\" (NIST SP 800-82r3)."]},
+  {"prompt": "In an EU factory, a system would read workers' anger from the cell's camera images to measure their job satisfaction. What does the AI Act say?",
+   "options": ["Allowed, if the workers' union agrees to it",
+               "Banned at work, except medical or safety reasons",
+               "Allowed, because anger counts as a physical state",
+               "Allowed, as long as the images are deleted"],
+   "answer": 1,
+   "why": ["Agreement does not lift the ban in Art. 5(1)(f).",
+           "Art. 5(1)(f) bans inferring emotions at work, except for medical or safety reasons. Job satisfaction is neither, and the safety exception covers only life and health.",
+           "Pain and fatigue are physical states. Anger is an emotion, so the ban applies.",
+           "The ban is about inferring emotions, not about how long images are kept."]}
+ ]}
+</script>
+</div>
+
+<div class="widget recall" id="recall-l5" data-widget="recall" data-title="From memory">
+  <p class="recall-prompt">For the running example, write the cameras' purposes and how workers are told. Then write what must happen when the remote link drops, and when it comes back.</p>
+  <div class="recall-answer">
+    <p><strong>Purposes.</strong> Perception for the VLA; recording demonstrations and new training data; safety monitoring if used. Each one is written down, shown on signs at the cell, put in internal rules, and discussed with the workers or their union. Face recognition, if any, is named.</p>
+    <p><strong>Link drops.</strong> After a risk-assessed time the robot stops by itself, using safety functions on the robot or in the cell that do not need the network. No silent switch to autonomous mode.</p>
+    <p><strong>Link returns.</strong> Nothing restarts by itself. A person restarts it with a deliberate action, and the robot shows its current mode.</p>
+  </div>
+</div>
+
+<h2>For client work</h2>
+<ul>
+  <li>What does each camera record: faces, products, documents? For which purposes, for how long, and who can see it? How were workers told?</li>
+  <li>Are recordings searchable by person (personal data)? Who outside the company handles them, and in which country?</li>
+  <li>Does any cloud service or vendor use the video or telemetry to train its own models?</li>
+  <li>Who can operate the robot remotely? What happens when the link drops, and when it returns? Has that been tested?</li>
+  <li>How do vendors connect: jump host, MFA, time windows, recorded sessions, outbound-only? Can a remote session reach the safety settings?</li>
+  <li>What does the robot send outside, where and how often? Has anyone checked with a network capture?</li>
+</ul>
+
+<h2>Summary: extension or new?</h2>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Extension of conventional measures</th><th scope="col">New for physical AI</th></tr></thead>
+  <tbody>
+    <tr><td>CCTV rules: purpose, notice, retention, security (PPC Q&amp;A; EDPB)</td><td>One camera with several purposes: perception, training data and safety. AI training must be stated</td></tr>
+    <tr><td>OT remote access: jump host, MFA, just-in-time access, session logs, outbound-only</td><td>Teleoperation turns workers into data sources: video, voice and motion that can identify them</td></tr>
+    <tr><td>Stop on link loss, from cableless control (IEC 60204-1; EU Machinery Regulation)</td><td>A model can infer emotions from the same frames. In the EU this is banned at work, except for medical or safety reasons</td></tr>
+    <tr><td>Cloud, entrustment and cross-border rules (APPI Art. 28; PPC Q&amp;A)</td><td>Fleet learning: vendors want customer video to train their models, and contracts must limit it</td></tr>
+    <tr><td>Data minimization (EU Cyber Resilience Act)</td><td>Robot telemetry to vendor clouds, sometimes without notice</td></tr>
+    <tr><td>Mode selectors and one operator per machine</td><td>Japan's new terms for autonomous and remote operation, with physical AI next in line for review</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Read the primary source</h2>
+
+<div class="source">
+  <p class="title"><a href="https://www.cisa.gov/resources-tools/resources/principles-secure-integration-artificial-intelligence-operational-technology">CISA and partners, "Principles for the Secure Integration of Artificial Intelligence in Operational Technology" (December 2025)</a></p>
+  <p>25 pages, in English. About 40 minutes.</p>
+  <p>Why this one: agencies from seven countries wrote it for exactly this case, AI inside industrial control. It covers push-based design, vendor data use, on-premises options and fail-safe practices. For the Japanese privacy side, then read PPC Q&amp;A items Q1-13, Q1-14, Q5-7, Q7-38, Q7-39 and Q12-4, and the <a href="https://www.mhlw.go.jp/content/11201250/001717896.pdf">MHLW summary</a> on remote operation.</p>
+</div>
+
+<div class="ask">
+  <p><strong>Ask your teacher.</strong> Questions are part of the lesson. Ask Claude anything that is unclear. For example:</p>
+  <p>"How would the sign for the cell's cameras be worded in Japanese?" · "Is a demonstration dataset labelled by operator 個人データ?" · "How do we test what the robot does when the link drops?"</p>
+</div>
+
+<h2>Next</h2>
+<p><strong><a href="0006-from-poc-to-production.html">Lesson 6: From PoC to production.</a></strong> How to build safety and security into each stage, from the first trial on a client's line to operation, and how to prove the result with trials and a safety case.</p>
+
+</main>
+
+<nav class="pager" aria-label="Lesson navigation">
+  <a href="0004-protect-data-models-and-know-how.html">← Lesson 4</a>
+  <a href="0006-from-poc-to-production.html">Lesson 6 →</a>
+</nav>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security · Lesson 5 · Written 16 October 2026. Sources were checked on that date; check dates before you rely on them with a client. A learning aid, not legal advice.</p>
+</footer>
+
+</div></div>
+</body>
+</html>

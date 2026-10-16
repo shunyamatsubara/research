@@ -11,14 +11,15 @@
 
 <nav class="topnav" aria-label="Course">
   <a class="here" href="index.html">Course home</a>
-  <a href="lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a>
-  <a href="lessons/0002-threat-model-the-cell.html">Lesson 2</a>
+  <a href="lessons/0001-the-ai-is-not-the-safety-system.html">Start: Lesson 1</a>
   <a href="reference/field-guide.html">Field guide</a>
+  <a href="reference/assessment-template.html">Assessment template</a>
+  <a href="reference/extension-vs-new.html">Extension vs New</a>
   <a href="reference/glossary.html">Glossary</a>
 </nav>
 
 <header class="masthead">
-  <p class="eyebrow"><span class="tag tag-hazard">Course</span> Started 15 October 2026 · Plain English · 15–20 minutes per lesson</p>
+  <p class="eyebrow"><span class="tag tag-hazard">Course</span> Started 15 October 2026 · Plain English · Eight lessons, 15–30 minutes each</p>
   <h1>Physical AI Safety &amp; Security</h1>
   <p class="lede">A short course for a security engineer who advises on AI-driven robots. The running example is a robot arm doing pick-and-place, with classical motion planning for the approach and a VLA policy for the grasp.</p>
   <div class="goal">
@@ -38,11 +39,43 @@
   <p class="title"><a href="lessons/0002-threat-model-the-cell.html">Lesson 2 · Threat-Model the Cell</a></p>
   <p>Eight entry points with a real case for each, a data-flow diagram of the cell, how to trace an attack chain to physical harm, and which controls are extensions of conventional security and which are new.</p>
 </div>
+<div class="source">
+  <p class="title"><a href="lessons/0003-control-permissions-and-motion-range.html">Lesson 3 · Control the AI's Permissions and Motion Range</a></p>
+  <p>What the AI may ask the robot to do, where and how fast the arm may move, who may change each limit, and what ISO 10218:2025 and Japan's rules say about them.</p>
+</div>
+<div class="source">
+  <p class="title"><a href="lessons/0004-protect-data-models-and-know-how.html">Lesson 4 · Protect Data, Models and Know-How</a></p>
+  <p>How demonstrations, datasets and trained models carry a factory's know-how, five ways to lose them, what Japanese trade-secret law and contracts protect, and how to manage models, datasets and open-source parts (AIBOM, signing, retraining as a change).</p>
+</div>
+<div class="source">
+  <p class="title"><a href="lessons/0005-camera-data-remote-and-cloud.html">Lesson 5 · Camera Data, Remote Operation and the Cloud</a></p>
+  <p>When camera images are personal information in Japan and the EU, what keeps remote operation safe when the link drops, and how to control vendor remote access and data sent to the cloud.</p>
+</div>
+<div class="source">
+  <p class="title"><a href="lessons/0006-from-poc-to-production.html">Lesson 6 · Build It In from PoC to Production</a></p>
+  <p>What to build in at each stage, what evidence each gate needs, how many trials a claim needs, and a minimal safety case.</p>
+</div>
+<div class="source">
+  <p class="title"><a href="lessons/0007-conventional-robots-vs-physical-ai.html">Lesson 7 · Conventional Robots vs Physical AI</a></p>
+  <p>A side-by-side comparison for clients, and five questions that separate engineering evidence from marketing, with NVIDIA Halos as a worked case.</p>
+</div>
+<div class="source">
+  <p class="title"><a href="lessons/0008-capstone-assess-a-client-cell.html">Lesson 8 · Capstone: Assess a Client Cell</a></p>
+  <p>A fictional client brief. Sort the findings, prioritize them by project stage, and write the top five for a steering committee.</p>
+</div>
 
 <h2>Reference</h2>
 <div class="source">
   <p class="title"><a href="reference/field-guide.html">Field guide</a></p>
   <p>All the research on one page: seven findings, the five layers, a threat model, a map of standards and rules (international, EU, Japan), how to prove a system is safe, how to read vendor claims, and a checklist of questions for clients.</p>
+</div>
+<div class="source">
+  <p class="title"><a href="reference/assessment-template.html">Assessment template</a></p>
+  <p>A structure for a real client assessment: scope, layers, entry points, data and models, video and remote access, rules, stage gates, vendor claims and a client summary.</p>
+</div>
+<div class="source">
+  <p class="title"><a href="reference/extension-vs-new.html">Extension vs New</a></p>
+  <p>Every lesson's "extension or new" summary, organized by your seven themes, with a first question for the client on each.</p>
 </div>
 <div class="source">
   <p class="title"><a href="reference/glossary.html">Glossary</a></p>
@@ -58,22 +91,13 @@
 </figure>
 
 <h2>Course path</h2>
-<p>Re-planned on 16 October 2026 around the themes you need for client work. Each lesson ends by sorting its controls into "extension of conventional measures" and "new for physical AI".</p>
-<ol>
-  <li><strong>The AI is not the safety system</strong> <span class="tag tag-safe">Ready</span></li>
-  <li><strong>Threat-model the cell:</strong> eight entry points, attack chains, and extension versus new. <span class="tag tag-safe">Ready</span></li>
-  <li><strong>Control the AI's permissions and motion range:</strong> what the AI may command, who may change the limits, and how the standards and Japan's rules set them. <span class="tag tag-plain">Next</span></li>
-  <li><strong>Protect data, models and know-how, and manage AI and OSS components:</strong> confidentiality of training data and know-how, model and dataset versions, SBOM, retraining as a change.</li>
-  <li><strong>Camera data, remote operation and the cloud:</strong> privacy and confidentiality of video, remote operation and what happens when the link drops.</li>
-  <li><strong>From PoC to production:</strong> what to build in at each stage, test statistics, and a minimal safety case.</li>
-  <li><strong>Conventional robots versus physical AI, and reading vendor claims:</strong> a side-by-side comparison, with NVIDIA Halos as a case study.</li>
-  <li><strong>Capstone:</strong> a short assessment of a sample client cell.</li>
-</ol>
+<p>All eight lessons are ready <span class="tag tag-safe">Ready</span>. The course was re-planned on 16 October 2026 around the themes you need for client work. Each of Lessons 2 to 6 ends by sorting its controls into "extension of conventional measures" and "new for physical AI", and the <a href="reference/extension-vs-new.html">Extension vs New</a> page collects them by theme.</p>
+<p>A suggested pace: two lessons a week, in order. Do the capstone last, a few days after Lesson 7, without looking back at the lessons first.</p>
 
 <h2>How to study</h2>
 <ul>
   <li>Answer the practice questions before you look anything up. Effortful recall is what builds memory.</li>
-  <li>After two or three days, try each lesson's "From memory" question again without looking.</li>
+  <li>After two or three days, try each lesson's "From memory" question again without looking. Each lesson's warm-up also asks about earlier lessons.</li>
   <li>Ask Claude about anything that is unclear. Questions are part of the course.</li>
 </ul>
 

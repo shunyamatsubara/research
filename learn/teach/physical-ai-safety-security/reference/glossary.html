@@ -16,9 +16,9 @@
 
 <nav class="topnav" aria-label="Course">
   <a href="../index.html">Course home</a>
-  <a href="../lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a>
-  <a href="../lessons/0002-threat-model-the-cell.html">Lesson 2</a>
   <a href="field-guide.html">Field guide</a>
+  <a href="assessment-template.html">Assessment template</a>
+  <a href="extension-vs-new.html">Extension vs New</a>
   <a class="here" href="glossary.html">Glossary</a>
 </nav>
 
@@ -108,6 +108,40 @@
   <div class="term"><dt>Special education (特別教育)</dt><dd>Training the employer must give before workers do teaching or inspection work. For teaching: at least 7 hours of classroom and 3 hours of practice.</dd></div>
 </dl>
 
+<h2>Data, models and know-how (Lesson 4)</h2>
+<dl class="terms wide">
+  <div class="term"><dt>Demonstration</dt><dd>A recorded example of a task, often made by teleoperation, used to train a policy. In a physical AI cell, demonstrations carry the operator's skill.</dd></div>
+  <div class="term"><dt>Trade secret (営業秘密)</dt><dd>Information that is managed as a secret, useful for business, and not publicly known (Unfair Competition Prevention Act, Art. 2(6)). All three conditions must hold.</dd></div>
+  <div class="term"><dt>Secret-management measures (秘密管理措置)</dt><dd>Steps that show employees the company intends to keep information secret, such as ㊙ marks, access limits and passwords.</dd></div>
+  <div class="term"><dt>Shared data with limited access (限定提供データ)</dt><dd>Data provided to specific parties as a business, accumulated in quantity and managed by electronic means (Art. 2(7)). A model trained on it may no longer count as the same data.</dd></div>
+  <div class="term"><dt>Derived model</dt><dd>A model made from an existing one, by additional training (再利用モデル) or by distillation (蒸留モデル). A contract must name these to restrict them.</dd></div>
+  <div class="term"><dt>Distillation</dt><dd>Training a new model on the inputs and outputs of an existing model.</dd></div>
+  <div class="term"><dt>Model extraction</dt><dd>Building a working copy of a model from its answers or its behavior, without its files. For robot policies it works like imitation learning.</dd></div>
+  <div class="term"><dt>Membership inference</dt><dd>Guessing whether a given record, or a whole demonstration, was in a model's training data.</dd></div>
+  <div class="term"><dt>Data poisoning</dt><dd>Changing training data so that the model learns a hidden or wrong behavior. In robots, a physical object in the scene can act as the trigger.</dd></div>
+  <div class="term"><dt>AIBOM (ML-BOM)</dt><dd>An inventory of the models, datasets and other parts of an AI system, next to the SBOM. Formats: CycloneDX ML-BOM and the SPDX 3.0 AI profile.</dd></div>
+  <div class="term"><dt>Model signing</dt><dd>A signature over a model's files that proves who made them and that they were not changed. It does not prove the model is safe.</dd></div>
+  <div class="term"><dt>Safetensors</dt><dd>A file format for model weights that cannot carry code, unlike pickle.</dd></div>
+</dl>
+
+<h2>Camera data, remote operation and the cloud (Lesson 5)</h2>
+<dl class="terms wide">
+  <div class="term"><dt>Personal information (個人情報)</dt><dd>Information that can identify a living person, including camera images in which a person can be identified.</dd></div>
+  <div class="term"><dt>Personal data (個人データ)</dt><dd>Personal information in a database organized so that you can search for a person. Duties on security, third-party provision and transfers abroad attach to it.</dd></div>
+  <div class="term"><dt>Purpose of use (利用目的)</dt><dd>What the data is used for. In Japan it must be specified as far as possible and notified or published. AI training is a purpose to state.</dd></div>
+  <div class="term"><dt>Entrustment (委託)</dt><dd>A vendor handles personal data for your purpose. It may not use the data for its own purposes.</dd></div>
+  <div class="term"><dt>Transfer abroad (外国にある第三者への提供)</dt><dd>Giving personal data to a third party in another country (APPI Art. 28). It needs consent or an exception, even when the server is in Japan but a foreign company handles the data.</dd></div>
+  <div class="term"><dt>Specified biometric personal information (特定生体個人情報)</dt><dd>A new category in Japan's 2026 amendment for biometric data that can be collected cheaply, such as face features. Not yet in force.</dd></div>
+  <div class="term"><dt>Emotion recognition (EU)</dt><dd>AI that identifies or infers emotions or intentions from biometric data (AI Act Art. 3(39)). Banned at work and in education in the EU, except for medical or safety reasons (AI Act Art. 5(1)(f)). Pain and fatigue are not emotions under the Act.</dd></div>
+  <div class="term"><dt>Autonomous operation (自律運転)</dt><dd>The machine is in control in normal operation; people start it, watch it and stop it in an emergency (MHLW, 2026).</dd></div>
+  <div class="term"><dt>Remote operation (遠隔運転)</dt><dd>A person is in control in normal operation, from a distance (MHLW, 2026).</dd></div>
+  <div class="term"><dt>Cableless control</dt><dd>Control over radio or another link without a cable. On loss of the link the machine must stop automatically, and restoring the link must not restart it (IEC 60204-1, 9.2.4).</dd></div>
+  <div class="term"><dt>Jump host</dt><dd>A hardened server that is the only way in for remote users, where authentication and session recording happen.</dd></div>
+  <div class="term"><dt>Just-in-time access</dt><dd>Remote access that is opened only for an agreed time window, such as a maintenance slot, and closed afterwards.</dd></div>
+  <div class="term"><dt>Push-based architecture</dt><dd>The cell sends data out; nothing outside holds a standing connection into the cell.</dd></div>
+  <div class="term"><dt>Telemetry</dt><dd>Data a device sends to its maker or a service, such as state, logs or sensor readings. Ask what is sent, where and how often.</dd></div>
+</dl>
+
 <h2>From PoC to production (Lesson 6)</h2>
 <dl class="terms wide">
   <div class="term"><dt>Stage gate</dt><dd>A decision point between project stages, with evidence that must exist before the project moves on.</dd></div>
@@ -128,7 +162,7 @@
 </main>
 
 <footer class="foot">
-  <p>Physical AI Safety &amp; Security · Glossary. Sources for each term are in <a href="../lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a> and the <a href="field-guide.html">field guide</a>.</p>
+  <p>Physical AI Safety &amp; Security · Glossary. Sources for each term are in the lesson named in its section and in the <a href="field-guide.html">field guide</a>.</p>
 </footer>
 
 </div></div>

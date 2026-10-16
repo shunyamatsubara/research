@@ -119,6 +119,66 @@ Checked on 2026-10-15. Labels: (peer-reviewed), (preprint), (company), (governme
 - [RRI Collaborative Robot Safety Explanatory Guide (2023)](https://www.jmfrri.gr.jp/wp-content/uploads/2024/12/wg2_anzen.pdf) (industry association)
   Worked risk-assessment examples; predates the 2025 standards.
 
+### Data, models and know-how (Lesson 4)
+- [Unfair Competition Prevention Act, e-Gov](https://laws.e-gov.go.jp/law/405AC0000000047) (law)
+  Art. 2(6) trade secret (managed as secret, useful, not public; "生産方法" named first); Art. 2(7) 限定提供データ.
+- [METI 営業秘密管理指針 (revised 2025-03)](https://www.meti.go.jp/policy/economy/chizai/chiteki/guideline/r7ts.pdf) (government)
+  Minimum measures for protection; ㊙ marks and passwords for electronic data; cloud storage is fine if managed as secret; new AI notes (note 2, footnote 24: giving data to an outside generative-AI provider may deny secrecy); tacit know-how must be made visible on a medium.
+- [METI 限定提供データに関する指針 (revised 2024-02)](https://www.meti.go.jp/policy/economy/chizai/chiteki/guideline/h31pd.pdf) (government)
+  Training datasets and trained models as examples; a model "no longer the same" as the data is not unfair competition.
+- [METI AI・データの利用に関する契約ガイドライン（AI編） (2018-06)](https://www.meti.go.jp/policy/mono_info_service/connected_industries/sharing_and_utilization/20180615001-3.pdf) (government)
+  Data cannot be owned; robots: the user may hold the know-how; restrict fine-tuned and distilled models explicitly in the contract.
+- [METI AIの利用・開発に関する契約チェックリスト (2025-02)](https://www.meti.go.jp/policy/mono_info_service/connected_industries/sharing_and_utilization/20250218003-ar.pdf) (government)
+  インプット処理成果 (A-6); removal from a trained model "generally difficult". Lesson 4's primary source.
+- [AI Guidelines for Business v1.2, appendix (2026-03-31)](https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/20260331_report.html) (government)
+  AIBOM next to SBOM for AI developers; physical AI widens the attack surface for data poisoning.
+- [NIST AI 100-2 E2025, Adversarial Machine Learning](https://csrc.nist.gov/pubs/ai/100/2/e2025/final) (government)
+  Model extraction: "a functionally equivalent model can be reconstructed"; differential privacy does not stop it.
+- Policy stealing research: ["Stealing Deep Reinforcement Learning Models for Fun and Profit"](https://arxiv.org/abs/2006.05032) (2020), ["Stealthy Imitation"](https://arxiv.org/abs/2405.07004) (ICML 2024), [cobot traffic fingerprinting](https://arxiv.org/abs/2312.06802) (2023, preprint), [membership inference on VLAs](https://arxiv.org/abs/2605.07088) (2026, preprint), [GoBA physical-object backdoors](https://arxiv.org/abs/2510.09269) (2025, preprint).
+- Supply-chain tools: [CycloneDX v1.5 (ML-BOM)](https://cyclonedx.org/news/cyclonedx-v1.5-released/), [SPDX 3.0.1 AI profile](https://spdx.github.io/spdx-spec/v3.0.1/model/AI/Classes/AIPackage/), [OWASP LLM03:2025 Supply Chain](https://genai.owasp.org/llmrisk/llm032025-supply-chain/), [model-signing](https://pypi.org/project/model-signing/) (1.0 on 2025-04-04), [safetensors](https://huggingface.co/docs/safetensors/index).
+- [LeRobot docs: recording](https://huggingface.co/docs/lerobot/il_robots) (project docs)
+  Datasets are pushed to the Hugging Face Hub by default after recording; Hub repos are public by default.
+- [J-AISI AI robotics guide v1.0](https://aisi.go.jp/assets/pdf/20260723_robotics_ai_safety_eval_v1.0_ja.pdf) (government)
+  Version and update history of software, models and settings; defined change scope and verification owner.
+- [FDA PCCP final guidance (2025-08)](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/marketing-submission-recommendations-predetermined-change-control-plan-artificial-intelligence) (government, medical devices)
+  A model for planning allowed model changes in advance.
+
+### Camera data, remote operation and the cloud (Lesson 5)
+- [PPC ガイドラインに関するＱ＆Ａ (updated 2025-07-01)](https://www.ppc.go.jp/files/pdf/250701_APPI_QA.pdf) (regulator)
+  Q1-13/Q1-14 cameras and face recognition; Q1-41 video databases; Q5-7 monitoring employees; Q7-38/Q7-39 vendors; Q7-53 and Q12-4 clouds and transfers abroad.
+- [PPC: 2026 amendment of the APPI](https://www.ppc.go.jp/personalinfo/legal/r8kaiseihogohou/) (law, regulator)
+  Passed 2026-07-10, promulgated 2026-07-17, in force within two years; 特定生体個人情報; statistics and AI development; limits on entrusted vendors. Detailed rules in drafting.
+- [Camera Guidebook ver3.0 (2022-03)](https://www.soumu.go.jp/main_content/000803603.pdf) (government)
+  Edge deletion still counts as acquisition; state AI retraining use; care with employees.
+- [PPC camera panel report (2023-03)](https://www.ppc.go.jp/files/pdf/cameragazou_yushikisyakentoukai_houkokusyo.pdf) (regulator)
+  Footnote 56: the "obvious purpose" exception may stop fitting as cameras gain other purposes.
+- [EDPB Guidelines 3/2019 on video devices](https://www.edpb.europa.eu/system/files/documents/files/file1/edpb_guidelines_201903_video_devices_en_0.pdf) (regulator, EU)
+  "For your safety" is not specific; employees do not expect monitoring; erase after a few days; deactivate unneeded functions.
+- [AI Act Art. 5(1)(f)](https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng) and [Commission guidelines on prohibited practices (2025-07-29)](https://ec.europa.eu/newsroom/dae/redirection/document/112367) (law, EU)
+  Emotion recognition at work banned except for medical or safety reasons; "factories and warehouses" are workplaces.
+- [Data Act (EU) 2023/2854](https://eur-lex.europa.eu/eli/reg/2023/2854/oj/eng) (law, EU)
+  Product data access for users; makers may not use data to learn the user's "production methods"; new products from 2026-09-12.
+- [MHLW interim summary on unmanned operation (2026-06-29)](https://www.mhlw.go.jp/content/11201250/001716203.pdf) and [summary](https://www.mhlw.go.jp/content/11201250/001717896.pdf) (government)
+  自律運転 vs 遠隔運転; explicit mode switching; one remote operator per machine; automatic stop on link failure; physical AI to be examined.
+- [IEC 60204-1:2016 9.2.4 as quoted by IDEC](https://www.jmf.or.jp/jmf/wp-content/uploads/2024/04/IEC-60204-1_2016.pdf) (company seminar quoting the standard)
+  Automatic stop on loss of cableless control; restoring the link "shall not restart the machine".
+- [CISA et al., Principles for the Secure Integration of AI in OT (2025-12-03)](https://www.cisa.gov/resources-tools/resources/principles-secure-integration-artificial-intelligence-operational-technology) (government)
+  Push-based design; vendor training on operational data; on-premises options. Lesson 5's primary source.
+- [CISA et al., Adapting Zero Trust Principles to OT (2026-04-29)](https://www.cisa.gov/resources-tools/resources/adapting-zero-trust-principles-operational-technology) (government)
+  Jump hosts, recorded privileged sessions, just-in-time vendor access.
+- [NCSC secure connectivity principles for OT (2026-01-14)](https://www.ncsc.gov.uk/collection/operational-technology/secure-connectivity) (government)
+  Outbound-only connections, deny-all host filtering, break-glass only for emergencies.
+- [NIST SP 800-82r3 (2023-09)](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-82r3.pdf) (government)
+  "Remote access should not circumvent or negate safety or security controls."
+- [METI factory security guideline v1.1 (2025-04-11)](https://www.meti.go.jp/policy/netsecurity/wg1/factorysystems_guideline_ver1.1.pdf) (government)
+  Checklist 3-6: two-factor authentication, per-user device limits, time limits, detection outside maintenance windows.
+- [Agility Robotics, "Built for the real world" (2026-06-22)](https://www.agilityrobotics.com/content/built-for-the-real-world) (company)
+  External safety controller: the robot "would fall" on communication loss; moved to an onboard safety PLC with category 1 stop.
+- ["Cybersecurity AI: Humanoid Robots as Attack Vectors"](https://arxiv.org/abs/2509.14139) (2025, preprint, robot-security company)
+  Unitree G1 telemetry "every 300 seconds without operator notice".
+- ["Unique Identification of 50,000+ VR Users from Head & Hand Motion Data"](https://arxiv.org/abs/2302.08927) (2023)
+  94.33% identification from 100 seconds of motion: teleoperation recordings can identify operators.
+
 ## Wisdom (Communities)
 
 - [Safety-Critical Systems Club (UK)](https://scsc.uk)
@@ -147,6 +207,9 @@ Checked on 2026-10-15. Labels: (peer-reviewed), (preprint), (company), (governme
 - Whether hand-guiding or teleoperation for VLA data collection counts as "teaching" (教示等) under Japanese law, which needs special education.
 - No VLA vendor publishes per-model grasp failure rates or safety evaluations of released models.
 - EU: whether a frozen-weight VLA counts as "self-evolving behaviour"; the delegated acts that add AI requirements to the Machinery Regulation are not adopted yet.
+- Whether model weights and datasets must be listed in a Cyber Resilience Act SBOM: no official text found (October 2026).
+- The detailed rules of Japan's 2026 APPI amendment (scope of 特定生体個人情報, how notices must be given) are still in drafting.
+- No study yet measures how much industrial know-how leaks from teleoperation demonstrations or from a deployed VLA.
 
 ## Excluded, or read with care
 

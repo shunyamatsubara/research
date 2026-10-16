@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lesson 4 · Protect Data, Models and Know-How</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/widgets.js" defer></script>
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a href="../index.html">Course home</a>
+  <a href="0003-control-permissions-and-motion-range.html">← Lesson 3</a>
+  <a class="here" href="0004-protect-data-models-and-know-how.html">Lesson 4</a>
+  <a href="0005-camera-data-remote-and-cloud.html">Lesson 5 →</a>
+  <a href="../reference/field-guide.html">Field guide</a>
+  <a href="../reference/glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-hazard">Lesson 4</span> About 25 minutes · Running example: an AI pick-and-place cell</p>
+  <h1>Protect Data, Models and Know-How</h1>
+  <p class="lede">In a physical AI project, a factory's skill moves into files: recorded demonstrations, datasets and trained models. This lesson shows how those files can be lost, copied or changed, what Japanese law and contracts protect, and how to manage models, datasets and open-source parts as a software supply chain.</p>
+  <div class="goal">
+    <span class="tag tag-act">Your goal</span>
+    <p>For an AI robot cell, list the assets that hold know-how. For each one, say how it could leak or be changed, and write three kinds of controls: secrecy measures, contract terms, and an inventory with signatures and change control.</p>
+  </div>
+</header>
+
+<main class="prose">
+
+<h2>Warm-up: Lessons 1 to 3 from memory</h2>
+
+<div class="widget" data-widget="quiz" data-title="Three quick questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "Lesson 2 said the policy server must never load pickle data from the network. Why?",
+   "options": ["Pickle files are too slow for robots",
+               "Loading pickle data can run attacker code",
+               "Pickle cannot store the arm's joint angles",
+               "Pickle data breaks the safety controller's checksum"],
+   "answer": 1,
+   "why": ["Speed is not the issue. The issue is what happens when the data is loaded.",
+           "Loading a pickle file can run code hidden inside it. Anyone who can send data to the server could run commands on it.",
+           "Pickle can store almost any Python object. That flexibility is exactly the danger.",
+           "The safety controller is separate (L4). The risk is on the policy server, which an attacker could take over."]},
+  {"prompt": "From Lesson 3: who should be able to add a new task to the AI's allowlist?",
+   "options": ["The planner itself, when a user asks",
+               "Any operator, by typing in the chat",
+               "The line owner, through a reviewed change",
+               "The vendor's cloud, whenever a model updates"],
+   "answer": 2,
+   "why": ["The AI must never grant itself new abilities.",
+           "Chat users must not be able to change the AI's permissions.",
+           "Permissions change only through a reviewed, logged change by the owner of the line or of safety.",
+           "An outside service that changes permissions on its own is a back door into the cell."]},
+  {"prompt": "From Lesson 1: Koopman's test imagines the doer attacking safety on purpose, with full knowledge of the design. If it could succeed, what does that tell you?",
+   "options": ["The checker depends on the AI",
+               "The AI needs more training data",
+               "The robot should move more slowly",
+               "The vendor must sign the model"],
+   "answer": 0,
+   "why": ["If the doer can defeat the checker, the checker is not independent. It must protect people even when an attacker fully controls the AI computer.",
+           "More data improves the doer. The test is about whether the checker is independent of it.",
+           "Slower motion can lower risk, but the test is about the checker's independence.",
+           "Signing proves who made a model. It says nothing about the checker's independence."]}
+ ]}
+</script>
+</div>
+
+<h2>Where the know-how goes</h2>
+
+<p>In a conventional cell, the know-how sits in a robot program and in the heads of skilled workers. In a physical AI cell, it moves into data. In the running example, the client's best operator records 300 grasps by teleoperation, and a VLA is fine-tuned on them. From that day, the operator's skill also exists as a dataset and as a set of model weights.</p>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Asset</th><th scope="col">In the running example</th><th scope="col">Why it matters</th></tr></thead>
+  <tbody>
+    <tr><td>Demonstrations</td><td>300 teleoperated grasps, with camera images and arm motions</td><td>The operator's tacit skill, in a form a machine can learn from</td></tr>
+    <tr><td>Process data</td><td>Grip forces, approach angles, cycle times, reject rates</td><td>The process recipe and the quality level</td></tr>
+    <tr><td>Camera images</td><td>Parts, fixtures, the line layout, sometimes products not yet released</td><td>Product and layout secrets. Often personal data too (<a href="0005-camera-data-remote-and-cloud.html">Lesson 5</a>)</td></tr>
+    <tr><td>Fine-tuned model</td><td>VLA weights trained on the demonstrations</td><td>The skill in compressed form. It can be copied and run elsewhere</td></tr>
+    <tr><td>Configuration</td><td>Allowlists, motion limits, safety settings</td><td>How the cell is protected. A target for tampering (<a href="0003-control-permissions-and-motion-range.html">Lesson 3</a>)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Two Japanese government guides point the same way. METI's trade-secret guideline says that intangible know-how that employees have learned, such as skills, must in principle be made visible "紙その他の媒体に" (on paper or another medium) to be protected, for example as a list of categories or a written document.<span class="note">METI, <a href="https://www.meti.go.jp/policy/economy/chizai/chiteki/guideline/r7ts.pdf">営業秘密管理指針</a> (revised March 2025), section on intangible know-how.</span> And METI's AI contract guideline notes that for a robot with delicate movements, the robot's hardware strongly shapes the training data, so "ユーザがノウハウを有しているような場合もある" (the user may be the one who holds the know-how).<span class="note">METI, <a href="https://www.meti.go.jp/policy/mono_info_service/connected_industries/sharing_and_utilization/20180615001-3.pdf">AI・データの利用に関する契約ガイドライン（AI編）</a> (June 2018), section on know-how.</span></p>
+
+<p>Our inference from these two points: a demonstration dataset may be the first time a factory's tacit skill exists on a medium at all. That makes it easier to protect, and also easier to steal.</p>
+
+<div class="keyrule">
+  <span class="tag tag-hazard">Key rule</span>
+  <p class="big">The demonstrations are the know-how.</p>
+  <p>Protect the dataset and the model trained on it as you would protect the skill itself. Decide who owns them, who may use them, and how they are kept secret before the first recording.</p>
+</div>
+
+<h2>Five ways to lose it</h2>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Way</th><th scope="col">What happens</th><th scope="col">First control</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1. Stolen</strong></td><td>Someone copies the dataset or the weights from storage, the policy server or a cloud bucket (entry points E3, E4, E7).</td><td>Access control, encryption, logging</td></tr>
+    <tr><td><strong>2. Published by default</strong></td><td>An open-source tool uploads the data to a public site because nobody changed a default.</td><td>Change the defaults; review every upload</td></tr>
+    <tr><td><strong>3. Copied by watching</strong></td><td>Someone builds a working copy of the policy from its behavior, without the files.</td><td>Limit who can query, watch or record the robot</td></tr>
+    <tr><td><strong>4. Reused by the vendor</strong></td><td>The vendor uses your data or model to improve its own products.</td><td>Contract terms before recording starts</td></tr>
+    <tr><td><strong>5. Poisoned</strong></td><td>Someone changes the training data so the model learns a hidden behavior.</td><td>Hashes, change records, review of demonstrations</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Published by default</h3>
+<p>LeRobot, a popular open-source robot-learning library, says: "By default, the dataset is pushed to your Hugging Face page after recording. To disable uploading, use <code>--dataset.push_to_hub=False</code>."<span class="note"><a href="https://huggingface.co/docs/lerobot/il_robots">LeRobot documentation, "Imitation learning on real-world robots"</a> (checked October 2026). Defaults can change between versions.</span> On the Hugging Face Hub, a new repository is public unless you say otherwise: "If None (default), the repo will be public unless the organization's default is private."<span class="note"><a href="https://huggingface.co/docs/huggingface_hub/package_reference/hf_api">huggingface_hub API reference</a>, <code>create_repo</code>.</span> In a client project, set the upload flags off, make the organization's default private, and check every upload. This is the same mistake as a public storage bucket, made by a tool on someone's behalf.</p>
+
+<h3>Copied by watching</h3>
+<p>You do not need the files to copy a policy. A study on stealing reinforcement-learning models found that "the process of DRL model extraction is equivalent to imitation learning": record what the policy does, and train a copy on it.<span class="note"><a href="https://arxiv.org/abs/2006.05032">"Stealing Deep Reinforcement Learning Models for Fun and Profit"</a> (2020).</span> Another, at ICML 2024, starts from the point that control policies "represent valuable intellectual property", and steals them with only black-box access.<span class="note"><a href="https://arxiv.org/abs/2405.07004">"Stealthy Imitation: Reward-guided Environment-free Policy Stealing"</a> (ICML 2024).</span> Even encrypted network traffic can show which action a collaborative robot is running.<span class="note"><a href="https://arxiv.org/abs/2312.06802">"On the Feasibility of Fingerprinting Collaborative Robot Network Traffic"</a> (2023, preprint).</span> And a 2026 preprint presents the first study of membership inference against VLA models: guessing whether a given demonstration was in the training data.<span class="note"><a href="https://arxiv.org/abs/2605.07088">"Membership Inference Attacks on Vision-Language-Action Models"</a> (2026, preprint).</span></p>
+<p>NIST's view of the limits: exact copies are not possible, but "a functionally equivalent model can be reconstructed", and differential privacy "does not provide guarantees against model extraction attacks".<span class="note"><a href="https://csrc.nist.gov/pubs/ai/100/2/e2025/final">NIST AI 100-2 E2025, Adversarial Machine Learning</a> (March 2025), section on model extraction.</span> So the controls are about access: keep the policy server inside the cell zone, limit and log queries, and treat motion logs and videos of the robot as secret.</p>
+
+<h3>Poisoned</h3>
+<p>Poisoning is an old idea with a physical twist. A 2025 preprint shows that "attackers can manipulate VLAs by simply injecting physical objects as triggers into the training dataset".<span class="note"><a href="https://arxiv.org/abs/2510.09269">"Goal-oriented Backdoor Attack against Vision-Language-Action Models via Physical Objects"</a> (2025, preprint).</span> An object in the scene during recording can become a hidden switch. Keep hashes of every dataset, record who changed what, and review the demonstrations before training. L3 and L4 still limit what a poisoned model can do to people.</p>
+
+<div class="bridge">
+  <span class="tag tag-act">You already know this</span>
+  <p>Ways 1 and 5 are the classic threats to confidentiality and integrity. Way 2 is a misconfigured default. Ways 3 and 4 are the newer ones: the asset can leak through the robot's behavior and through the model itself, even when no file is stolen.</p>
+</div>
+
+<h2>What Japanese law protects, and where it stops</h2>
+
+<h3>Trade secrets (営業秘密)</h3>
+<p>Under the Unfair Competition Prevention Act, a trade secret is information that is "秘密として管理されている" (managed as a secret), useful for business, and "公然と知られていない" (not publicly known). The law's first example of useful information is "生産方法" (production methods).<span class="note"><a href="https://laws.e-gov.go.jp/law/405AC0000000047">不正競争防止法</a>, Art. 2(6).</span> All three conditions must hold.</p>
+<p>METI's guideline sets the "最低限の水準の対策" (minimum level of measures) needed for legal protection. The key test is whether employees can tell that the company intends to keep the information secret. For electronic data, a ㊙ mark in file or folder names, a mark shown when the file opens, or a password can each be enough. Storing secrets in an outside cloud does not by itself lose protection, as long as they are managed as secret, for example with layered access control.<span class="note">METI, <a href="https://www.meti.go.jp/policy/economy/chizai/chiteki/guideline/r7ts.pdf">営業秘密管理指針</a> (revised March 2025), section on electronic information.</span></p>
+<p>The March 2025 revision added notes on AI. Using secret data to train an AI model inside the company does not, by itself, end its protection, even if the model later outputs the data. But if the data goes to a third party outside the company, such as a generative-AI provider, "秘密管理性が否定される場合もあり得る" (its status as a managed secret may be denied).<span class="note">Same guideline, note 2 and footnote 24.</span></p>
+
+<h3>Shared data (限定提供データ)</h3>
+<p>Data you share with partners can be protected as 限定提供データ: information provided to specific parties as a business and "相当量蓄積され、及び管理されている" (accumulated in substantial quantity and managed by electronic means).<span class="note"><a href="https://laws.e-gov.go.jp/law/405AC0000000047">不正競争防止法</a>, Art. 2(7).</span> METI's guideline lists training datasets and trained models as examples. But it also says that when a model trained on the data is judged "もはや元の限定提供データとは異なるもの" (no longer the same as the original data), using it is not unfair competition.<span class="note">METI, <a href="https://www.meti.go.jp/policy/economy/chizai/chiteki/guideline/h31pd.pdf">限定提供データに関する指針</a> (revised February 2024).</span> The protection may not follow the data into the model.</p>
+
+<h3>Contracts</h3>
+<p>METI's AI contract guideline starts from a simple point: "データは、無体物（情報）であるため、所有権の対象とはなり得ない" (data is intangible, so it cannot be owned). Rights to data come from contracts, together with trade-secret, copyright and privacy law.<span class="note">METI, <a href="https://www.meti.go.jp/policy/mono_info_service/connected_industries/sharing_and_utilization/20180615001-3.pdf">契約ガイドライン（AI編）</a>, section on the legal nature of data.</span></p>
+<p>The same guideline warns that a ban on using a trained model does not by itself ban new models made from it by additional training or distillation. "再利用モデルや蒸留モデルの生成や利用を制限したい場合には、その旨を契約書に明記することが重要となる" (to restrict fine-tuned or distilled models, state it in the contract).</p>
+<p>METI's 2025 checklist for AI contracts adds a category that is easy to miss: "インプット処理成果", what the vendor creates from your inputs, including "学習用データ、中間生成物、派生的知的財産" (training data, intermediate products and derived IP). It also warns that "一度AIモデル（学習済みモデル）に取り込まれた情報の除去は一般的には困難" (once information is absorbed into a trained model, removing it is generally difficult). Its basic advice: keep unneeded information out of the inputs.<span class="note">METI, <a href="https://www.meti.go.jp/policy/mono_info_service/connected_industries/sharing_and_utilization/20250218003-ar.pdf">AIの利用・開発に関する契約チェックリスト</a> (February 2025).</span></p>
+
+<div class="keyrule">
+  <span class="tag tag-hazard">Key rule</span>
+  <p class="big">Data cannot be owned. Keep it secret, and agree in writing who may use it.</p>
+  <p>Sign the contract before the first recording. Data inside a trained model is hard to take back.</p>
+</div>
+
+<p>For the running example, the contract should answer these questions:</p>
+<ul>
+  <li>Who may use the 300 demonstrations, for what purpose, and for how long?</li>
+  <li>May the vendor use the data, or the model trained on it, to improve its own products or to serve other customers?</li>
+  <li>Are fine-tuning and distillation of the trained model allowed? By whom?</li>
+  <li>Who owns improvements and derived models?</li>
+  <li>How are data and models returned or deleted at the end, knowing that data inside a model is hard to remove?</li>
+  <li>Which audit rights and logs let the client check all of this?</li>
+</ul>
+
+<h2>Manage AI parts as a software supply chain</h2>
+
+<div class="bridge">
+  <span class="tag tag-act">You already know this</span>
+  <p>SBOMs, code signing, pinned dependencies and "never deserialize untrusted data" all apply. The difference: a model file is part code, part data. It decides behavior like code, but you cannot read it like code. A signature proves who made it, not how it behaves.</p>
+</div>
+
+<h3>Keep an inventory (AIBOM)</h3>
+<p>Japan's AI Guidelines for Business, version 1.2, now ask AI developers to create an AIBOM next to the SBOM: "AIシステムの構成管理を容易にするAIBOMを作成" (create an AIBOM to make configuration management of AI systems easier).<span class="note">METI and MIC, <a href="https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/20260331_report.html">AI事業者ガイドライン（第1.2版）</a> (March 2026), appendix, guidance for AI developers.</span> The formats exist. CycloneDX added a machine-learning BOM (ML-BOM) in version 1.5 (June 2023), and SPDX 3.0 has an AI profile with fields such as <code>autonomyType</code> and <code>safetyRiskAssessment</code>.<span class="note"><a href="https://cyclonedx.org/news/cyclonedx-v1.5-released/">CycloneDX v1.5 announcement</a> (26 June 2023); <a href="https://spdx.github.io/spdx-spec/v3.0.1/model/AI/Classes/AIPackage/">SPDX 3.0.1, AIPackage</a>.</span> OWASP's advice: "AI BOMs and ML SBOMs are an emerging area and you should evaluate options starting with OWASP CycloneDX."<span class="note"><a href="https://genai.owasp.org/llmrisk/llm032025-supply-chain/">OWASP LLM03:2025 Supply Chain</a>.</span></p>
+<p>For robots, J-AISI's robotics guide expects that "ソフトウェア／モデル／設定内容のバージョンや更新履歴が管理されている" (versions and update history of software, models and settings are managed), and that each change has a defined content, timing, scope of impact and owner for verification.<span class="note">J-AISI, <a href="https://aisi.go.jp/assets/pdf/20260723_robotics_ai_safety_eval_v1.0_ja.pdf">AIロボティクスに関するセーフティ評価観点ガイド</a> v1.0 (July 2026), configuration and change management.</span></p>
+<p>In the EU, the Cyber Resilience Act requires a software bill of materials "covering at the very least the top-level dependencies of the products".<span class="note"><a href="https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng">Cyber Resilience Act (EU) 2024/2847</a>, Annex I, Part II(1).</span> We found no official text that says whether model weights and datasets must be listed. List them anyway. The Machinery Regulation requires that "software and data that are critical" for meeting its safety requirements "shall be identified as such and shall be adequately protected against accidental or intentional corruption".<span class="note"><a href="https://eur-lex.europa.eu/eli/reg/2023/1230/oj/eng">EU Machinery Regulation 2023/1230</a>, Annex III, 1.1.9. It applies from 20 January 2027.</span></p>
+
+<p>What to record for each AI part (a suggested minimum):</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Field</th><th scope="col">For the grasp VLA</th></tr></thead>
+  <tbody>
+    <tr><td>Identity</td><td>Name, version, file hash, signature</td></tr>
+    <tr><td>Origin</td><td>Supplier, base model and its license, where it was downloaded from</td></tr>
+    <tr><td>Training data</td><td>Dataset IDs and hashes; when, where and by whom it was recorded; the contract or consent that allows the use</td></tr>
+    <tr><td>Training run</td><td>Code version, settings, who ran it, when</td></tr>
+    <tr><td>Evidence</td><td>Test results, trial counts and operating conditions (<a href="0006-from-poc-to-production.html">Lesson 6</a>)</td></tr>
+    <tr><td>Release</td><td>Who approved it, and which version of the safety case covers it</td></tr>
+    <tr><td>Where it runs</td><td>Which robots and servers, and how to roll back</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="sources">This list is our suggestion, built from the sources above. CycloneDX and SPDX can hold these fields.</p>
+
+<h3>Sign, and load safely</h3>
+<ul>
+  <li><strong>Sign every model release</strong> and check the signature before loading. The OpenSSF <code>model-signing</code> tool, "a tool for signing and verifying ML models", reached version 1.0 in April 2025.<span class="note"><a href="https://pypi.org/project/model-signing/">model-signing on PyPI</a> (1.0.0 released 4 April 2025).</span></li>
+  <li><strong>Never load untrusted pickle files.</strong> Hugging Face warns: "There are dangerous arbitrary code execution attacks that can be perpetrated when you load a pickle file." Use safetensors, a format "for storing tensors safely (as opposed to pickle)".<span class="note"><a href="https://huggingface.co/docs/hub/security-pickle">Hugging Face, "Pickle Scanning"</a>; <a href="https://huggingface.co/docs/safetensors/index">safetensors documentation</a>.</span></li>
+  <li><strong>Pin and mirror.</strong> Pin model and dataset versions as you pin dependencies, and keep approved copies inside the company.</li>
+</ul>
+
+<h3>Retraining is a change</h3>
+<p>A retrained model is a new model. UL 4600 requires a safety case analysis in response to changes, and its examples include "update to training data".<span class="note"><a href="https://users.ece.cmu.edu/~koopman/ul4600/191213_UL4600_VotingVersion.pdf">UL 4600 voting draft</a> (2019), 12.6.1. The published editions are paywalled.</span> Treat each retraining like a software release: impact analysis, re-validation, approval, and an inventory update (<a href="0006-from-poc-to-production.html">Lesson 6</a>).</p>
+<p>Medical devices show one way to plan for this. The US FDA lets makers describe planned model changes in advance, in a "Predetermined Change Control Plan", so that each listed change can be made "without necessitating additional marketing submissions".<span class="note">US FDA, <a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/marketing-submission-recommendations-predetermined-change-control-plan-artificial-intelligence">PCCP final guidance for AI-enabled device software</a> (August 2025).</span> The idea transfers to a robot cell: agree in advance which retraining is allowed and how each one is tested.</p>
+
+<h2>Practice: name the control</h2>
+
+<div class="widget" data-widget="sorter" data-title="What does this control protect?">
+<script type="application/json">
+{"buckets": [
+  {"id": "SEC", "short": "Secret", "label": "Keeps the asset secret"},
+  {"id": "INT", "short": "Intact", "label": "Keeps the asset unchanged"},
+  {"id": "USE", "short": "Rights", "label": "Agrees who may use the asset"}
+ ],
+ "missDefault": "Ask: does this stop others from seeing it (Secret), stop it from being changed (Intact), or decide who may use it (Rights)?",
+ "items": [
+  {"text": "The demonstration dataset is marked ㊙ and only the project team can open it.",
+   "answer": "SEC",
+   "why": "A secrecy measure. It also shows employees that the company intends to keep the data secret, which trade-secret law requires.",
+   "miss": {"INT": "Marking and access limits stop people from seeing the data. They do not detect changes.",
+            "USE": "This is a measure inside the company, not an agreement with another party."}},
+  {"text": "Recording runs with --dataset.push_to_hub=False, and the organization's default on the Hub is private.",
+   "answer": "SEC",
+   "why": "It stops the tool from publishing the data by default.",
+   "miss": {"INT": "This is about who can see the data, not whether it is changed.",
+            "USE": "No agreement is involved. It is a setting that keeps the data from being published."}},
+  {"text": "The contract says the vendor may not fine-tune or distill new models from the client's trained model.",
+   "answer": "USE",
+   "why": "A rights term. METI says a ban on using a model does not cover derived models unless the contract says so.",
+   "miss": {"SEC": "The vendor already has the model. The question is what it may do with it.",
+            "INT": "This is about permitted use, not about changes to the files."}},
+  {"text": "Each model release is signed, and the robot checks the signature before loading it.",
+   "answer": "INT",
+   "why": "Signing proves who made the file and that it was not changed. It does not prove the model is safe.",
+   "miss": {"SEC": "A signature does not hide the model. Anyone with the file can still read it."}},
+  {"text": "Model weights are loaded only in safetensors format, never as pickle files.",
+   "answer": "INT",
+   "why": "It stops a model file from carrying code that runs when it is loaded.",
+   "miss": {"SEC": "The format does not hide anything. It protects the system that loads the file."}},
+  {"text": "The parties agree in writing who may use the 300 demonstrations, for what purpose, and for how long.",
+   "answer": "USE",
+   "why": "Data cannot be owned, so rights come from the contract.",
+   "miss": {"SEC": "Secrecy measures limit access. This agreement decides what each party may do with the data."}},
+  {"text": "The policy server limits and logs queries, and only accepts them from inside the cell.",
+   "answer": "SEC",
+   "why": "It makes copying the policy by watching its behavior (model extraction) harder.",
+   "miss": {"INT": "The main threat here is copying the policy, not changing it."}},
+  {"text": "Every training dataset has a hash, and each change to it records who made it.",
+   "answer": "INT",
+   "why": "It detects poisoning or other changes to the data before training.",
+   "miss": {"SEC": "Hashes and change records do not hide the data. They show whether it changed."}}
+ ]}
+</script>
+</div>
+
+<h2>Check yourself</h2>
+
+<div class="widget" data-widget="quiz" data-title="Four questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "Under Japan's Unfair Competition Prevention Act, which three conditions must data meet to be a trade secret?",
+   "options": ["Registered, encrypted, and stored on Japanese servers",
+               "Created by staff, labelled, and backed up",
+               "Kept secret, useful, and not publicly known",
+               "Patented, licensed, and named in every contract"],
+   "answer": 2,
+   "why": ["Registration and the server's location are not conditions. Encryption can help show secrecy, but it is not a condition by itself.",
+           "Who made the data and whether it is backed up do not decide protection.",
+           "Art. 2(6): managed as a secret, useful for business, and not publicly known. All three must hold.",
+           "Trade secrets are not patented. A patent makes the information public."]},
+  {"prompt": "The contract says the vendor may not use the model trained on the client's demonstrations for other customers. Does that alone stop the vendor from distilling a new model from it?",
+   "options": ["Not by itself: name distillation in the contract",
+               "Yes: any use ban always covers distillation too",
+               "Yes, because data and models are owned property",
+               "No, and no contract term can restrict it"],
+   "answer": 0,
+   "why": ["METI's guideline says a ban on using a model does not by itself ban fine-tuned or distilled models. Write it in the contract.",
+           "That is the mistake METI warns about. A ban on use does not automatically cover derived models.",
+           "Data cannot be owned under Japanese law. That is why the contract matters.",
+           "A contract can restrict it. METI recommends stating it explicitly."]},
+  {"prompt": "The vendor retrains the grasp VLA every month on new demonstrations. How should the client treat each new model?",
+   "options": ["As routine maintenance that needs no review",
+               "As safe, since the architecture is unchanged",
+               "As the vendor's business, not the client's",
+               "As a change: impact analysis and re-validation"],
+   "answer": 3,
+   "why": ["New training data can change behavior anywhere. UL 4600 lists an update to training data as a change.",
+           "Same architecture, new weights: the behavior can be different.",
+           "The client runs the cell and keeps the duty to protect its workers.",
+           "A retrained model is a new model: analyze the impact, test again, approve, and update the inventory."]},
+  {"prompt": "A competitor can send many requests to your policy server and watch the robot's motions. What can it gain?",
+   "options": ["Nothing, because the weights stay encrypted on site",
+               "A working copy of the policy, by imitation",
+               "Only the robot's model number and its speed",
+               "The exact weights, bit for bit, every time"],
+   "answer": 1,
+   "why": ["Encryption protects the files. Extraction uses the policy's behavior, not its files.",
+           "Model extraction works like imitation learning: record the behavior, train a copy that acts the same way.",
+           "Motions and answers reveal far more than that. They are training data for a copy.",
+           "NIST says exact copies are not possible, but a functionally equivalent model is."]}
+ ]}
+</script>
+</div>
+
+<div class="widget recall" id="recall-l4" data-widget="recall" data-title="From memory">
+  <p class="recall-prompt">For the running example, name four assets that hold know-how. For each one, write one control, and say whether it keeps the asset secret, keeps it unchanged, or decides who may use it.</p>
+  <div class="recall-answer">
+    <p><strong>Demonstrations.</strong> Marked ㊙, access for the project team only, upload to public hubs turned off (secret). A contract on who may use them, for what and how long (rights).</p>
+    <p><strong>Fine-tuned model.</strong> Signed releases checked before loading (unchanged). Contract terms that name fine-tuning and distillation (rights). Queries limited and logged (secret).</p>
+    <p><strong>Training datasets.</strong> A hash and a change record for each one, and a review before training (unchanged).</p>
+    <p><strong>Camera images and process data.</strong> Only what the task needs; kept inside the company or under contract (secret, rights). See Lesson 5 for personal data.</p>
+  </div>
+</div>
+
+<h2>For client work</h2>
+<ul>
+  <li>Which data and models carry the client's know-how? Who owns and may use each one under the contract, and was that agreed before recording?</li>
+  <li>Are these assets managed as trade secrets: marked, limited, logged?</li>
+  <li>Does any tool upload data or models by default? To where, public or private?</li>
+  <li>Can the vendor reuse the data or the model? Does the contract name fine-tuning and distillation?</li>
+  <li>Is there an inventory of models, datasets and open-source parts, with hashes, signatures and origins?</li>
+  <li>What happens when a model is retrained: who analyzes the impact, who re-tests, who approves?</li>
+</ul>
+
+<h2>Summary: extension or new?</h2>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Extension of conventional measures</th><th scope="col">New for physical AI</th></tr></thead>
+  <tbody>
+    <tr><td>Trade-secret measures (marking, access limits, NDAs), now for datasets and models</td><td>Tacit skill becomes data: the demonstrations are the know-how and the main target</td></tr>
+    <tr><td>SBOM, extended to an AIBOM or ML-BOM</td><td>Copying by watching: model extraction works like imitation learning, and even encrypted traffic can show which action runs</td></tr>
+    <tr><td>Code signing, extended to model signing; no untrusted deserialization (pickle)</td><td>Data inside a trained model is hard to remove, and legal protection may not follow the data into the model</td></tr>
+    <tr><td>Version control and change records for configuration</td><td>Open-source robot tools that publish data by default</td></tr>
+    <tr><td>Contracts on data use</td><td>Contracts that must name fine-tuning and distillation; every retraining is a change to re-validate</td></tr>
+    <tr><td>Data integrity with hashes and records</td><td>Poisoning through physical objects placed in the scene during recording</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Read the primary source</h2>
+
+<div class="source">
+  <p class="title"><a href="https://www.meti.go.jp/policy/mono_info_service/connected_industries/sharing_and_utilization/20250218003-ar.pdf">METI, 「AIの利用・開発に関する契約チェックリスト」 (February 2025)</a></p>
+  <p>In Japanese. Read the overview and the sections on inputs, outputs and インプット処理成果. About 30 minutes.</p>
+  <p>Why this one: it is the most practical Japanese government guide to who may use what in an AI contract, and it is recent. Then read the AI notes in the <a href="https://www.meti.go.jp/policy/economy/chizai/chiteki/guideline/r7ts.pdf">営業秘密管理指針</a> (March 2025) for the trade-secret side.</p>
+</div>
+
+<div class="ask">
+  <p><strong>Ask your teacher.</strong> Questions are part of the lesson. Ask Claude anything that is unclear. For example:</p>
+  <p>"How do I mark a dataset as a trade secret in practice?" · "What would a CycloneDX entry for our grasp VLA look like?" · "How would a contract clause on distillation be worded?"</p>
+</div>
+
+<h2>Next</h2>
+<p><strong><a href="0005-camera-data-remote-and-cloud.html">Lesson 5: Camera data, remote operation and the cloud.</a></strong> When camera images are personal data, what makes remote operation safe when the link drops, and how to control vendor access and data sent to the cloud.</p>
+
+</main>
+
+<nav class="pager" aria-label="Lesson navigation">
+  <a href="0003-control-permissions-and-motion-range.html">← Lesson 3</a>
+  <a href="0005-camera-data-remote-and-cloud.html">Lesson 5 →</a>
+</nav>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security · Lesson 4 · Written 16 October 2026. Sources were checked on that date; check dates before you rely on them with a client. A learning aid, not legal advice.</p>
+</footer>
+
+</div></div>
+</body>
+</html>

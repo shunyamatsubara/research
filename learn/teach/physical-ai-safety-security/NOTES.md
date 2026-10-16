@@ -22,12 +22,13 @@
 Every lesson starts with a short recall warm-up from earlier lessons and ends with an "extension of conventional measures / new for physical AI" table.
 1. The AI is not the safety system (done 2026-10-15): doer/checker, the five layers, the trust boundary, Japan's motion range.
 2. Threat-model the cell (done 2026-10-16): eight entry points E1–E8 with real cases, the cell data-flow diagram, an attack chain through E4, two sorters (entry point; extension or new), EU Machinery Regulation 1.1.9 and CRA reporting.
-3. Control the AI's permissions and motion range: permission design (what the AI may command, who may change limits), safety functions, ISO 12100 order, ISO 10218-1/-2:2025, ISO/TS 15066, ISO 13849-1, EU Machinery Regulation 1.2.1, Japan Art. 150-4, the two fence-free routes, JIS status, and the PoC/R&D point. Research exists.
-4. Protect data, models and know-how; manage AI and OSS components: needs NEW research (trade secrets and data contracts in Japan, model and dataset versioning, AI SBOM, retraining as change). Research exists only for the integrity side.
-5. Camera data, remote operation and the cloud: needs NEW research on privacy and confidentiality of video (Japan APPI and guidance, EU GDPR). Link loss and remote access partly researched.
-6. From PoC to production: stage gates, test statistics, safety case, re-validation after retraining, Japan R&D exclusion. Research exists.
-7. Conventional robots vs physical AI, and reading vendor claims (NVIDIA Halos). Research exists.
-8. Capstone: assess a sample client cell with the field-guide checklist.
+3. Control the AI's permissions and motion range (done 2026-10-16): permission table, five rules, L3 vs L4 limits, ISO 10218:2025 classes and functions, Japan's 80 W rule, fence rule and fence-free routes, who may change each limit, EU record-keeping.
+4. Protect data, models and know-how (done 2026-10-16): assets in the cell, five ways to lose them (stolen, published by default, copied by watching, reused by the vendor, poisoned), UCPA Art. 2(6)/(7), METI trade-secret guideline (2025 AI notes), AI contract guideline and checklist, AIBOM (AI Guidelines for Business v1.2), CycloneDX/SPDX, model signing, safetensors, retraining as change (UL 4600, FDA PCCP).
+5. Camera data, remote operation and the cloud (done 2026-10-16): PPC Q&A on cameras, monitoring, vendors and transfers abroad; Camera Guidebook ver3.0; 2026 APPI amendment; EDPB 3/2019; AI Act Art. 5(1)(f); Data Act; MHLW autonomous vs remote operation (June 2026); MR 1.2.1/1.2.6 and IEC 60204-1 link loss; Agility case; CISA/NCSC/NIST/METI remote access; CISA AI-in-OT cloud principles; Unitree G1 telemetry.
+6. Build it in from PoC to production (done 2026-10-16): stages and gates, trial statistics, SACE, minimal safety case.
+7. Conventional robots vs physical AI (done 2026-10-16): comparison table, five questions for vendor claims, NVIDIA Halos case.
+8. Capstone: assess a client cell (done 2026-10-16): fictional brief, sorter by stage, quiz, top-five recall.
+Reference pages: field guide, glossary, assessment template, Extension vs New (by the learner's seven themes).
 
 ## Themes the learner needs (stated 2026-10-16, in Japanese)
 - AI decision and motion-range control, including the permissions of autonomous AI.
@@ -45,4 +46,7 @@ Every lesson starts with a short recall warm-up from earlier lessons and ends wi
 ## Working notes
 - Research reports from 2026-10-15 are in `research/`. They are agent output: re-check any fact against its source before putting it in a lesson.
 - Glossary terms from lesson 1 were added when the lesson was written, before the learner showed they can use them. Confirm with retrieval questions at the start of the next session, and revise definitions if they struggle.
-- In the next session, ask how lesson 1 went (first-try scores, which sorter items were hard). Quiz results stay in the learner's browser; Claude cannot see them.
+- In the next session, ask how the lessons went (first-try scores, which sorter items were hard). Quiz results stay in the learner's browser; Claude cannot see them.
+- 2026-10-16: the learner asked to "create all material"; Lessons 3 to 8 and the reference pages were written in one go. Spacing therefore depends on the learner: the home page suggests two lessons a week and the capstone last.
+- Research for Lessons 4 and 5 is in `research/2026-10-16-*.md` (agent output). Facts used in the lessons were re-checked against local copies of the primary sources on 2026-10-16.
+- Open points to watch: whether teleoperation to record demonstrations counts as 教示等 (no official interpretation found); the detailed rules of the 2026 APPI amendment; MHLW follow-up on physical AI machines; whether model weights belong in a CRA SBOM; EU delegated acts adding AI requirements to the Machinery Regulation.

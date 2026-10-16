@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Extension vs New · Physical AI Safety &amp; Security</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a href="../index.html">Course home</a>
+  <a href="field-guide.html">Field guide</a>
+  <a href="assessment-template.html">Assessment template</a>
+  <a class="here" href="extension-vs-new.html">Extension vs New</a>
+  <a href="glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-plain">Reference</span> Updated 16 October 2026 · Your seven themes</p>
+  <h1>Extension vs New</h1>
+  <p class="lede">Your starting idea was that some measures for physical AI extend what a security program already does, and others are new. This page collects the "extension or new" summary from every lesson, organized by your seven themes. Use it to plan an assessment, a proposal or a client briefing.</p>
+</header>
+
+<main class="prose">
+
+<p><strong>How to read it.</strong> "Extension" means an existing control that still works, with new targets or new settings. "New" means something that needs new thinking, new evidence or new rules. Most themes have both. Each table links to the lesson that explains it.</p>
+
+<h2>The seven themes at a glance</h2>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Theme</th><th scope="col">In one line</th><th scope="col">Lessons</th></tr></thead>
+  <tbody>
+    <tr><td><a href="#t1">1. AIの判断・動作範囲の制御</a><br>Permissions and motion range</td><td>Access control is old. Bounding continuous motion, and checking what a task means, are new.</td><td>1, 2, 3</td></tr>
+    <tr><td><a href="#t2">2. 学習データ・製造ノウハウの保護</a><br>Training data and know-how</td><td>The methods are old (secrecy, contracts). The asset and the ways it leaks are new.</td><td>4</td></tr>
+    <tr><td><a href="#t3">3. AIモデル・OSS等の構成管理</a><br>Models and open-source parts</td><td>Mostly an extension of supply-chain security, plus "retraining is a change".</td><td>2, 4, 6</td></tr>
+    <tr><td><a href="#t4">4. 遠隔操作・クラウド接続</a><br>Remote operation and the cloud</td><td>Mostly OT security and machine safety you know, applied to a much bigger surface.</td><td>2, 5</td></tr>
+    <tr><td><a href="#t5">5. カメラデータ等の取り扱い</a><br>Camera data</td><td>CCTV rules apply. Several purposes per camera, AI training and emotion inference are new.</td><td>2, 4, 5</td></tr>
+    <tr><td><a href="#t6">6. 従来ロボットとフィジカルAIのリスクの違い</a><br>Conventional robots vs physical AI</td><td>Same moving arm and safety functions. New source of behavior, new failures, new inputs, moving rules.</td><td>1, 7</td></tr>
+    <tr><td><a href="#t7">7. PoCから本番展開までの組み込み方</a><br>From PoC to production</td><td>The stage gates are old. The evidence at each gate is new.</td><td>3, 6</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="t1">1. Permissions and motion range of the AI (AIの判断・動作範囲の制御)</h2>
+<p>From <a href="../lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a>, <a href="../lessons/0002-threat-model-the-cell.html">Lesson 2</a> and <a href="../lessons/0003-control-permissions-and-motion-range.html">Lesson 3</a>.</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Extension of conventional measures</th><th scope="col">New for physical AI</th></tr></thead>
+  <tbody>
+    <tr><td>Authorization outside the application, least privilege, default-deny</td><td>Bounding a model whose output is continuous motion, not a list of API calls</td></tr>
+    <tr><td>A separate identity for the AI process, never root</td><td>Permissions about meaning (which object goes where), checked outside the model by a guardrail grounded in the scene, because jailbreaks reach the planner (E2)</td></tr>
+    <tr><td>Change control, keys and logs for configuration (E8)</td><td>Safety settings treated as the most valuable asset to protect (E8)</td></tr>
+    <tr><td>Safety-rated limits, fences and lockout from machine safety (ISO 10218; Japan Art. 150-3 to 150-5)</td><td>A certified safety layer that still holds after a full takeover of the AI computer (Koopman's test)</td></tr>
+    <tr><td>Training before risky work (special education)</td><td>EU law: a learning machine must stay within its "defined task and movement space"; machine-learning safety components need third-party assessment; a year of safety-decision data for self-evolving machines</td></tr>
+    <tr><td>&nbsp;</td><td>Collaboration as a property of the application: no AI and no robot model is "safe" on its own</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>First question for the client:</strong> "What can the AI ask the robot to do, and what stops the arm if it asks for something else?"</p>
+
+<h2 id="t2">2. Training data and manufacturing know-how (学習データ・製造ノウハウの保護)</h2>
+<p>From <a href="../lessons/0004-protect-data-models-and-know-how.html">Lesson 4</a>.</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Extension of conventional measures</th><th scope="col">New for physical AI</th></tr></thead>
+  <tbody>
+    <tr><td>Trade-secret measures (marking, access limits, NDAs), now for datasets and models</td><td>Tacit skill becomes data: the demonstrations are the know-how and the main target</td></tr>
+    <tr><td>Contracts on data use</td><td>Contracts that must name fine-tuning and distillation, because a ban on use does not cover derived models</td></tr>
+    <tr><td>Data integrity with hashes and records</td><td>Copying by watching: model extraction works like imitation learning, and even encrypted traffic can show which action runs</td></tr>
+    <tr><td>Access control and encryption for storage</td><td>Data inside a trained model is hard to remove, and legal protection may not follow the data into the model</td></tr>
+    <tr><td>&nbsp;</td><td>Poisoning through physical objects placed in the scene during recording</td></tr>
+    <tr><td>&nbsp;</td><td>EU Data Act: a robot maker may not use the robot's data to learn the user's "production methods" (<a href="../lessons/0005-camera-data-remote-and-cloud.html">Lesson 5</a>)</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>First question for the client:</strong> "Which data and models hold your know-how, and who may use each one under the contract?"</p>
+
+<h2 id="t3">3. Configuration management of models and open-source parts (AIモデル・OSS等の構成管理)</h2>
+<p>From <a href="../lessons/0002-threat-model-the-cell.html">Lesson 2</a>, <a href="../lessons/0004-protect-data-models-and-know-how.html">Lesson 4</a> and <a href="../lessons/0006-from-poc-to-production.html">Lesson 6</a>.</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Extension of conventional measures</th><th scope="col">New for physical AI</th></tr></thead>
+  <tbody>
+    <tr><td>SBOM, extended to an AIBOM or ML-BOM (now asked for in Japan's AI Guidelines for Business v1.2)</td><td>An inventory that also lists models, datasets and inference runtimes; no official rule yet on whether weights belong in the EU's SBOM</td></tr>
+    <tr><td>Code signing, extended to model signing</td><td>A signature proves origin, not safe behavior</td></tr>
+    <tr><td>Never deserialize untrusted data: no pickle, use safetensors (E3, E4)</td><td>Backdoors in weights that code review cannot see (E3)</td></tr>
+    <tr><td>Version control and change records for configuration</td><td>Every retraining is a change that needs re-validation, with no code change</td></tr>
+    <tr><td>Vulnerability handling and patching, including the robot middleware (E5)</td><td>Open-source robot tools that publish data by default</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>First question for the client:</strong> "Can you list every model, dataset and open-source part in the cell, with versions, hashes and origins?"</p>
+
+<h2 id="t4">4. Remote operation, remote access and the cloud (遠隔操作・クラウド接続のセキュリティ)</h2>
+<p>From <a href="../lessons/0002-threat-model-the-cell.html">Lesson 2</a> and <a href="../lessons/0005-camera-data-remote-and-cloud.html">Lesson 5</a>.</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Extension of conventional measures</th><th scope="col">New for physical AI</th></tr></thead>
+  <tbody>
+    <tr><td>Network zones and conduits around the cell (E4, E5, E7)</td><td>Motion commands that arrive over the network from a policy server (E4)</td></tr>
+    <tr><td>OT remote access: jump host, MFA, just-in-time access, recorded sessions, outbound-only</td><td>A vendor's remote path that can reach the policy server, the training pipeline and the cameras, not just a controller</td></tr>
+    <tr><td>Stop on link loss, and no restart on reconnection (IEC 60204-1; EU Machinery Regulation)</td><td>Japan's new terms for autonomous and remote operation, with physical AI next in line for review</td></tr>
+    <tr><td>Mode selectors and one operator per machine</td><td>Teleoperation turns workers into data sources: video, voice and motion that can identify them</td></tr>
+    <tr><td>Data minimization (EU Cyber Resilience Act); unique keys per device (E6)</td><td>Fleet learning: vendors want customer data to train their models, and contracts must limit it</td></tr>
+    <tr><td>&nbsp;</td><td>Robot telemetry to vendor clouds, sometimes without notice</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>First question for the client:</strong> "What happens when the link drops, and who can connect into the cell from outside?"</p>
+
+<h2 id="t5">5. Camera data (カメラデータ等の取り扱い)</h2>
+<p>From <a href="../lessons/0002-threat-model-the-cell.html">Lesson 2</a>, <a href="../lessons/0004-protect-data-models-and-know-how.html">Lesson 4</a> and <a href="../lessons/0005-camera-data-remote-and-cloud.html">Lesson 5</a>.</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Extension of conventional measures</th><th scope="col">New for physical AI</th></tr></thead>
+  <tbody>
+    <tr><td>CCTV rules: purpose, notice, retention, security (PPC Q&amp;A; EDPB)</td><td>One camera with several purposes: perception, training data and safety. AI training must be stated</td></tr>
+    <tr><td>Rules for monitoring employees: purpose in internal rules, tell staff, consult the union</td><td>A model can infer emotions from the same frames. In the EU this is banned at work, except for medical or safety reasons</td></tr>
+    <tr><td>Cloud, entrustment and cross-border rules (APPI Art. 28; PPC Q&amp;A)</td><td>The scene is an input channel that no firewall sees (E1)</td></tr>
+    <tr><td>&nbsp;</td><td>Frames that train the AI also record products and layouts, so they are trade secrets too</td></tr>
+    <tr><td>&nbsp;</td><td>Japan's 2026 amendment adds rules for biometric data such as face features (in force within two years)</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>First question for the client:</strong> "What does each camera record, for which purposes, and how were the workers told?"</p>
+
+<h2 id="t6">6. Conventional robots vs physical AI (従来ロボットとフィジカルAIのリスクの違い)</h2>
+<p>From <a href="../lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a> and <a href="../lessons/0007-conventional-robots-vs-physical-ai.html">Lesson 7</a>.</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Extension of conventional measures</th><th scope="col">New for physical AI</th></tr></thead>
+  <tbody>
+    <tr><td>The hazard is the same moving arm: same safety functions, same Japanese rules</td><td>Behavior comes from a model learned from data, so it must be tested statistically</td></tr>
+    <tr><td>The doer/checker split from safety engineering: the AI is the doer</td><td>Success can fall sharply under small changes, such as a moved camera, so operating conditions must be written down</td></tr>
+    <tr><td>Old protections for new asset types: data, demonstrations, weights</td><td>Failures with nothing broken: hazard analysis must cover losses where no part failed</td></tr>
+    <tr><td>Old network controls for a much bigger surface: GPU servers, vendor cloud, remote support</td><td>New inputs for attackers: the scene and natural language (E1, E2)</td></tr>
+    <tr><td>&nbsp;</td><td>Rules still moving: EU dates in 2027 and 2028; in Japan, no specific rules yet for physical-AI machines</td></tr>
+    <tr><td>&nbsp;</td><td>Vendor safety claims to read closely: an inspection by the vendor's own lab is not a third-party certificate</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>First question for the client:</strong> "Which parts of your current robot-safety program still apply as they are, and which assume the robot only does what it was programmed to do?"</p>
+
+<h2 id="t7">7. From PoC to production (PoCから本番展開までの組み込み方)</h2>
+<p>From <a href="../lessons/0003-control-permissions-and-motion-range.html">Lesson 3</a> and <a href="../lessons/0006-from-poc-to-production.html">Lesson 6</a>.</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Extension of conventional measures</th><th scope="col">New for physical AI</th></tr></thead>
+  <tbody>
+    <tr><td>Stage gates, release approvals, change management</td><td>Retraining as a change that needs re-validation, with no code change</td></tr>
+    <tr><td>Penetration tests, hardening, patching, incident response</td><td>Statistical evidence of learned behavior under written operating conditions</td></tr>
+    <tr><td>Risk assessment records, fences and conformity documents (Japan's 2013 routes, CE marking)</td><td>Showing that a simulator is realistic before its results count as safety evidence</td></tr>
+    <tr><td>Japan's industrial-robot rules for a PoC on a production line (it is not R&amp;D)</td><td>Safety-case claims about the machine-learning part: operating context, unusual input, retraining</td></tr>
+    <tr><td>SBOM and vulnerability handling; safety cases for safety-critical systems</td><td>An SBOM that also lists models, datasets and inference runtimes</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>First question for the client:</strong> "What evidence will you need at the end of the PoC, and is anyone collecting it now?"</p>
+
+<h2>How to use this with a client</h2>
+<ol>
+  <li><strong>Start with the extensions.</strong> Show the client which parts of their current program already apply: information security (for example an ISMS), OT security (IEC 62443), machine safety (ISO 12100, ISO 10218, Japan's ordinance) and privacy. This builds trust and avoids starting from zero.</li>
+  <li><strong>Then show the new items as the gap.</strong> For each theme, the right column is a list of questions their program does not yet answer.</li>
+  <li><strong>Write findings in the template.</strong> The "extension or new" column of the <a href="assessment-template.html#summary">assessment template's client summary</a> uses the same idea.</li>
+</ol>
+
+</main>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security · Extension vs New. Compiled from the lesson summaries on 16 October 2026. A learning aid, not legal advice. Check current rules and standards on every project.</p>
+</footer>
+
+</div></div>
+</body>
+</html>
