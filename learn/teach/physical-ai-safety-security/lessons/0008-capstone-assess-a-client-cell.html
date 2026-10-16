@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lesson 8 · Capstone: Assess a Client Cell</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/widgets.js" defer></script>
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a href="../index.html">Course home</a>
+  <a href="0007-conventional-robots-vs-physical-ai.html">← Lesson 7</a>
+  <a class="here" href="0008-capstone-assess-a-client-cell.html">Lesson 8</a>
+  <a href="../reference/assessment-template.html">Assessment template</a>
+  <a href="../reference/extension-vs-new.html">Extension vs New</a>
+  <a href="../reference/glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-hazard">Lesson 8</span> About 30 minutes · Capstone</p>
+  <h1>Capstone: Assess a Client Cell</h1>
+  <p class="lede">A fictional client wants to start an AI pick-and-place project next month. Read the brief, sort the findings, and write the top five for their steering committee. Everything you need is in Lessons 1 to 7.</p>
+  <div class="goal">
+    <span class="tag tag-act">Your goal</span>
+    <p>Run a short safety and security assessment of a physical AI project: find the issues, decide when each must be fixed, and explain each one to the client, including whether it is an extension of what they already do or something new.</p>
+  </div>
+</header>
+
+<main class="prose">
+
+<h2>The brief</h2>
+<p><span class="tag tag-plain">Fictional</span> This client and vendor are invented for practice. Any similarity to a real company is not intended.</p>
+
+<div class="source">
+  <p class="title">Client: a mid-sized electronics maker in Japan. Project: an AI cell that sorts connectors into trays at a packing station.</p>
+  <ul>
+    <li><strong>Robot.</strong> A 6-axis arm with a 400 W largest motor and a 22 kg manipulator, sold by its maker as a "cobot" with built-in power and force limiting. Two packing workers stand about two meters from it.</li>
+    <li><strong>AI.</strong> A startup supplies a VLA for the grasp, fine-tuned from an open model on a public model hub, and an LLM planner that takes instructions typed on the line leader's tablet.</li>
+    <li><strong>Compute.</strong> The robot PC sends camera images over gRPC to the startup's GPU server in a public cloud and gets actions back. Startup staff can log in remotely for support, including into the safety controller's settings tool. Telemetry is uploaded every five minutes.</li>
+    <li><strong>Data.</strong> Two skilled workers will teleoperate the arm for two weeks to record 300 demonstrations. The startup's contract says it may use "all data" to improve its products.</li>
+    <li><strong>Cameras.</strong> Two cameras see the work area, including the workers' faces and an unreleased product.</li>
+    <li><strong>Safety claims.</strong> The startup says: "Our camera AI detects people with 98% accuracy, so no safety scanner is needed." The grasp has worked in 20 of 20 demo runs, which the startup calls "production-ready".</li>
+    <li><strong>Plan.</strong> The PoC runs directly on the production line next month, with no fence. Production is planned in six months. The startup will retrain the VLA every month. The client also exports cells to the EU. There is no SBOM for the AI parts, and near misses on the line are not recorded.</li>
+  </ul>
+</div>
+
+<h2>Step 1: when must each issue be fixed?</h2>
+
+<div class="widget" data-widget="sorter" data-title="Sort the findings">
+<script type="application/json">
+{"buckets": [
+  {"id": "PRE", "short": "Before PoC", "label": "Must be fixed before the PoC starts"},
+  {"id": "PROD", "short": "Before production", "label": "Must be fixed before release to production"},
+  {"id": "OPS", "short": "In operation", "label": "An ongoing duty during operation"}
+ ],
+ "missDefault": "Ask: could this hurt someone, leak something, or break a rule during the PoC itself? If yes, it comes first.",
+ "items": [
+  {"text": "There is no safety-rated scanner. The startup relies on its camera AI to detect people, and workers stand two meters from the arm.",
+   "answer": "PRE",
+   "why": "People are near the arm from the first PoC run. AI detection is not a safety function, so an L4 function such as speed and separation monitoring must come first (Lesson 1).",
+   "miss": {"PROD": "Workers are near the arm during the PoC itself. This cannot wait."}},
+  {"text": "The PoC runs directly on the production line with no fence and no recorded risk assessment.",
+   "answer": "PRE",
+   "why": "A finished machine on trial at a production site is not R&D in Japan. With a 400 W motor, Article 150-4 applies: a fence, or a recorded risk assessment that shows no danger (Lesson 3).",
+   "miss": {"PROD": "The robot rules already apply to the PoC on the production line."}},
+  {"text": "Nobody knows whether the gRPC link to the cloud GPU server uses TLS, authentication or pickle.",
+   "answer": "PRE",
+   "why": "E4: if the link is open, an attacker controls the arm's actions. Check it before the robot moves under the cloud model's control (Lesson 2).",
+   "miss": {"OPS": "This decides whether an attacker can command the arm on day one."}},
+  {"text": "Startup staff can log in remotely, including into the safety controller's settings tool.",
+   "answer": "PRE",
+   "why": "This puts E8 behind E7. Safety settings must need a local, authorized, logged change. Remove remote write access before any run (Lessons 2 and 3).",
+   "miss": {"PROD": "A remote path to the safety settings weakens the last line of defense from the first run."}},
+  {"text": "Workers will record demonstrations for two weeks, and the contract lets the startup use \"all data\" to improve its products.",
+   "answer": "PRE",
+   "why": "Demonstrations capture the client's know-how. Agree in writing who owns the data and the models, and what the startup may reuse, before recording starts (Lesson 4).",
+   "miss": {"PROD": "Once the demonstrations are recorded and shared, the know-how has already left."}},
+  {"text": "The cameras record the workers' faces and an unreleased product.",
+   "answer": "PRE",
+   "why": "This is personal data and a trade secret. Set the purpose, tell the workers, limit retention and access, and keep the product out of view or out of uploads, all before recording starts (Lesson 5).",
+   "miss": {"OPS": "Recording starts in the PoC, so the rules for the video must exist before it."}},
+  {"text": "The LLM planner accepts any instruction typed on the line leader's tablet.",
+   "answer": "PROD",
+   "why": "Before people share the space in normal work, add a task allowlist and a guardrail outside the model (Lesson 3). During a separated PoC, the L4 functions carry the risk to people.",
+   "miss": {"PRE": "It matters, but with the PoC separated and L4 in place, it can be built during the PoC and must be done before release.",
+            "OPS": "Permissions must exist before release, not be added later."}},
+  {"text": "The grasp has worked in 20 of 20 demo runs, and the startup calls it production-ready.",
+   "answer": "PROD",
+   "why": "20 failure-free runs only support a failure rate below about 14% at 95% confidence. Plan statistical trials in the pilot (Lesson 6).",
+   "miss": {"PRE": "Reliability evidence comes from the pilot. The PoC is where you design those trials."}},
+  {"text": "There is no SBOM for the model files and the inference runtime, and the client exports cells to the EU.",
+   "answer": "PROD",
+   "why": "Production needs an SBOM that includes AI parts. EU export brings Cyber Resilience Act duties and, from January 2027, the Machinery Regulation (Lessons 4 and 6)."},
+  {"text": "The startup plans to retrain the VLA every month on new demonstrations.",
+   "answer": "OPS",
+   "why": "Every retraining is a change: an impact analysis and re-validation, with records (Lesson 6).",
+   "miss": {"PRE": "Retraining happens later, but agree on the change process in the contract early."}},
+  {"text": "Near misses on the line are not recorded anywhere.",
+   "answer": "OPS",
+   "why": "In operation, track near misses and safety indicators so problems are found before an accident (Lesson 6)."}
+ ]}
+</script>
+</div>
+
+<h2>Step 2: four judgment calls</h2>
+
+<div class="widget" data-widget="quiz" data-title="Four questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "The arm has power and force limiting and is sold as a \"cobot\". What does that mean for the client's cell?",
+   "options": ["The cell is collaborative, so no assessment is needed",
+               "The cell still needs its own risk assessment first",
+               "Only the AI model needs to be assessed now",
+               "Japan's rules stop applying to the cell at once"],
+   "answer": 1,
+   "why": ["Collaboration is a property of the application, not of the robot. The label proves nothing about this cell.",
+           "The application decides. In Japan, the cell needs one of the two fence-free routes, for example a recorded risk assessment that shows no danger.",
+           "The arm, the tools and the layout are all part of the hazard, not just the AI.",
+           "With a 400 W motor, the industrial-robot rules apply whatever the label says."]},
+  {"prompt": "20 of 20 demo runs succeeded. What can the client claim with 95% confidence?",
+   "options": ["The failure rate is below about 1%",
+               "The grasp will never fail in production",
+               "The failure rate is exactly zero percent",
+               "The failure rate is below about 14%"],
+   "answer": 3,
+   "why": ["That would need about 300 failure-free trials.",
+           "No number of trials can promise that.",
+           "Zero failures in a sample does not mean a zero failure rate.",
+           "After 20 failure-free trials, the 95% upper bound is about 14%."]},
+  {"prompt": "Which single change most reduces the worst-case harm if the startup's cloud is hacked?",
+   "options": ["Retrain the VLA on more demonstrations every month",
+               "Ask the startup for a higher accuracy number",
+               "Remove remote write access to the safety settings",
+               "Reposition the cameras so they capture more workers"],
+   "answer": 2,
+   "why": ["More data does not stop an attacker who controls the cloud.",
+           "A better number does not change who can reach the safety functions.",
+           "If the cloud is hacked, the attacker must not be able to weaken L4. Removing remote write access keeps the last line out of reach.",
+           "Seeing more workers adds personal data, not safety."]},
+  {"prompt": "The contract lets the startup use \"all data\". What is the main risk for the client?",
+   "options": ["The robot will move more slowly during the PoC",
+               "The client's know-how leaves with the data and models",
+               "The safety scanner will stop working after each retraining",
+               "The vendor can no longer patch the robot's software"],
+   "answer": 1,
+   "why": ["Data terms do not change the robot's speed.",
+           "Demonstrations by skilled workers, and models trained on them, carry the client's process know-how. The video also contains personal data and an unreleased product.",
+           "The scanner is a separate certified function. Retraining does not affect it.",
+           "Data terms do not stop patching."]}
+ ]}
+</script>
+</div>
+
+<h2>Step 3: write it up</h2>
+
+<div class="widget recall" id="recall-l8" data-widget="recall" data-title="Your top five findings">
+  <p class="recall-prompt">Write the top five findings for the client's steering committee. For each one, give what you found, the layer (L1–L5) or entry point (E1–E8), whether the fix is an extension of what they do today or something new, and the fix.</p>
+  <div class="recall-answer">
+    <p><strong>1. No certified protection for people.</strong> The startup offers AI person-detection instead of a safety scanner. L4. Extension: machine safety the client knows, needed for a new reason. Fix: a safety-rated scanner with speed and separation monitoring; keep the AI detection only as an extra layer.</p>
+    <p><strong>2. The PoC breaks the robot rules.</strong> A 400 W arm on the production line with no fence and no recorded risk assessment. Japan's Article 150-4; a trial at a production site is not R&amp;D. Extension. Fix: a separated PoC cell, or a recorded risk assessment that shows no danger.</p>
+    <p><strong>3. The cloud can reach the safety settings.</strong> E8 behind E7. New asset, old controls. Fix: remove remote write access; safety settings change only locally, by an authorized person, with a checksum and a log.</p>
+    <p><strong>4. The cloud inference link is unknown.</strong> E4. Extension. Fix: mutual TLS, no pickle, an allowlisted connection; consider running inference on site.</p>
+    <p><strong>5. Data, know-how and video.</strong> The contract allows "all data"; the cameras record faces and an unreleased product. New asset types. Fix: a data agreement on ownership and reuse before recording; tell the workers, limit purpose and retention; keep the product out of view or out of uploads.</p>
+    <p><em>Also worth listing:</em> the 20-run "production-ready" claim (plan statistical pilot trials), no SBOM for AI parts, the unlimited LLM planner (task allowlist), monthly retraining (change process), and no near-miss records.</p>
+  </div>
+</div>
+
+<h2>Step 4: use the template with real clients</h2>
+<p>The <a href="../reference/assessment-template.html">assessment template</a> turns this capstone into a checklist you can use on a real project: scope, the five layers, the eight entry points, data and video, rules, the PoC-to-production plan, and an "extension or new" summary. The <a href="../reference/extension-vs-new.html">Extension vs New</a> page collects every lesson's summary table by theme.</p>
+
+<div class="ask">
+  <p><strong>Ask your teacher.</strong> Share your five findings with Claude for feedback, or ask for a second fictional case with a mobile robot or a humanoid. Real projects are where judgment grows: take your findings to one of the communities on the <a href="../index.html">course home</a> page.</p>
+</div>
+
+</main>
+
+<nav class="pager" aria-label="Lesson navigation">
+  <a href="0007-conventional-robots-vs-physical-ai.html">← Lesson 7</a>
+  <a href="../index.html">Course home →</a>
+</nav>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security · Lesson 8 · Written 16 October 2026. The client and vendor in this case are fictional. A learning aid, not legal advice.</p>
+</footer>
+
+</div></div>
+</body>
+</html>

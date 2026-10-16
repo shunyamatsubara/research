@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Assessment Template · Physical AI Safety &amp; Security</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a href="../index.html">Course home</a>
+  <a href="field-guide.html">Field guide</a>
+  <a class="here" href="assessment-template.html">Assessment template</a>
+  <a href="extension-vs-new.html">Extension vs New</a>
+  <a href="glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-plain">Reference</span> Updated 16 October 2026 · For real client work</p>
+  <h1>Assessment Template</h1>
+  <p class="lede">A structure for a safety and security assessment of a physical AI project. Work through the sections in order, write your findings, and finish with the client summary. Each section names the lesson that explains it.</p>
+</header>
+
+<main class="prose">
+
+<p><strong>Sections:</strong> <a href="#scope">0 Scope</a> · <a href="#layers">1 Layers</a> · <a href="#entries">2 Entry points</a> · <a href="#data">3 Data, models, know-how</a> · <a href="#video">4 Video, remote, cloud</a> · <a href="#rules">5 Rules</a> · <a href="#stages">6 Stages</a> · <a href="#claims">7 Vendor claims</a> · <a href="#summary">8 Client summary</a></p>
+
+<h2 id="scope">0. Scope</h2>
+<ul>
+  <li>System and task, in one sentence. Where it runs (country, site), and the project stage: PoC, pilot, production or operation.</li>
+  <li>Written operating conditions: objects, lighting, camera positions, who may be near the robot and when.</li>
+  <li>Robot data: rated output of the largest drive motor (the 80 W line in Japan), manipulator mass, maximum force and speed (ISO 10218:2025 Class I or II).</li>
+  <li>AI parts: planner, VLA or other policies, where each runs, who supplies and trains them.</li>
+  <li>Connections: policy server, cloud, vendor remote access, telemetry, wireless setup. Draw the data-flow diagram (<a href="../lessons/0002-threat-model-the-cell.html">Lesson 2</a>).</li>
+</ul>
+
+<h2 id="layers">1. The five layers</h2>
+<p>From <a href="../lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a> and <a href="../lessons/0003-control-permissions-and-motion-range.html">Lesson 3</a>.</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Layer</th><th scope="col">Questions</th></tr></thead>
+  <tbody>
+    <tr><td><strong>L1</strong> Check the task</td><td>Is there a task and object allowlist, enforced outside the model? Can a user's prompt reach the guardrail? Does the system ask a person when an instruction is unclear?</td></tr>
+    <tr><td><strong>L2</strong> The AI itself</td><td>Under which conditions was the policy tested, with how many trials, and how were failures counted? Where do the model and its training data come from?</td></tr>
+    <tr><td><strong>L3</strong> Check the motion</td><td>Which software limits exist (work area, speed, joints, stale input)? What is the fallback when a check fails?</td></tr>
+    <tr><td><strong>L4</strong> Certified safety functions</td><td>Which functions protect people? Rated to which PL or SIL, certified by whom? Do they still work if the AI computer is fully taken over (Koopman's test)?</td></tr>
+    <tr><td><strong>L5</strong> Physical design and procedures</td><td>Guards and layout (at least 500 mm to fixed structures, or release by hand), lockout before maintenance, teaching rules, required training.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="entries">2. The eight entry points</h2>
+<p>From <a href="../lessons/0002-threat-model-the-cell.html">Lesson 2</a>. For each one: is it present, what is the control, and what still protects people if the control fails?</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Entry point</th><th scope="col">Questions</th></tr></thead>
+  <tbody>
+    <tr><td><strong>E1</strong> The scene</td><td>Can text or patterns in the camera view change what the AI does? What detects unusual input?</td></tr>
+    <tr><td><strong>E2</strong> Commands</td><td>Who can instruct the AI, through which interface? Is every plan checked outside the model?</td></tr>
+    <tr><td><strong>E3</strong> Models and data</td><td>Are model files signed and loaded in safe formats? Who trains the model, on which data?</td></tr>
+    <tr><td><strong>E4</strong> Policy server link</td><td>Mutual TLS? Authentication? No pickle? Is the server inside the cell zone?</td></tr>
+    <tr><td><strong>E5</strong> Robot middleware</td><td>Is SROS2 enabled and enforced? Is discovery narrowed? Who may publish actuator topics? Is DDS patched?</td></tr>
+    <tr><td><strong>E6</strong> Wireless setup</td><td>Unique keys per device? Validated inputs? Radios off when not in use?</td></tr>
+    <tr><td><strong>E7</strong> Cloud, fleet, remote access</td><td>A full list of vendor connections? Per-device authorization? Push data out instead of letting outside systems reach in?</td></tr>
+    <tr><td><strong>E8</strong> The safety functions</td><td>Who can change safety settings, from where? Checksums, change logs, a separate safety network?</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="data">3. Data, models and know-how</h2>
+<p>From <a href="../lessons/0004-protect-data-models-and-know-how.html">Lesson 4</a>.</p>
+<ul>
+  <li>Which assets carry know-how: demonstrations, teleoperation logs, process recipes, fine-tuned models? Who owns each, and what may each party reuse? Is it in the contract before recording starts?</li>
+  <li>Are these assets managed as trade secrets (access limited, marked, logged)?</li>
+  <li>Is there an inventory of models, datasets, runtimes and OSS (an SBOM that includes AI parts)? Are model files signed and their origin known?</li>
+  <li>Is every retraining treated as a change, with an impact analysis and re-validation?</li>
+</ul>
+
+<h2 id="video">4. Camera data, remote operation and the cloud</h2>
+<p>From <a href="../lessons/0005-camera-data-remote-and-cloud.html">Lesson 5</a>.</p>
+<ul>
+  <li>What do the cameras record: workers' faces, products, documents? For what purpose, for how long, and who can see it? Have workers been told?</li>
+  <li>Does video or telemetry leave the site or the country? Under which agreement?</li>
+  <li>Who can operate the robot remotely? With which authentication, logging and session control?</li>
+  <li>What happens when the link drops: does the robot reach a safe state on its own?</li>
+</ul>
+
+<h2 id="rules">5. Rules and standards</h2>
+<p>From <a href="../lessons/0003-control-permissions-and-motion-range.html">Lesson 3</a> and the <a href="field-guide.html#rules">field guide</a>. Check current dates on every project.</p>
+<ul>
+  <li><strong>Japan:</strong> 80 W threshold; Art. 150-3 (teaching), 150-4 (fences or measures), 150-5 (stop, lock and sign); the two fence-free routes; a PoC at a production site is not R&amp;D; special education; JIS B 8433 still matches ISO 10218:2011.</li>
+  <li><strong>EU:</strong> Machinery Regulation from 20 January 2027 (protection against corruption, evidence of interventions, records of safety software, third party for machine-learning safety components); Cyber Resilience Act reporting within 24 and 72 hours; AI Act high-risk dates.</li>
+  <li><strong>Standards:</strong> ISO 12100 (order of measures), ISO 10218-1/-2:2025, ISO/TS 15066 and ISO 10218-2 Annex M, ISO 13849-1, IEC 62443.</li>
+</ul>
+
+<h2 id="stages">6. Stage gates</h2>
+<p>From <a href="../lessons/0006-from-poc-to-production.html">Lesson 6</a>.</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Gate</th><th scope="col">Evidence to ask for</th></tr></thead>
+  <tbody>
+    <tr><td>End of PoC</td><td>Risk assessment record; first threat model; written operating conditions; list of vendor connections; data agreement.</td></tr>
+    <tr><td>End of pilot</td><td>Trial results with failure definitions and confidence bounds; fault-injection results; pentest report.</td></tr>
+    <tr><td>Release</td><td>Safety case reviewed independently; technical file and declaration of conformity (or CE marking); SBOM with AI parts; named release decision.</td></tr>
+    <tr><td>Operation</td><td>Near-miss and incident records; safety indicators; an impact analysis for every change, including retraining.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="claims">7. Vendor claims</h2>
+<p>From <a href="../lessons/0007-conventional-robots-vs-physical-ai.html">Lesson 7</a>. For every safety claim: who checked it (first, second or third party)? Against which standard, at which level, for which function? Done or in progress? What does the vendor's own fine print say? Who owns the rest?</p>
+
+<h2 id="summary">8. Client summary</h2>
+<p>One row per finding, most urgent first. Use the "extension or new" column to show the client what their current program already covers.</p>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Finding</th><th scope="col">Layer / entry point</th><th scope="col">Extension or new</th><th scope="col">Fix</th><th scope="col">When</th></tr></thead>
+  <tbody>
+    <tr><td>Example: AI person-detection instead of a safety scanner</td><td>L4</td><td>Extension (machine safety), for a new reason</td><td>Safety-rated scanner with speed and separation monitoring</td><td>Before PoC</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  </tbody>
+</table>
+</div>
+
+</main>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security · Assessment template. A learning aid, not legal advice. Check current rules and standards on every project.</p>
+</footer>
+
+</div></div>
+</body>
+</html>
