@@ -27,6 +27,19 @@
 6. Reading vendor claims: NVIDIA Halos case (ANAB second-party scope, TÜV readiness, Outside-In safety notice).
 7. Capstone: assess a sample client cell with the field-guide checklist.
 
+## Themes the learner needs (stated 2026-10-16, in Japanese)
+- AI decision and motion-range control, including the permissions of autonomous AI.
+- Protection of training data, AI models and manufacturing know-how.
+- Configuration management of AI models and OSS.
+- Security of remote operation and cloud connections.
+- Handling of camera data.
+- How the risks of physical AI differ from those of conventional robots.
+- How to build safety and security in, from PoC to production.
+- Learner's framing: split each theme into "extension of conventional measures" and "needs new measures". Use this split as a recurring structure in lessons.
+- Coverage on 2026-10-16: motion range is covered (Lesson 1). Permissions, model/OSS configuration, remote/cloud, conventional-vs-physical-AI differences and PoC-to-production are only partly covered (field guide). Confidentiality of data and know-how, and camera data handling (privacy), are not covered and need new research.
+- Proposed (awaiting the learner's answer): re-plan the course around these themes. Confirm before changing MISSION.md.
+- Verified 2026-10-16: the R&D exclusion from Japan's industrial-robot rules does not cover a completed machine used on a trial basis at a production site (MHLW notice 基発第339号, 第3 Ⅰ 1(6)). Relevant to PoCs on a client's factory floor.
+
 ## Working notes
 - Research reports from 2026-10-15 are in `research/`. They are agent output: re-check any fact against its source before putting it in a lesson.
 - Glossary terms from lesson 1 were added when the lesson was written, before the learner showed they can use them. Confirm with retrieval questions at the start of the next session, and revise definitions if they struggle.
