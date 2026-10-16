@@ -8,7 +8,8 @@
  *   quiz    Multiple choice. A wrong pick shows why it is wrong and the learner tries again;
  *           the score counts first tries only.
  *   sorter  Each item gets one button per bucket ("which layer stops this?"); feedback
- *           appears under the item. Same scoring as quiz.
+ *           appears under the item. Same scoring as quiz. Optional "missDefault" is the
+ *           feedback for a wrong bucket that has no item-specific "miss" text.
  *   recall  Free recall. The learner writes from memory, reveals the model answer
  *           (a .recall-answer child), and grades themself; the grade suggests when to retry.
  */
@@ -151,7 +152,7 @@
         var right = id === item.answer;
         button.setAttribute("data-state", right ? "right" : "wrong");
         button.disabled = true;
-        var why = right ? item.why : ((item.miss && item.miss[id]) || "Think about which layer can still act if the AI is wrong.");
+        var why = right ? item.why : ((item.miss && item.miss[id]) || data.missDefault || "Look again at the legend above.");
         showFeedback(feedback, right, " " + why + (right ? "" : " Try again."));
         if (right) {
           buttons.forEach(function (b) { b.disabled = true; });

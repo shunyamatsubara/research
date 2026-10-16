@@ -426,6 +426,70 @@ td { min-width: 8rem; }
   .crosscut { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* ---------- Flow: numbered stages in a row (wraps on narrow screens) ----------
+   <ol class="flow"><li><span class="flow-name">…</span><span class="flow-desc">…</span></li></ol>
+   Use only when the order of the stages is real. */
+
+.prose .flow {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 0.4rem;
+  margin: 1.25rem 0 1.5rem; padding: 0; list-style: none; counter-reset: flow;
+}
+.prose .flow > li {
+  counter-increment: flow; margin: 0; padding: 0.7rem 0.8rem;
+  border: 1px solid var(--rule); background: var(--surface);
+}
+.prose .flow > li::before {
+  content: counter(flow); display: block;
+  font-family: var(--font-mono); font-size: var(--step--2); color: var(--muted);
+}
+.flow-name {
+  display: block; font-family: var(--font-display); font-weight: 700;
+  font-size: var(--step-1); line-height: 1.15;
+}
+.flow-desc { display: block; margin-top: 0.2rem; font-size: var(--step--1); line-height: 1.4; color: var(--muted); }
+
+/* ---------- Chain: the steps of an attack or failure, joined by a line ----------
+   <ol class="chain"><li><span class="chain-title">…</span>…<span class="fix">…</span></li></ol> */
+
+.prose .chain {
+  margin: 1.5rem 0; padding: 0; list-style: none; counter-reset: chain; max-width: var(--measure);
+}
+.prose .chain > li { counter-increment: chain; position: relative; margin: 0; padding: 0 0 1.25rem 3rem; }
+.prose .chain > li::before {
+  content: counter(chain); position: absolute; left: 0; top: 0; width: 2rem; height: 2rem;
+  display: grid; place-items: center; border: 2px solid var(--ink); border-radius: 50%;
+  background: var(--bg); font-family: var(--font-display); font-weight: 700;
+}
+.prose .chain > li::after {
+  content: ""; position: absolute; left: calc(1rem - 1px); top: 2.15rem; bottom: 0.2rem;
+  border-left: 2px solid var(--rule);
+}
+.prose .chain > li:last-child::after { display: none; }
+.chain-title { display: block; margin-bottom: 0.15rem; font-weight: 700; }
+.chain .fix { display: block; margin-top: 0.4rem; font-size: var(--step--1); }
+.chain .fix .tag { margin-right: 0.35rem; }
+
+/* ---------- Data-flow diagram (inline SVG, class "dfd") ----------
+   Boxes, zones and entry markers take their colors from the theme tokens. On phones the
+   diagram keeps a readable size and scrolls sideways inside .figure-box. */
+
+.figure-box svg.dfd { width: 100%; max-width: 820px; min-width: 680px; font-family: var(--font-body); }
+.dfd text { fill: var(--ink); }
+.dfd .dfd-box { fill: var(--surface); stroke: var(--muted); stroke-width: 1; }
+.dfd .dfd-ai { fill: var(--hazard-wash); stroke: var(--hazard); }
+.dfd .dfd-cert { fill: var(--safe-wash); stroke: var(--safe); }
+.dfd .dfd-zone { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 6 4; }
+.dfd .dfd-safezone { fill: none; stroke: var(--safe); stroke-width: 1.5; stroke-dasharray: 6 4; }
+.dfd .dfd-line { fill: none; stroke: var(--muted); stroke-width: 1.5; }
+.dfd .dfd-head { fill: var(--muted); }
+.dfd .dfd-name { font-size: 12.5px; font-weight: 700; }
+.dfd .dfd-detail { font-size: 10.5px; fill: var(--muted); }
+.dfd .dfd-label { font-size: 11px; fill: var(--muted); }
+.dfd .dfd-zone-label { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.04em; fill: var(--muted); }
+.dfd .dfd-safe-label { fill: var(--safe); }
+.dfd .dfd-entry circle { fill: var(--hazard); stroke: var(--tape-dark); stroke-width: 1; }
+.dfd .dfd-entry text { fill: var(--tape-dark); font-family: var(--font-mono); font-size: 9.5px; font-weight: 500; }
+
 /* ---------- Narrow screens ---------- */
 
 @media (max-width: 30rem) {

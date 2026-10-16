@@ -42,6 +42,9 @@ Useful classes inside `.prose`:
 | `.ask` | Reminder to ask the teacher follow-up questions. |
 | `.pager` | Previous / next links. |
 | `dl.terms > div.term > dt + dd` | Glossary entries; `span.avoid` lists words to avoid. |
+| `ol.flow` | Numbered stages in a row (`span.flow-name`, `span.flow-desc`). Only for a real order. |
+| `ol.chain` | Steps of an attack or failure, joined by a line (`span.chain-title`, `span.fix`). |
+| `svg.dfd` | Data-flow diagram inside `.figure-box`. Classes: `dfd-box`, `dfd-ai`, `dfd-cert`, `dfd-zone`, `dfd-safezone`, `dfd-line` (+ `marker-end`), `dfd-name`, `dfd-detail`, `dfd-label`, `dfd-zone-label`, `g.dfd-entry` (circle + text). Keeps a 680px minimum and scrolls sideways on phones. The full cell diagram with E1–E8 is in Lesson 2; copy it when a later lesson needs it. |
 
 ## `widgets.js`
 
@@ -71,6 +74,7 @@ number of characters); move the correct answer to a different position in each q
 <div class="widget" data-widget="sorter" data-title="Which layer stops it?">
   <script type="application/json">
   {"buckets": [{"id": "L1", "short": "L1", "label": "Task guardrails"}],
+   "missDefault": "shown for a wrong bucket that has no miss text",
    "items": [{"text": "…", "answer": "L1", "why": "shown when right",
               "miss": {"L2": "shown when the learner picks L2"}}]}
   </script>

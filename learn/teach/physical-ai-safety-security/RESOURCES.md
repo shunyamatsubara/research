@@ -44,6 +44,18 @@ Checked on 2026-10-15. Labels: (peer-reviewed), (preprint), (company), (governme
 - Papers on attacks against the AI layer: [BadVLA backdoors (2025, preprint)](https://arxiv.org/abs/2505.16640), [adversarial patches on VLAs (2024)](https://arxiv.org/abs/2411.13587), [CHAI sign-based command hijacking (2025)](https://arxiv.org/abs/2510.00181).
 - [OWASP LLM06:2025 Excessive Agency](https://genai.owasp.org/llmrisk/llm062025-excessive-agency/)
   "Implement authorization in downstream systems". Use for: shared language with AppSec teams.
+- [Docs: ROS 2 discovery settings (source on GitHub)](https://github.com/ros2/ros2_documentation/blob/kilted/source/Tutorials/Advanced/Improved-Dynamic-Discovery.rst)
+  "By default, ROS 2 will attempt to find all nodes on all hosts on the same subnet automatically"; `ROS_AUTOMATIC_DISCOVERY_RANGE`. Use for: E5 hardening.
+- [Advisory: ICSA-21-315-02, vulnerabilities in DDS implementations, CISA (2021-11-11)](https://www.cisa.gov/news-events/ics-advisories/icsa-21-315-02) (government)
+  13 CVEs across six DDS vendors, highest CVSS 8.6. Use for: showing that robot middleware needs patching like any other software.
+- [Disclosure: UniPwn, Bin4ry and team (2025-09-20)](https://github.com/Bin4ry/UniPwn)
+  Hard-coded key "same across all devices", "unitree" handshake, wormable over BLE; with timeline. Use for: E6 case study.
+- [Preprint: "Cybersecurity AI: Humanoid Robots as Attack Vectors", Mayoral-Vilches, Makris & Finisterre (2025-09)](https://arxiv.org/abs/2509.14139) (preprint by a security vendor)
+  Unitree G1 telemetry "every 300 seconds without operator notice"; hardcoded AES keys shared across units. Use for: E7 and camera/telemetry data questions.
+- [Paper: "To Make a Robot Secure", Bonaci et al. (2015)](https://arxiv.org/abs/1504.04339) (preprint)
+  Raven II surgical robot: overriding surgeon commands and abusing the e-stop with "single packet" attacks. Use for: E8, safety functions as a target.
+- [Blog: ISA/IEC 62443 concepts, Dragos (2025-01, updated 2025-08)](https://dragos.com/blog/isa-iec-62443-concepts) (company, technical)
+  Plain definitions of zones and conduits. Use for: explaining cell segmentation to clients.
 
 ### Safety standards and architecture
 - [Preprint: ISO 10218 2011 vs 2025 comparison, Hartmann et al. (2026-02)](https://arxiv.org/abs/2602.17822) (preprint)

@@ -17,12 +17,13 @@
 <nav class="topnav" aria-label="Course">
   <a href="../index.html">Course home</a>
   <a href="../lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a>
+  <a href="../lessons/0002-threat-model-the-cell.html">Lesson 2</a>
   <a href="field-guide.html">Field guide</a>
   <a class="here" href="glossary.html">Glossary</a>
 </nav>
 
 <header class="masthead">
-  <p class="eyebrow"><span class="tag tag-plain">Reference</span> Updated 15 October 2026 · Terms from Lesson 1</p>
+  <p class="eyebrow"><span class="tag tag-plain">Reference</span> Updated 16 October 2026 · Terms from Lessons 1–2</p>
   <h1>Glossary</h1>
   <p class="lede">The words this course uses, with one meaning each. A term joins this list when a lesson teaches it. "Avoid" lists words that mean the same thing or that blur the meaning. Use the main term instead.</p>
 </header>
@@ -64,6 +65,32 @@
 <h2>Japan</h2>
 <dl class="terms wide">
   <div class="term"><dt>Motion range (可動範囲)</dt><dd>Under the labour ministry (MHLW) notice for industrial robots: the maximum range the robot's parts, tool included, can structurally move. Only electrical or mechanical stoppers make it smaller.</dd></div>
+</dl>
+
+<h2>Threat modeling (Lesson 2)</h2>
+<dl class="terms wide">
+  <div class="term"><dt>Entry point</dt><dd>A place where an attacker's input can enter the cell. This course uses eight (E1–E8); together they are the cell's attack surface.<span class="avoid">Avoid: "attack vector" (used loosely for both places and techniques).</span></dd></div>
+  <div class="term"><dt>Attack chain</dt><dd>The steps from an entry point to harm. A good threat model names one control that breaks the chain early and one that still protects people at the end.<span class="avoid">Avoid: "kill chain" (the name of a specific military and IT model).</span></dd></div>
+  <div class="term"><dt>Scene injection</dt><dd>Instructions placed in the camera's view, such as a sign or a printed patch, that steer an AI model.<span class="avoid">Also called: physical or environmental prompt injection.</span></dd></div>
+  <div class="term"><dt>Robot jailbreak</dt><dd>Prompts that make an LLM-controlled robot do what its rules should refuse.</dd></div>
+  <div class="term"><dt>Policy backdoor</dt><dd>Hidden behavior trained into a model that appears only when a trigger is present. Code review and normal tests do not reveal it.</dd></div>
+  <div class="term"><dt>Policy server</dt><dd>The computer that runs the VLA model and sends actions back to the robot over the network.</dd></div>
+  <div class="term"><dt>ROS 2 / DDS</dt><dd>ROS 2 is a common software framework for robots. DDS is the publish/subscribe middleware that most ROS 2 systems use to pass messages between nodes.</dd></div>
+  <div class="term"><dt>SROS2</dt><dd>The ROS 2 tools that switch on DDS security (authentication, encryption, access control) for groups of nodes. Security is off by default.</dd></div>
+  <div class="term"><dt>Zone and conduit (IEC 62443)</dt><dd>A zone is a group of systems that share common security requirements. A conduit is the controlled communication path between zones.</dd></div>
+  <div class="term"><dt>Wormable</dt><dd>Able to spread from device to device on its own, as UniPwn did over Bluetooth.</dd></div>
+</dl>
+
+<h2>The eight entry points (course model)</h2>
+<dl class="terms wide">
+  <div class="term"><dt>E1 The scene</dt><dd>What the camera sees: parts, signs, people. An input that no firewall sees.</dd></div>
+  <div class="term"><dt>E2 Commands</dt><dd>Instructions from people or systems, for example through a chat window or an HMI.</dd></div>
+  <div class="term"><dt>E3 Models and data</dt><dd>Model weights, datasets and demonstrations, and the files and tools that load them.</dd></div>
+  <div class="term"><dt>E4 Policy server link</dt><dd>The network connection between the robot and the computer that runs the VLA.</dd></div>
+  <div class="term"><dt>E5 Robot middleware</dt><dd>ROS 2 / DDS and the other paths that carry messages between the robot's software nodes.</dd></div>
+  <div class="term"><dt>E6 Wireless setup</dt><dd>Bluetooth, Wi-Fi and other radios used to set up or control the robot nearby.</dd></div>
+  <div class="term"><dt>E7 Cloud, fleet and remote access</dt><dd>Vendor support, remote operation, updates and telemetry that cross the cell's boundary.</dd></div>
+  <div class="term"><dt>E8 The safety functions</dt><dd>The safety controller's settings and signals. The most valuable asset, because they are the last line.</dd></div>
 </dl>
 
 </main>

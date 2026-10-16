@@ -12,12 +12,13 @@
 <nav class="topnav" aria-label="Course">
   <a class="here" href="index.html">Course home</a>
   <a href="lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1</a>
+  <a href="lessons/0002-threat-model-the-cell.html">Lesson 2</a>
   <a href="reference/field-guide.html">Field guide</a>
   <a href="reference/glossary.html">Glossary</a>
 </nav>
 
 <header class="masthead">
-  <p class="eyebrow"><span class="tag tag-hazard">Course</span> Started 15 October 2026 · Plain English · About 15 minutes per lesson</p>
+  <p class="eyebrow"><span class="tag tag-hazard">Course</span> Started 15 October 2026 · Plain English · 15–20 minutes per lesson</p>
   <h1>Physical AI Safety &amp; Security</h1>
   <p class="lede">A short course for a security engineer who advises on AI-driven robots. The running example is a robot arm doing pick-and-place, with classical motion planning for the approach and a VLA policy for the grasp.</p>
   <div class="goal">
@@ -28,11 +29,17 @@
 
 <main class="prose">
 
-<h2>Start here</h2>
+<h2>Lessons</h2>
 <div class="source">
   <p class="title"><a href="lessons/0001-the-ai-is-not-the-safety-system.html">Lesson 1 · The AI Is Not the Safety System</a></p>
-  <p>Why an independent, certified checker must limit what an AI-driven robot can do, and how to tell which layer should stop which failure. Includes a sorting exercise, a quiz and a recall question.</p>
+  <p>Why an independent, certified checker must limit what an AI-driven robot can do, and how to tell which layer should stop which failure.</p>
 </div>
+<div class="source">
+  <p class="title"><a href="lessons/0002-threat-model-the-cell.html">Lesson 2 · Threat-Model the Cell</a></p>
+  <p>Eight entry points with a real case for each, a data-flow diagram of the cell, how to trace an attack chain to physical harm, and which controls are extensions of conventional security and which are new.</p>
+</div>
+
+<h2>Reference</h2>
 <div class="source">
   <p class="title"><a href="reference/field-guide.html">Field guide</a></p>
   <p>All the research on one page: seven findings, the five layers, a threat model, a map of standards and rules (international, EU, Japan), how to prove a system is safe, how to read vendor claims, and a checklist of questions for clients.</p>
@@ -51,14 +58,15 @@
 </figure>
 
 <h2>Course path</h2>
-<p>A plan, not a promise. It will change as you learn and as your client work needs change.</p>
+<p>Re-planned on 16 October 2026 around the themes you need for client work. Each lesson ends by sorting its controls into "extension of conventional measures" and "new for physical AI".</p>
 <ol>
   <li><strong>The AI is not the safety system</strong> <span class="tag tag-safe">Ready</span></li>
-  <li><strong>Threat-model the cell:</strong> where an attacker turns a software flaw into a physical hazard, with real cases from 2025–2026. <span class="tag tag-plain">Next</span></li>
-  <li><strong>Standards and rules for an arm cell:</strong> ISO 10218:2025, ISO/TS 15066, ISO 13849-1, the EU Machinery Regulation, and Japan's rules on fence-free work.</li>
-  <li><strong>Guardrails for the AI itself:</strong> task checks, asking for help, and evaluation with enough trials.</li>
-  <li><strong>Proving it:</strong> hazard analysis, statistics, and a minimal safety case.</li>
-  <li><strong>Reading vendor claims:</strong> NVIDIA Halos as a case study.</li>
+  <li><strong>Threat-model the cell:</strong> eight entry points, attack chains, and extension versus new. <span class="tag tag-safe">Ready</span></li>
+  <li><strong>Control the AI's permissions and motion range:</strong> what the AI may command, who may change the limits, and how the standards and Japan's rules set them. <span class="tag tag-plain">Next</span></li>
+  <li><strong>Protect data, models and know-how, and manage AI and OSS components:</strong> confidentiality of training data and know-how, model and dataset versions, SBOM, retraining as a change.</li>
+  <li><strong>Camera data, remote operation and the cloud:</strong> privacy and confidentiality of video, remote operation and what happens when the link drops.</li>
+  <li><strong>From PoC to production:</strong> what to build in at each stage, test statistics, and a minimal safety case.</li>
+  <li><strong>Conventional robots versus physical AI, and reading vendor claims:</strong> a side-by-side comparison, with NVIDIA Halos as a case study.</li>
   <li><strong>Capstone:</strong> a short assessment of a sample client cell.</li>
 </ol>
 
