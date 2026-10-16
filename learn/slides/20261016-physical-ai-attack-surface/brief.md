@@ -49,10 +49,13 @@ Out:
   named only where they decide who must act).
 
 ## Sources the user trusts
-(to be filled in after the user answers)
+None yet (2026-10-16). Research starts from primary sources: papers, standards, vendor and
+CERT advisories, and public statements by Bosch, Denso and their units.
 
-## Provisional decisions
+## Decisions (confirmed by the user, 2026-10-16)
 - Working folder is learn/slides/ in this repository (as for 20261010-pixel-to-grasp-pose), not
   the skill's default ~/github/ai-workspace, so the user can open the files in the app.
 - "Who owns the defence for each" is narrowed to "which existing control can see each way in",
   because ownership depends on the client's organisation, not on the mechanism.
+- The user confirmed the question, the reader guess (both security and production engineers
+  read it), and the scope as written above.
