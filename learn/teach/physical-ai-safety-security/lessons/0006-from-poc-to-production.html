@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lesson 6 · From PoC to Production</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/widgets.js" defer></script>
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a href="../index.html">Course home</a>
+  <a href="0005-camera-data-remote-and-cloud.html">← Lesson 5</a>
+  <a class="here" href="0006-from-poc-to-production.html">Lesson 6</a>
+  <a href="0007-conventional-robots-vs-physical-ai.html">Lesson 7 →</a>
+  <a href="../reference/field-guide.html">Field guide</a>
+  <a href="../reference/glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-hazard">Lesson 6</span> About 20 minutes · Running example: an AI pick-and-place cell</p>
+  <h1>Build It In from PoC to Production</h1>
+  <p class="lede">Most physical AI projects start as a quick PoC. The safety and security work skipped there is hard to add later, and in Japan the PoC itself may already fall under the robot rules. This lesson gives you a stage-by-stage plan: what to build in at each stage, and what evidence each gate needs.</p>
+  <div class="goal">
+    <span class="tag tag-act">Your goal</span>
+    <p>For a client's physical AI project, list the minimum safety and security work and the gate evidence for each stage, and explain why test results alone are not enough to go to production.</p>
+  </div>
+</header>
+
+<main class="prose">
+
+<h2>Warm-up: earlier lessons from memory</h2>
+
+<div class="widget" data-widget="quiz" data-title="Three quick questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "Under ISO 10218:2025, collaboration is a property of…",
+   "options": ["the robot model", "the whole application", "the AI policy", "the safety scanner"],
+   "answer": 1,
+   "why": ["The 2025 edition drops the idea of a collaborative robot on its own.",
+           "Collaboration is \"exclusively a property of the application, rather than the machine\". The application's risk assessment decides.",
+           "No AI policy makes an application collaborative. Safety comes from the application's design and its certified functions.",
+           "A scanner is one safety function. It does not make the whole application collaborative by itself."]},
+  {"prompt": "A GPU server returns VLA actions to the robot over gRPC. Which entry point is that link?",
+   "options": ["E5 ROS 2 middleware", "E3 Models and data", "E7 Cloud remote access", "E4 Policy server link"],
+   "answer": 3,
+   "why": ["ROS 2 carries messages inside the robot's software. The server link is a separate path.",
+           "E3 is about model files and training data. This is the live connection to the server.",
+           "E7 covers vendor support, fleet and remote access. This is the inference link.",
+           "The link between the robot and the computer that runs the VLA is E4, the LeRobot pattern."]},
+  {"prompt": "In DeepMind's tests, AI person-detection tuned for few false alarms missed…",
+   "options": ["fewer than 1% of hazards", "about 10% of all hazards", "more than 40% of hazards", "no hazards in any test"],
+   "answer": 2,
+   "why": ["The misses were much higher. That is why AI detection is not a safety function.",
+           "Models tuned to miss only 10–15% stopped the robot for no reason 15–25% of the time.",
+           "With fewer than 5% false alarms, models missed more than 40% of real hazards.",
+           "Every model missed hazards. No model was good at both catching hazards and avoiding false alarms."]}
+ ]}
+</script>
+</div>
+
+<h2>Why the PoC matters</h2>
+
+<p>Shortcuts taken in a PoC tend to stay: the network design, the data deal with the vendor, the way the AI talks to the robot. Two facts make the PoC more important than it looks.</p>
+<ul>
+  <li><strong>In Japan, a PoC on a client's line is not "R&amp;D".</strong> When "完成された機械を生産現場において試行的に使用する" (a completed machine is used on a trial basis at a production site), it does not count as a machine under research and development. If its largest motor is above 80 W, the industrial-robot rules apply, including fences or a recorded risk assessment.<span class="note"><a href="https://www.mhlw.go.jp/web/t_doc?dataId=00tb9779&amp;dataType=1&amp;pageNo=1">MHLW notice 基発第339号</a>, 第3 Ⅰ 1(6).</span></li>
+  <li><strong>Good startups stage it.</strong> Agility Robotics first validates a use case at its own site, then runs on-site validation: "We cordon off a workflow site to separate the pilot phase from your official manufacturing line or live floor." Its humanoid "stays in a sectioned-off workcell", and these workcells "have passed OSHA-recognized Nationally Recognized Test Lab (NRTL) field inspections". Fence-free work is planned for 2027, not assumed from day one.<span class="note"><a href="https://www.agilityrobotics.com/content/agilitys-humanoid-deployment-process">Agility Robotics, "Agility's humanoid deployment process"</a> (4 August 2026). Company blog.</span></li>
+</ul>
+
+<h2>Four stages, four gates</h2>
+
+<ol class="flow">
+  <li><span class="flow-name">PoC</span><span class="flow-desc">Prove the task works, in a separated cell</span></li>
+  <li><span class="flow-name">Pilot</span><span class="flow-desc">Run on the real line under defined conditions</span></li>
+  <li><span class="flow-name">Production</span><span class="flow-desc">Release with a safety case and conformity documents</span></li>
+  <li><span class="flow-name">Operation</span><span class="flow-desc">Monitor, learn, and control every change</span></li>
+</ol>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Stage</th><th scope="col">Build in: safety</th><th scope="col">Build in: security</th><th scope="col">Evidence at the gate</th></tr></thead>
+  <tbody>
+    <tr><td><strong>PoC</strong></td><td>A fenced or sectioned-off cell; no people inside during autonomous runs. Emergency stop and protective stop work from day one. In Japan: a fence or a recorded risk assessment.</td><td>The cell on its own network zone. No default passwords. SROS2 on. No pickle. A list of every vendor connection. A data agreement before collecting demonstrations (<a href="0004-protect-data-models-and-know-how.html">Lesson 4</a>).</td><td>Risk assessment record; first threat model (E1–E8); written operating conditions (objects, lighting, people's access).</td></tr>
+    <tr><td><strong>Pilot</strong></td><td>L4 safety functions set up and tested by fault injection. A trial plan with statistics. Trained operators (special education for teaching work).</td><td>Penetration test of the cell. Signed models and updates. Logging and monitoring. An incident process.</td><td>Test report with trial counts, failure definitions and confidence bounds; fault-injection results; pentest report.</td></tr>
+    <tr><td><strong>Production</strong></td><td>A safety case (claims, arguments, evidence) reviewed by someone independent of the team. Conformity documents: in Japan's ISO route a technical file and declaration of conformity; in the EU, the Machinery Regulation from January 2027.</td><td>Hardened configuration. An SBOM that includes models and the inference runtime. Vulnerability handling; for EU products, CRA reporting within 24 and 72 hours.</td><td>Safety case; technical file; SBOM; a release decision signed by named people.</td></tr>
+    <tr><td><strong>Operation</strong></td><td>Track safety indicators and near misses. Investigate incidents.</td><td>Patch. Watch vendor connections and telemetry.</td><td>For every change: an impact analysis, then re-validation.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="keyrule">
+  <span class="tag tag-hazard">Key rule</span>
+  <p class="big">Retraining is a change, even when no code changes.</p>
+  <p>The public draft of UL 4600 requires a safety case analysis "in response to changes", and its examples include "use of a retrained neural network" and new versions of "neural network training tools, training data collection items".<span class="note"><a href="https://users.ece.cmu.edu/~koopman/ul4600/191213_UL4600_VotingVersion.pdf">UL 4600 voting draft</a> (2019), 12.6.1. The published editions are paywalled.</span> EU law also keeps the trail: the tracing log of safety software uploads is kept "for five years after such upload".<span class="note"><a href="https://eur-lex.europa.eu/eli/reg/2023/1230/oj/eng">EU Machinery Regulation</a>, Annex III, 1.2.1.</span></p>
+</div>
+
+<h2>Why test results are not enough</h2>
+
+<p>A demo that works ten times proves very little. If a policy succeeds in every trial, this is the most you can claim with 95% confidence:</p>
+
+<div class="table-scroll">
+<table>
+  <thead><tr><th scope="col">Failure-free trials</th><th scope="col">You can claim the failure rate is below</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">50</td><td>5.8%</td></tr>
+    <tr><td class="mono">100</td><td>3.0%</td></tr>
+    <tr><td class="mono">299</td><td>1%</td></tr>
+    <tr><td class="mono">2,995</td><td>0.1%</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="sources">Formula n = ln(1 − C) / ln(1 − p), as used by <a href="https://www.rand.org/pubs/research_reports/RR1478.html">RAND (2016)</a>; the arithmetic is ours. It assumes the trials are independent and match real use.</p>
+
+<p>Three more warnings from the field:</p>
+<ul>
+  <li>Toyota Research Institute evaluated each task "with 50 rollouts per task per policy" and warns that "robotics papers are measuring statistical noise due to insufficient statistical power".<span class="note"><a href="https://arxiv.org/abs/2507.05331">TRI LBM Team, "A Careful Examination of Large Behavior Models"</a> (2025, preprint).</span></li>
+  <li>NVIDIA: "A raw failure rate is not, on its own, a safety argument." And a simulator's "realism must itself be characterized before its outputs can be trusted as safety evidence."<span class="note"><a href="https://docs.nvidia.com/common/resources/Nvidia_Halos_Safety_Evaluation_Framework_Tech_Brief.pdf">NVIDIA Halos Safety Evaluation Framework</a> (2026). Written for cars; the logic applies to robots.</span></li>
+  <li>Accidents can come from "unsafe interactions of system components, none of which may have failed". A test of each part can pass while the system still causes harm.<span class="note"><a href="https://psas.scripts.mit.edu/home/get_file.php?name=STPA_Handbook.pdf">Leveson &amp; Thomas, STPA Handbook</a> (MIT, 2018).</span></li>
+</ul>
+<p>So tests are one kind of evidence. A production decision also needs hazard analysis, an architecture where L4 holds when the AI fails (Lesson 1), and a safety case that connects them.</p>
+
+<h2>A safety case in one page</h2>
+<p>A safety case is a structured argument that the system is safe enough for a stated use, backed by evidence. The University of York's SACE method walks through eight stages: operating context, hazardous scenarios, safe operating concept, safety requirements, design, hazardous failures, out-of-context operation, and verification.<span class="note"><a href="https://www.york.ac.uk/media/assuring-autonomy/documents/guidancedocuments/SACE_v1_1.pdf">SACE v1.1</a> (University of York, 2026).</span> A minimal case for the running example:</p>
+<ul>
+  <li><strong>Claim:</strong> the cell is acceptably safe for its task under its written operating conditions.
+    <ul>
+      <li>Normal use: the grasp-hazard rate is below the target. <em>Evidence:</em> N failure-free trials and a 95% bound.</li>
+      <li>Wrong or hacked AI output cannot cause harm, because L4 limits override it. <em>Evidence:</em> fault-injection and hardware-in-the-loop reports.</li>
+      <li>Unusual input is detected and leads to a safe stop. <em>Evidence:</em> monitor tests with new objects and lighting.</li>
+      <li>Foreseeable misuse and attacks are handled. <em>Evidence:</em> threat model and pentest (Lesson 2).</li>
+      <li>Safety is kept in operation. <em>Evidence:</em> change process; every retraining triggers an impact analysis.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Practice: which gate needs it?</h2>
+
+<div class="widget" data-widget="sorter" data-title="Match the evidence to the gate">
+<script type="application/json">
+{"buckets": [
+  {"id": "POC", "short": "PoC", "label": "End of PoC"},
+  {"id": "PIL", "short": "Pilot", "label": "End of pilot"},
+  {"id": "PRO", "short": "Production", "label": "Release to production"},
+  {"id": "OPS", "short": "Operation", "label": "During operation"}
+ ],
+ "missDefault": "Ask: when is this evidence first needed, and what would go wrong if it came later?",
+ "items": [
+  {"text": "A recorded risk assessment for running the PoC on the client's line.",
+   "answer": "POC",
+   "why": "In Japan the rules apply to a trial on a production site, so this is needed before the PoC runs near people.",
+   "miss": {"PRO": "Too late. The PoC on the client's line already falls under the robot rules."}},
+  {"text": "A list of every vendor connection into the cell.",
+   "answer": "POC",
+   "why": "Connections set up in the PoC tend to stay. Find them before they become part of the design.",
+   "miss": {"OPS": "By then the connections are part of the system. Start the list in the PoC."}},
+  {"text": "Trial results with failure definitions and confidence bounds.",
+   "answer": "PIL",
+   "why": "The pilot runs under real conditions, so this is where trial statistics mean something.",
+   "miss": {"POC": "A PoC shows the task can work. The statistics that support a release come from the pilot."}},
+  {"text": "Fault-injection results showing that the protective stop works.",
+   "answer": "PIL",
+   "why": "Before people work near the cell, show that the safety functions actually work when something fails."},
+  {"text": "A penetration test report for the cell.",
+   "answer": "PIL",
+   "why": "Test the real configuration before release, while changes are still cheap."},
+  {"text": "A safety case reviewed by someone independent of the team.",
+   "answer": "PRO",
+   "why": "The release decision needs a complete argument, checked by someone who did not write it."},
+  {"text": "An SBOM that includes the model files and the inference runtime.",
+   "answer": "PRO",
+   "why": "Production needs a complete list of components, including AI ones, so vulnerabilities can be tracked.",
+   "miss": {"OPS": "You need it during operation too, but it must exist at release."}},
+  {"text": "An impact analysis because the VLA was retrained on new demonstrations.",
+   "answer": "OPS",
+   "why": "Retraining is a change, even with no code change. It triggers an impact analysis and re-validation."}
+ ]}
+</script>
+</div>
+
+<h2>Check yourself</h2>
+
+<div class="widget" data-widget="quiz" data-title="Three questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "A policy succeeded in 50 of 50 trials. What can you claim with 95% confidence?",
+   "options": ["Its failure rate is exactly zero percent",
+               "It will not fail in real production",
+               "Its failure rate is below about 6%",
+               "Its failure rate is below about 0.1%"],
+   "answer": 2,
+   "why": ["Zero failures in a sample does not mean a zero failure rate.",
+           "No number of trials can promise that.",
+           "The 95% upper bound after 50 failure-free trials is about 5.8%.",
+           "That would need about 3,000 failure-free trials."]},
+  {"prompt": "The vendor retrained the VLA on new demonstrations. The code did not change. What should happen?",
+   "options": ["An impact analysis, then re-validate the safety case",
+               "Nothing, because no code was changed at all",
+               "Only a quick demo for the client's manager",
+               "A new fence around the whole production line"],
+   "answer": 0,
+   "why": ["Retraining changes behavior. UL 4600's draft lists \"use of a retrained neural network\" as a change that triggers a safety case analysis.",
+           "The behavior can change completely without a single line of code changing.",
+           "A demo is not evidence. Re-run the tests the safety case depends on.",
+           "A fence may not be needed. First find out what the change affects."]},
+  {"prompt": "Where do Agility's humanoid deployments run today?",
+   "options": ["fence-free next to workers since 2024",
+               "only inside Agility's own test lab",
+               "under remote control from a cloud",
+               "in separated workcells that NRTL inspected"],
+   "answer": 3,
+   "why": ["Fence-free (\"cooperatively safe\") work is planned for 2027.",
+           "The robots also work at customer sites, but in separated workcells.",
+           "Agility describes on-site workcells, not remote operation.",
+           "The workcells \"have passed OSHA-recognized Nationally Recognized Test Lab (NRTL) field inspections\"."]}
+ ]}
+</script>
+</div>
+
+<div class="widget recall" id="recall-l6" data-widget="recall" data-title="From memory">
+  <p class="recall-prompt">A client wants to move their pick-and-place cell from pilot to production next month. Write the five pieces of evidence you would ask for at that gate.</p>
+  <div class="recall-answer">
+    <p>1. Trial results from the pilot, with failure definitions, trial counts and confidence bounds, under the written operating conditions.</p>
+    <p>2. Fault-injection results showing that the L4 safety functions work.</p>
+    <p>3. A penetration test report, with findings fixed or accepted by a named person.</p>
+    <p>4. A safety case reviewed by someone independent, and the conformity documents (technical file and declaration of conformity; CE marking for the EU).</p>
+    <p>5. An SBOM that includes models and runtimes, and a change process in which every retraining triggers an impact analysis.</p>
+  </div>
+</div>
+
+<h2>Summary: extension or new?</h2>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Extension of conventional measures</th><th scope="col">New for physical AI</th></tr></thead>
+  <tbody>
+    <tr><td>Stage gates, release approvals, change management</td><td>Retraining as a change that needs re-validation, with no code change</td></tr>
+    <tr><td>Penetration tests, hardening, patching, incident response</td><td>Statistical evidence of learned behavior under written operating conditions</td></tr>
+    <tr><td>Risk assessment records, fences and conformity documents (Japan's 2013 routes, CE marking)</td><td>Showing that a simulator is realistic before its results count as safety evidence</td></tr>
+    <tr><td>SBOM and vulnerability handling</td><td>An SBOM that also lists models, datasets and inference runtimes</td></tr>
+    <tr><td>Safety cases for safety-critical systems</td><td>Safety-case claims about the machine-learning part (operating context, unusual input, retraining)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Read the primary source</h2>
+
+<div class="source">
+  <p class="title"><a href="https://www.york.ac.uk/media/assuring-autonomy/documents/guidancedocuments/SACE_v1_1.pdf">SACE: Guidance on the Safety Assurance of Autonomous Systems in Complex Environments, v1.1 (University of York, 2026)</a></p>
+  <p>Read the overview of the SACE process and Stage 1 (operating context). About 30 minutes.</p>
+  <p>Why this one: it is a free, step-by-step method for building the safety case of an autonomous system, with examples. It turns "is it safe?" into a list of claims and evidence you can plan into each project stage.</p>
+</div>
+
+<div class="ask">
+  <p><strong>Ask your teacher.</strong> Questions are part of the lesson. Ask Claude anything that is unclear. For example:</p>
+  <p>"How many trials would we need for our client's target?" · "What goes into a fault-injection test for a protective stop?" · "How should a contract split PoC and production responsibilities?"</p>
+</div>
+
+<h2>Next</h2>
+<p><strong><a href="0007-conventional-robots-vs-physical-ai.html">Lesson 7: Conventional robots versus physical AI.</a></strong> What changes and what stays the same, and how to read a vendor's safety claims.</p>
+
+</main>
+
+<nav class="pager" aria-label="Lesson navigation">
+  <a href="0005-camera-data-remote-and-cloud.html">← Lesson 5</a>
+  <a href="0007-conventional-robots-vs-physical-ai.html">Lesson 7 →</a>
+</nav>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security · Lesson 6 · Written 16 October 2026. Sources were checked on that date; check dates before you rely on them with a client. A learning aid, not legal advice.</p>
+</footer>
+
+</div></div>
+</body>
+</html>

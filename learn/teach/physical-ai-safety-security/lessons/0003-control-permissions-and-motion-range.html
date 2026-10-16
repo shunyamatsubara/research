@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lesson 3 · Control Permissions and Motion Range</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/widgets.js" defer></script>
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a href="../index.html">Course home</a>
+  <a href="0002-threat-model-the-cell.html">← Lesson 2</a>
+  <a class="here" href="0003-control-permissions-and-motion-range.html">Lesson 3</a>
+  <a href="0004-protect-data-models-and-know-how.html">Lesson 4 →</a>
+  <a href="../reference/field-guide.html">Field guide</a>
+  <a href="../reference/glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-hazard">Lesson 3</span> About 20 minutes · Running example: an AI pick-and-place cell</p>
+  <h1>Control the AI's Permissions and Motion Range</h1>
+  <p class="lede">An AI robot needs two kinds of limits. Permissions say what the AI may ask the robot to do. Motion limits say where and how fast the arm may move, whatever the AI asks. This lesson shows how to set both, who may change them, and what the standards and Japan's rules say about them.</p>
+  <div class="goal">
+    <span class="tag tag-act">Your goal</span>
+    <p>For an AI robot cell, write its permission limits and its motion limits. For each one, say which layer enforces it, who may change it, and which rule or standard supports it.</p>
+  </div>
+</header>
+
+<main class="prose">
+
+<h2>Warm-up: Lessons 1 and 2 from memory</h2>
+
+<div class="widget" data-widget="quiz" data-title="Three quick questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "The UniPwn attack took over Unitree robots through which entry point?",
+   "options": ["E5 Robot middleware", "E7 Remote access", "E6 Wireless setup", "E2 Operator commands"],
+   "answer": 2,
+   "why": ["ROS 2 was not the way in. The input arrived over Bluetooth during Wi-Fi setup.",
+           "No internet connection was needed. The attacker only had to be within radio range.",
+           "A crafted Wi-Fi name sent over Bluetooth ran as a root command, and the attack could spread from robot to robot.",
+           "Nobody typed a command. The attack used the wireless setup process."]},
+  {"prompt": "In the LeRobot-style chain through E4, which control breaks the chain earliest?",
+   "options": ["A safety laser scanner near people",
+               "More training data for the VLA",
+               "A protective stop at the arm",
+               "Mutual TLS and no pickle loading"],
+   "answer": 3,
+   "why": ["The scanner is the last line (L4). It protects people at the end of the chain, not at the start.",
+           "The model is not the problem. The attacker enters through the network link.",
+           "A protective stop is also the last line. You still want the chain broken at the entry.",
+           "Authenticating the link and refusing pickle data stops the attacker before any code runs."]},
+  {"prompt": "\"Give each ROS 2 node only the topics it needs.\" Is that an extension of conventional security, or new?",
+   "options": ["Extension: it is least privilege for each node",
+               "New: ROS 2 needs a new security model",
+               "New: topics can only be protected by L4",
+               "Extension: but only if the cloud enforces it"],
+   "answer": 0,
+   "why": ["Least privilege and authentication are old ideas. SROS2 is only the tool that applies them to robot nodes.",
+           "The idea is not new. Only the tool (SROS2 permissions) is robot-specific.",
+           "L4 protects people, not message topics. Topic access is ordinary access control.",
+           "The robot enforces this itself with SROS2. No cloud is involved."]}
+ ]}
+</script>
+</div>
+
+<h2>Two kinds of limits</h2>
+
+<p><strong>Permissions</strong> say what the AI may ask for: which tasks, which objects, which places, which tools it may call. They belong outside the model. OWASP's advice for AI agents: "Implement authorization in downstream systems rather than relying on an LLM to decide if an action is allowed or not."<span class="note"><a href="https://genai.owasp.org/llmrisk/llm062025-excessive-agency/">OWASP LLM06:2025 Excessive Agency</a>.</span> Exein says the same for robots: "enforcement must live below the model, in the kernel, the OS, or the hardware, where a prompt cannot reach."<span class="note"><a href="https://www.exein.io/blog/threat-modeling-physical-ai">Exein, "Threat modeling physical AI"</a> (10 July 2026).</span></p>
+
+<p><strong>Motion limits</strong> say where and how the arm may move, whatever the AI asks. L3 enforces them in software. L4 enforces them with certified safety functions. From January 2027, EU law requires that the control system of a learning machine "shall not cause the machinery or related product to perform actions beyond its defined task and movement space".<span class="note"><a href="https://eur-lex.europa.eu/eli/reg/2023/1230/oj/eng">EU Machinery Regulation 2023/1230</a>, Annex III, 1.2.1.</span></p>
+
+<div class="bridge">
+  <span class="tag tag-act">You already know this</span>
+  <p>Permissions are access control for the AI: an allowlist of actions with bounded parameters, its own identity, and no way to grant itself more. Motion limits are the sandbox it runs in. The difference: in a robot cell, the strongest part of the sandbox is certified hardware.</p>
+</div>
+
+<h2>Permissions: what the AI may ask for</h2>
+
+<p>Here is a permission table for the running example. The planner asks for actions; something outside the model decides.</p>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">The planner asks for…</th><th scope="col">Decision</th><th scope="col">Enforced where</th></tr></thead>
+  <tbody>
+    <tr><td>Pick a part that is on this job's parts list</td><td><span class="tag tag-safe">Allowed</span></td><td>L1 allowlist</td></tr>
+    <tr><td>Pick something else, such as a cutter or a phone</td><td><span class="tag tag-stop">Refused</span> and a person is asked</td><td>L1</td></tr>
+    <tr><td>Place a part in bin A, B or C</td><td><span class="tag tag-safe">Allowed</span></td><td>L1 allowlist</td></tr>
+    <tr><td>Move to a pose outside the work area</td><td><span class="tag tag-stop">Refused</span></td><td>L3 software limit</td></tr>
+    <tr><td>Move faster than the cell allows</td><td><span class="tag tag-stop">Impossible</span>: the AI has no such action</td><td>Not exposed; L4 limit anyway</td></tr>
+    <tr><td>Change a safety setting</td><td><span class="tag tag-stop">Impossible</span>: never exposed to the AI</td><td>L4 settings need a key</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Five rules make this work:</p>
+<ul>
+  <li><strong>Default-deny.</strong> Give the AI only the actions the job needs, with bounded parameters. Exein: "Default-deny is the posture."</li>
+  <li><strong>Check plans outside the model.</strong> RoboGuard grounds written rules in the robot's environment with a "root-of-trust LLM" that is shielded from user prompts, turns them into "temporal logic constraints", and checks each plan against them. Under jailbreak attacks, unsafe plans executed fell "from over 92% to below 3%".<span class="note"><a href="https://arxiv.org/abs/2503.07885">Ravichandran et al., "Safety Guardrails for LLM-Enabled Robots"</a> (2025).</span></li>
+  <li><strong>Refuse or ask when unsure.</strong> DeepMind's list of guardrails for robot agents includes "refusing tasks that violate operational constraints" and "requesting human help" when instructions are ambiguous.<span class="note"><a href="https://storage.googleapis.com/deepmind-media/gemini-robotics/Gemini-Robotics-2-Safety.pdf">Google DeepMind, Gemini Robotics 2: Safety Evaluations</a> (July 2026), p. 1.</span></li>
+  <li><strong>A separate identity for the AI.</strong> "The agent needs its own identity: its own user, its own process boundary." Never root, never a shared service account.</li>
+  <li><strong>No self-granting.</strong> The AI, and the people who chat with it, can never change the AI's permissions or any limit.</li>
+</ul>
+
+<h2>Motion limits: where and how the arm may move</h2>
+
+<h3>Software limits (L3)</h3>
+<p>A work-area box, joint limits and speed caps in the motion stack. They catch most wrong commands early, and the robot can recover. They are not certified, and they run on the computer an attacker might control.</p>
+
+<h3>Safety-rated limits (L4) in ISO 10218:2025</h3>
+<p>The 2025 edition of the industrial-robot safety standard, ISO 10218-1/-2, makes these safety functions more explicit:<span class="note">Summary from <a href="https://arxiv.org/abs/2602.17822">Hartmann et al. (2026, preprint)</a>, which compares the 2011 and 2025 editions clause by clause. The standard itself is paywalled; check the text before you cite a clause to a client.</span></p>
+<ul>
+  <li><strong>Monitored standstill</strong> (the new name for "safety-rated monitored stop"), speed monitoring, and limits on stopping time and stopping distance.</li>
+  <li><strong>Software limits and dynamic motion limits</strong> (clauses 5.7.4–5.7.5), which replace the old term "safety-rated soft axis and space limiting".</li>
+  <li><strong>Robot classes.</strong> Class I is a robot with "manipulator mass ≤ 10 kg, maximum force ≤ 50 N, and speed ≤ 250 mm/s"; anything bigger is Class II. Class II safety functions need PL d and SIL 2; Class I needs PL b or SIL 1.</li>
+  <li><strong>Protected settings.</strong> Safety-function parameters are protected with checksums and identifiers (clause 5.3.5).</li>
+</ul>
+
+<div class="keyrule">
+  <span class="tag tag-hazard">Key rule</span>
+  <p class="big">No robot and no AI is "collaborative" on its own. The application is.</p>
+  <p>ISO 10218:2025 treats collaboration as "exclusively a property of the application, rather than the machine". The four collaborative modes from ISO/TS 15066 are now part of the standard: monitored standstill, hand guiding, speed and separation monitoring, and power and force limiting.<span class="note"><a href="https://arxiv.org/abs/2602.17822">Hartmann et al.</a>; modes as listed in the <a href="https://storage.googleapis.com/deepmind-media/gemini-robotics/Gemini-Robotics-2-Safety.pdf">DeepMind safety report</a>, p. 12.</span> The body-region force limits from ISO/TS 15066 now appear in ISO 10218-2:2025, Annex M (informative).</p>
+</div>
+
+<h3>Japan's rules</h3>
+<ul>
+  <li><strong>Which robots.</strong> The industrial-robot rules do not apply to a machine whose drive motor is rated "八〇ワツト以下" (80 W or less). With several motors, the largest one counts.<span class="note"><a href="https://www.mhlw.go.jp/web/t_doc?dataId=74084000&amp;dataType=0&amp;pageNo=1">Ministry of Labour Notice No. 51</a> (1983).</span></li>
+  <li><strong>The fence rule.</strong> Where contact with a running robot could endanger workers, the employer must provide "さく又は囲いを設ける等" (a fence, an enclosure or other measures).<span class="note">Ordinance on Industrial Safety and Health, <a href="https://laws.e-gov.go.jp/law/347M50002000032">Art. 150-4</a>.</span></li>
+  <li><strong>Two routes to work without a fence</strong> (2013 notice 基発1224第2号). (1) A risk assessment shows the danger is gone. It must look especially at the arm's force and kinetic energy, the chance of a person being trapped against surrounding structures, and the arm's shape. The results must be recorded and kept. (2) The robot is designed, made and installed to ISO 10218-1/-2:2011, and the designer, maker and installer each prepare a technical file and a declaration of conformity.<span class="note"><a href="https://www.mhlw.go.jp/bunya/roudoukijun/dl/pamphlet_140115.pdf">MHLW leaflet</a> (December 2013).</span></li>
+  <li><strong>MHLW's examples of "no danger".</strong> Keep at least 500 mm between the arm and surrounding structures, or make sure a trapped person can be freed by hand without drive power. For force, the example counts only if the limit is guaranteed "制御によらず構造的に" (structurally, not by control). This is one example, not the only route, but it shows how cautious Japanese guidance is about limits that depend on software.</li>
+  <li><strong>Standards status.</strong> JIS B 8433-1/-2:2015 still match the 2011 edition of ISO 10218; the 2025 edition has not yet been adopted as JIS.<span class="note"><a href="https://www.jisc.go.jp/app/jis/general/GnrJISNumberNameSearchList?show&amp;jisStdNo=B8433">JISC database</a> (checked October 2026).</span></li>
+  <li><strong>PoCs count.</strong> A completed machine used on a trial basis at a production site is not "研究開発中のもの" (under research and development), so the rules apply to a PoC on a client's line.<span class="note"><a href="https://www.mhlw.go.jp/web/t_doc?dataId=00tb9779&amp;dataType=1&amp;pageNo=1">MHLW notice 基発第339号</a>, 第3 Ⅰ 1(6).</span></li>
+</ul>
+
+<h2>Who may change the limits</h2>
+
+<p>A limit is only as strong as the process that changes it. For each limit, name its owner and its change control:</p>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Limit</th><th scope="col">Lives in</th><th scope="col">Who may change it</th><th scope="col">Controls</th></tr></thead>
+  <tbody>
+    <tr><td>Task and object allowlist</td><td>L1 guardrail settings</td><td>The line or safety owner, through a reviewed change</td><td>Version control, review, change log</td></tr>
+    <tr><td>Action bounds for the AI (work area, speeds)</td><td>L3 motion stack</td><td>Engineering, through code review and tests</td><td>Re-test after every change</td></tr>
+    <tr><td>Safety-rated limits and protective fields</td><td>L4 safety controller</td><td>Only an authorized, trained safety person</td><td>Password or key, checksum, change log, re-validation</td></tr>
+    <tr><td>Teaching inside the motion range</td><td>Work procedure</td><td>Workers with the required special education</td><td>Written rules (including the arm's speed during teaching), a way to stop the robot at once, and a "work in progress" sign</td></tr>
+    <tr><td>Stoppers and guards</td><td>L5 hardware</td><td>Maintenance, following the procedure</td><td>Inspection</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="sources">Teaching rules: Ordinance on Industrial Safety and Health, <a href="https://laws.e-gov.go.jp/law/347M50002000032">Art. 150-3</a>. Special education for teaching work is at least 7 hours of classroom and 3 hours of practical training (<a href="https://www.mhlw.go.jp/web/t_doc?dataId=74085000&amp;dataType=0">安全衛生特別教育規程</a>, Art. 18).</p>
+
+<p>EU law adds record-keeping. The machine must "collect evidence of a legitimate or illegitimate intervention" in its software or configuration. The tracing log of safety software uploads must be kept "for five years after such upload". For machines with self-evolving behavior, data on safety decisions "is retained for one year after its collection".<span class="note"><a href="https://eur-lex.europa.eu/eli/reg/2023/1230/oj/eng">EU Machinery Regulation</a>, Annex III, 1.1.9 and 1.2.1.</span></p>
+
+<h2>Practice: name the limit</h2>
+
+<div class="widget" data-widget="sorter" data-title="Which kind of limit is this?">
+<script type="application/json">
+{"buckets": [
+  {"id": "L1", "short": "L1", "label": "Permission: what the AI may ask for"},
+  {"id": "L3", "short": "L3", "label": "Software motion limit"},
+  {"id": "L4", "short": "L4", "label": "Safety-rated motion limit"},
+  {"id": "L5", "short": "L5", "label": "Physical limit or procedure"}
+ ],
+ "missDefault": "Ask: is this about what the AI may ask for (L1), a software limit (L3), a certified limit (L4), or hardware and procedures (L5)?",
+ "items": [
+  {"text": "The planner may only pick parts that are on this job's parts list.",
+   "answer": "L1",
+   "why": "A permission: it limits what the AI may ask for. Enforce it outside the model.",
+   "miss": {"L3": "The motion stack does not know the parts list. This limits which task is allowed.",
+            "L4": "The safety controller checks speed, distance and zones, not which part is picked."}},
+  {"text": "The VLA's target positions are clipped to a box around the bins.",
+   "answer": "L3",
+   "why": "A software motion limit in the motion stack. It is useful and lets the robot recover, but it is not certified.",
+   "miss": {"L4": "It is enforced by the ordinary motion stack, not by a certified safety function.",
+            "L1": "It limits where the arm goes, not which task the AI may request."}},
+  {"text": "The safety controller limits the arm's speed near the operator's station, and stops the arm if the limit is exceeded.",
+   "answer": "L4",
+   "why": "A safety-rated limit. It works whatever the AI or the motion stack does.",
+   "miss": {"L3": "A safety controller is certified hardware, so this is L4, not ordinary software."}},
+  {"text": "A mechanical stopper keeps the base joint from turning toward the walkway.",
+   "answer": "L5",
+   "why": "A physical limit. In Japan, stoppers are what make the legal motion range smaller.",
+   "miss": {"L4": "No safety function is involved. The stopper limits motion physically."}},
+  {"text": "Only the line supervisor can add a new task, through a reviewed change. The chat window cannot.",
+   "answer": "L1",
+   "why": "Permission governance: neither the AI nor its users can grant new abilities through the chat.",
+   "miss": {"L5": "This is about the AI's permissions, not a work procedure inside the cell."}},
+  {"text": "If the camera image is too old, the motion stack stops sending VLA commands.",
+   "answer": "L3",
+   "why": "A software watchdog in the motion stack. It catches stale input early.",
+   "miss": {"L4": "It runs in the ordinary motion stack. L4 still protects people if this check fails."}},
+  {"text": "The robot stops when a person enters the safety scanner's protective field.",
+   "answer": "L4",
+   "why": "A certified protective stop, triggered by a safety-rated sensor.",
+   "miss": {"L3": "The scanner and the stop are safety-rated, so this is L4."}},
+  {"text": "Before teaching inside the motion range, the worker follows written rules for the arm's speed and puts a \"work in progress\" sign on the start switch.",
+   "answer": "L5",
+   "why": "A procedure. Japan's Article 150-3 requires these measures for teaching work.",
+   "miss": {"L1": "This controls people's work inside the cell, not the AI's permissions."}}
+ ]}
+</script>
+</div>
+
+<h2>Check yourself</h2>
+
+<div class="widget" data-widget="quiz" data-title="Four questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "Under Japan's rules, when is a machine excluded from the industrial-robot rules because of its motor power?",
+   "options": ["When the total motor power is under 80 W",
+               "When the whole arm weighs less than 80 kg",
+               "When every drive motor is 80 W or less",
+               "When the arm always moves slower than 80 mm/s"],
+   "answer": 2,
+   "why": ["The notice compares the largest single motor, not the total.",
+           "The exclusion is about motor power, not weight. Weight matters for ISO 10218 robot classes, which is a different rule.",
+           "Notice No. 51 (1983) excludes machines whose drive motors are rated 80 W or less. With several motors, the largest one counts.",
+           "Speed matters for risk assessment and for ISO robot classes, but this Japanese exclusion is about rated motor output."]},
+  {"prompt": "Under ISO 10218:2025, what makes a robot application collaborative?",
+   "options": ["The robot maker's collaborative label on the arm",
+               "The application design and its own risk assessment",
+               "An AI model that can detect people nearby",
+               "Drive motors that are all under 80 watts"],
+   "answer": 1,
+   "why": ["The 2025 edition drops the idea of a collaborative robot by itself. A label on the arm proves nothing.",
+           "Collaboration is \"exclusively a property of the application, rather than the machine\". The application's risk assessment decides.",
+           "AI person-detection is not a safety function, and it does not make an application collaborative.",
+           "The 80 W rule is a Japanese legal threshold, not what makes an application collaborative."]},
+  {"prompt": "Who should be able to raise a safety-rated speed limit?",
+   "options": ["The LLM planner, when the task needs more speed",
+               "Any operator who asks for that in the chat",
+               "The vendor's cloud service, at any time it likes",
+               "Only a trained safety person, through a logged change"],
+   "answer": 3,
+   "why": ["The AI must never be able to change its own limits.",
+           "Chat users must not be able to grant the robot new abilities.",
+           "An outside service that can change safety settings is entry point E8 reached through E7, the worst case.",
+           "A safety-rated limit needs an owner, a key, a checksum, a change log and re-validation."]},
+  {"prompt": "A finished robot is tried out on a client's production line as a PoC. In Japan, can it be treated as \"under R&D\" and left outside the industrial-robot rules?",
+   "options": ["No: trials at production sites do not count as R&D",
+               "Yes: any PoC still counts as research and development work",
+               "Yes, but only while no contract has been signed yet",
+               "That depends only on which country built the robot arm"],
+   "answer": 0,
+   "why": ["MHLW says a completed machine used on a trial basis at a production site is not \"under research and development\". If its largest motor is above 80 W, the rules apply to the PoC.",
+           "The exclusion is narrow. It covers a machine that is itself under development, not a finished machine on trial.",
+           "Contracts do not matter here. What matters is whether the machine itself is still under development.",
+           "Where the robot was built does not matter for this rule."]}
+ ]}
+</script>
+</div>
+
+<div class="widget recall" id="recall-l3" data-widget="recall" data-title="From memory">
+  <p class="recall-prompt">For the running example, write two permission limits and two motion limits. For each one, say where it is enforced and who may change it.</p>
+  <div class="recall-answer">
+    <p><strong>Permission 1.</strong> The planner may only pick parts on the job's parts list and place them in bins A to C. Enforced by an L1 guardrail outside the model. Changed only by the line owner, through a reviewed change.</p>
+    <p><strong>Permission 2.</strong> The AI has no action that changes speeds or safety settings. Nothing is exposed, so nobody can grant it through the chat.</p>
+    <p><strong>Motion limit 1.</strong> VLA targets are clipped to the bin area. Enforced in the L3 motion stack. Changed by engineering, with tests.</p>
+    <p><strong>Motion limit 2.</strong> A safety-rated speed limit and protective field near the operator's station. Enforced by the L4 safety controller. Changed only by an authorized safety person, with a checksum, a change log and re-validation.</p>
+  </div>
+</div>
+
+<h2>Summary: extension or new?</h2>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Extension of conventional measures</th><th scope="col">New for physical AI</th></tr></thead>
+  <tbody>
+    <tr><td>Authorization outside the application, least privilege, default-deny</td><td>Bounding a model whose output is continuous motion, not a list of API calls</td></tr>
+    <tr><td>A separate identity for the AI process, never root</td><td>Permissions about meaning (which object goes where), checked by a guardrail grounded in the scene</td></tr>
+    <tr><td>Change control, keys and logs for configuration</td><td>EU law: a learning machine must stay within its "defined task and movement space", and machine-learning safety components need third-party assessment</td></tr>
+    <tr><td>Safety-rated limits, fences and lockout from machine safety (ISO 10218; Japan Art. 150-3 to 150-5)</td><td>A year of safety-decision data kept for machines with self-evolving behavior</td></tr>
+    <tr><td>Training before risky work (special education)</td><td>Collaboration as a property of the application: no AI and no robot model is "safe" on its own</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Read the primary source</h2>
+
+<div class="source">
+  <p class="title"><a href="https://www.mhlw.go.jp/bunya/roudoukijun/dl/pamphlet_140115.pdf">MHLW, 「産業用ロボットと人との協働作業が可能となる安全基準を明確化しました」 (December 2013)</a></p>
+  <p>Two pages, in Japanese. About 15 minutes.</p>
+  <p>Why this one: it is the official Japanese basis for working next to a robot without a fence, including the two routes, the examples of "no danger", and what a technical file must contain. Read it with the 2025 changes in mind, because it names the 2011 edition of ISO 10218. For the international side, the <a href="https://arxiv.org/abs/2602.17822">Hartmann et al. comparison</a> is the best free summary of ISO 10218:2025.</p>
+</div>
+
+<div class="ask">
+  <p><strong>Ask your teacher.</strong> Questions are part of the lesson. Ask Claude anything that is unclear. For example:</p>
+  <p>"How does a risk assessment under route (1) work in practice?" · "What goes into a technical file?" · "How would the permission table look for an LLM planner with tool calls?"</p>
+</div>
+
+<h2>Next</h2>
+<p><strong><a href="0004-protect-data-models-and-know-how.html">Lesson 4: Protect data, models and know-how.</a></strong> How to protect training data, models and the know-how inside them, and how to manage AI and OSS components as you would any other software supply chain.</p>
+
+</main>
+
+<nav class="pager" aria-label="Lesson navigation">
+  <a href="0002-threat-model-the-cell.html">← Lesson 2</a>
+  <a href="0004-protect-data-models-and-know-how.html">Lesson 4 →</a>
+</nav>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security · Lesson 3 · Written 16 October 2026. Sources were checked on that date; check dates before you rely on them with a client. A learning aid, not legal advice.</p>
+</footer>
+
+</div></div>
+</body>
+</html>

@@ -23,7 +23,7 @@
 </nav>
 
 <header class="masthead">
-  <p class="eyebrow"><span class="tag tag-plain">Reference</span> Updated 16 October 2026 · Terms from Lessons 1–2</p>
+  <p class="eyebrow"><span class="tag tag-plain">Reference</span> Updated 16 October 2026 · Terms from all lessons</p>
   <h1>Glossary</h1>
   <p class="lede">The words this course uses, with one meaning each. A term joins this list when a lesson teaches it. "Avoid" lists words that mean the same thing or that blur the meaning. Use the main term instead.</p>
 </header>
@@ -91,6 +91,38 @@
   <div class="term"><dt>E6 Wireless setup</dt><dd>Bluetooth, Wi-Fi and other radios used to set up or control the robot nearby.</dd></div>
   <div class="term"><dt>E7 Cloud, fleet and remote access</dt><dd>Vendor support, remote operation, updates and telemetry that cross the cell's boundary.</dd></div>
   <div class="term"><dt>E8 The safety functions</dt><dd>The safety controller's settings and signals. The most valuable asset, because they are the last line.</dd></div>
+</dl>
+
+<h2>Permissions and motion range (Lesson 3)</h2>
+<dl class="terms wide">
+  <div class="term"><dt>Permission (for the AI)</dt><dd>What the AI may ask the robot to do: which tasks, objects, places and actions. Enforced outside the model.</dd></div>
+  <div class="term"><dt>Default-deny</dt><dd>Allow only the actions the job needs, and refuse everything else.</dd></div>
+  <div class="term"><dt>Root-of-trust guardrail</dt><dd>A checker that user prompts cannot reach, which turns written rules into checks on every plan. RoboGuard calls its version a "root-of-trust LLM".</dd></div>
+  <div class="term"><dt>Motion limit</dt><dd>A limit on where and how fast the arm may move: software limits in L3, safety-rated limits in L4, stoppers in L5.</dd></div>
+  <div class="term"><dt>Monitored standstill</dt><dd>ISO 10218:2025's term for a standstill that a safety function watches while people work nearby.<span class="avoid">Avoid: "safety-rated monitored stop" (the older term).</span></dd></div>
+  <div class="term"><dt>Robot class (ISO 10218:2025)</dt><dd>Class I: manipulator mass ≤ 10 kg, force ≤ 50 N and speed ≤ 250 mm/s. Every other robot is Class II, which needs safety functions at PL d and SIL 2.</dd></div>
+  <div class="term"><dt>Collaborative application</dt><dd>An application designed and risk-assessed so that people and the robot can share space. Collaboration is a property of the application, not of the robot.<span class="avoid">Avoid: "collaborative robot" or "cobot" as if the label proved safety.</span></dd></div>
+  <div class="term"><dt>80 W rule (Japan)</dt><dd>A machine whose drive motors are all rated 80 W or less is outside the industrial-robot rules (Notice No. 51, 1983).</dd></div>
+  <div class="term"><dt>Fence-free routes (Japan)</dt><dd>The two 2013 routes to working next to a robot without a fence: a recorded risk assessment that shows no danger, or ISO 10218:2011 robots with a technical file and a declaration of conformity.</dd></div>
+  <div class="term"><dt>Teaching (教示等)</dt><dd>Programming or checking the arm's motions while inside its motion range. It needs written rules, a way to stop the robot at once, and special education.</dd></div>
+  <div class="term"><dt>Special education (特別教育)</dt><dd>Training the employer must give before workers do teaching or inspection work. For teaching: at least 7 hours of classroom and 3 hours of practice.</dd></div>
+</dl>
+
+<h2>From PoC to production (Lesson 6)</h2>
+<dl class="terms wide">
+  <div class="term"><dt>Stage gate</dt><dd>A decision point between project stages, with evidence that must exist before the project moves on.</dd></div>
+  <div class="term"><dt>Operating conditions</dt><dd>The written conditions under which a system is claimed to be safe, such as objects, lighting and people's access.<span class="avoid">Also called: operational design domain (ODD).</span></dd></div>
+  <div class="term"><dt>Safety case</dt><dd>A structured argument, backed by evidence, that a system is acceptably safe for a stated use.</dd></div>
+  <div class="term"><dt>Fault injection</dt><dd>Testing by causing failures on purpose, to show that the safety functions really work.</dd></div>
+  <div class="term"><dt>95% upper bound</dt><dd>The highest failure rate still consistent with your test results at 95% confidence. After 50 failure-free trials it is about 5.8%.</dd></div>
+  <div class="term"><dt>Retraining trigger</dt><dd>The rule that a retrained model is a change, which needs an impact analysis and re-validation even when no code changes.</dd></div>
+</dl>
+
+<h2>Reading vendor claims (Lesson 7)</h2>
+<dl class="terms wide">
+  <div class="term"><dt>First, second and third party</dt><dd>Who checked a claim: the vendor itself, a body that is part of the vendor, or an independent body.</dd></div>
+  <div class="term"><dt>Accreditation</dt><dd>Formal recognition that an inspection or certification body is competent to do its job, for example ANAB accrediting an inspection lab.<span class="avoid">Avoid: treating accreditation of a lab as certification of a product.</span></dd></div>
+  <div class="term"><dt>Readiness inspection</dt><dd>A check of whether a product is ready to be certified. It is not a certificate.</dd></div>
 </dl>
 
 </main>

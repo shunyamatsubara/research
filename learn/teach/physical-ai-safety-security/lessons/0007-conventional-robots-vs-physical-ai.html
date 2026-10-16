@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lesson 7 · Conventional Robots vs Physical AI</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/widgets.js" defer></script>
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap"><div class="page">
+
+<nav class="topnav" aria-label="Course">
+  <a href="../index.html">Course home</a>
+  <a href="0006-from-poc-to-production.html">← Lesson 6</a>
+  <a class="here" href="0007-conventional-robots-vs-physical-ai.html">Lesson 7</a>
+  <a href="0008-capstone-assess-a-client-cell.html">Lesson 8 →</a>
+  <a href="../reference/field-guide.html">Field guide</a>
+  <a href="../reference/glossary.html">Glossary</a>
+</nav>
+
+<header class="masthead">
+  <p class="eyebrow"><span class="tag tag-hazard">Lesson 7</span> About 20 minutes · Running example: an AI pick-and-place cell</p>
+  <h1>Conventional Robots vs Physical AI</h1>
+  <p class="lede">Clients often ask two questions: "How is this different from the robots we already have?" and "The vendor says it is safe. Is it?" This lesson answers both. It gives you a side-by-side comparison, and five questions that separate engineering evidence from marketing.</p>
+  <div class="goal">
+    <span class="tag tag-act">Your goal</span>
+    <p>Explain to a client what stays the same and what changes when a robot cell gets an AI brain, and judge a vendor's safety claim with five questions.</p>
+  </div>
+</header>
+
+<main class="prose">
+
+<h2>Warm-up: earlier lessons from memory</h2>
+
+<div class="widget" data-widget="quiz" data-title="Three quick questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "In Japan, what makes a robot's legal motion range (可動範囲) smaller?",
+   "options": ["Retraining the grasp policy", "Electrical or mechanical stoppers", "Painted yellow floor markings", "Safer programmed robot movements"],
+   "answer": 1,
+   "why": ["Training changes what the AI tries to do, not where the arm can physically go.",
+           "The motion range is the maximum range the robot can structurally move. Only electrical or mechanical stoppers make it smaller.",
+           "Floor markings tell people where to stand. They do not limit the arm.",
+           "The range is not limited to what one program does. A program can change, or be wrong."]},
+  {"prompt": "The VLA was retrained on new demonstrations, with no code change. What does UL 4600's draft require?",
+   "options": ["Nothing, because the code is still unchanged", "A safety case analysis of the change", "Only an updated SBOM for the cell", "A new certificate for the robot arm"],
+   "answer": 1,
+   "why": ["Behavior can change completely without code changes.",
+           "\"Use of a retrained neural network\" is listed as a change that triggers a safety case analysis.",
+           "An SBOM update may be part of it, but the requirement is an analysis of the change.",
+           "The arm did not change. What must be analyzed is the effect of the new model."]},
+  {"prompt": "Which control is an extension of conventional security, not new for physical AI?",
+   "options": ["Treating text in the camera view as untrusted", "Assuming model weights may hide a backdoor trigger", "Putting the cell in its own network zone", "Checking every plan against rules outside the LLM"],
+   "answer": 2,
+   "why": ["No firewall sees text in the scene. That is new.",
+           "Code review cannot see a backdoor in weights. That is new.",
+           "Zones and conduits (IEC 62443) are standard industrial practice. Only the asset inside is new.",
+           "Checking the meaning of a physical plan is new work, even though authorization outside the model is a familiar idea."]}
+ ]}
+</script>
+</div>
+
+<h2>What stays the same</h2>
+
+<p>The hazard is the same: a moving arm with mass, speed and force, and places where a hand can be trapped. So machine safety still applies in full. The ISO 12100 order still holds: remove the hazard first, then protect, then inform users. Safety functions still protect people. Japan's rules still apply: the 80 W threshold, the fence rule (Art. 150-4), the motion range, the teaching and maintenance rules.</p>
+
+<p>Japan's AI Safety Institute starts from the same place: machine-safety principles require "安全関連系を、それ以外の部分から独立させること" (keeping the safety-related part independent from the other parts).<span class="note"><a href="https://aisi.go.jp/output/output_information/260723/">J-AISI, AIロボティクスに関するセーフティ評価観点ガイド v1.0</a> (July 2026), p. 28.</span></p>
+
+<h2>What changes</h2>
+
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Aspect</th><th scope="col">Conventional robot cell</th><th scope="col">Physical AI cell</th><th scope="col">What it means for you</th></tr></thead>
+  <tbody>
+    <tr><td>Where behavior comes from</td><td>A program, taught with a teach pendant</td><td>A model learned from data and demonstrations</td><td><span class="tag tag-hazard">New</span> Test behavior statistically; control the data</td></tr>
+    <tr><td>Predictability</td><td>Same input, same motion</td><td>Success can fall "from 95% to below 30% under modest perturbations", such as a moved camera</td><td><span class="tag tag-hazard">New</span> Write down the operating conditions and test changes to them</td></tr>
+    <tr><td>Typical failure</td><td>A part breaks: a sensor, a cable, a bug</td><td>Nothing breaks, but the AI is wrong for this situation</td><td><span class="tag tag-hazard">New</span> Hazard analysis must cover losses where "none of which may have failed"</td></tr>
+    <tr><td>Inputs an attacker can use</td><td>Network, controller, teach pendant</td><td>Also the scene and natural language</td><td><span class="tag tag-hazard">New</span> E1 and E2 from Lesson 2</td></tr>
+    <tr><td>Assets to protect</td><td>Programs and recipes</td><td>Also training data, demonstrations and model weights</td><td><span class="tag tag-act">Both</span> Old protections, new asset types (Lesson 4)</td></tr>
+    <tr><td>Change</td><td>A reviewed program change</td><td>Retraining changes behavior with no code change</td><td><span class="tag tag-hazard">New</span> Retraining triggers re-validation (Lesson 6)</td></tr>
+    <tr><td>Connections</td><td>Often an isolated cell</td><td>GPU servers, vendor cloud, remote support, telemetry</td><td><span class="tag tag-act">Both</span> Old controls, a much bigger surface (Lesson 5)</td></tr>
+    <tr><td>Where the hazard energy is</td><td>The moving arm</td><td>The same moving arm</td><td><span class="tag tag-safe">Same</span> Same safety functions, same Japanese rules</td></tr>
+    <tr><td>Rules</td><td>Settled: ISO 10218, Japan's rules since 1983</td><td>Moving: EU rules for machine-learning safety components (2027), AI Act dates (2027–2028); in Japan, physical-AI machines are not yet covered by specific rules</td><td><span class="tag tag-hazard">New</span> Check dates on every project</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="sources">Sources: <a href="https://arxiv.org/abs/2510.13626">LIBERO-Plus</a> (2025); <a href="https://psas.scripts.mit.edu/home/get_file.php?name=STPA_Handbook.pdf">STPA Handbook</a> (MIT, 2018); <a href="https://users.ece.cmu.edu/~koopman/ul4600/191213_UL4600_VotingVersion.pdf">UL 4600 voting draft</a>, 12.6.1; <a href="https://eur-lex.europa.eu/eli/reg/2023/1230/oj/eng">EU Machinery Regulation</a>; <a href="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai">EU AI Act timeline</a>; <a href="https://www.mhlw.go.jp/stf/newpage_74141.html">MHLW interim summary</a> (29 June 2026).</p>
+
+<p>NVIDIA puts it in one sentence: "Traditional functional safety methods, built around deterministic software and deductive failure analysis, are necessary but no longer sufficient."<span class="note"><a href="https://docs.nvidia.com/common/resources/Nvidia_Halos_Safety_Evaluation_Framework_Tech_Brief.pdf">NVIDIA Halos Safety Evaluation Framework</a> (2026), conclusion.</span> "Necessary" is the part clients forget. AI adds work; it does not remove any.</p>
+
+<div class="bridge">
+  <span class="tag tag-act">You already know this</span>
+  <p>This is like moving an application to the cloud. The old controls still matter (patching, access control, logging), and new ones are added for new failure modes (misconfigured storage, stolen keys). Nobody says "the cloud is secure, so we can drop patching". The same logic holds here: AI does not replace fences and safety functions.</p>
+</div>
+
+<h2>Reading vendor claims: five questions</h2>
+
+<ol>
+  <li><strong>Who checked it?</strong> First party (the vendor itself), second party (a body that is part of the vendor), or third party (independent)?</li>
+  <li><strong>Against what?</strong> Which standard, which level, which function. "IEC 61508 SIL 2 for the stop function" is a claim you can check. "Certified safe" is not.</li>
+  <li><strong>Done, or in progress?</strong> A certificate is evidence. A readiness inspection, a roadmap or a "when available" product is not, yet.</li>
+  <li><strong>What does their own fine print say?</strong> Model cards, safety notices and usage terms often say more than the marketing page.</li>
+  <li><strong>Who owns the rest?</strong> A certified part does not make the cell safe. The integrator still owns the risk assessment, the cell's safety functions and the safety case.</li>
+</ol>
+
+<h3>A worked case: NVIDIA Halos</h3>
+<div class="table-scroll wide">
+<table>
+  <thead><tr><th scope="col">Question</th><th scope="col">What the evidence shows (October 2026)</th></tr></thead>
+  <tbody>
+    <tr><td>1. Who checked it?</td><td>NVIDIA's AI Systems Inspection Lab is accredited as a "TYPE C (SECOND PARTY) BODY": it is part of NVIDIA. (<a href="https://search.anab.org/public/organization_files/NVIDIA-Corporation-Cert-and-Scope-File-06-06-2025_1749243349.pdf">ANAB scope</a>)</td></tr>
+    <tr><td>2. Against what?</td><td>Its method is "review of documentation", against functional-safety standards such as IEC 61508 and ISO 13849-1. (same source)</td></tr>
+    <tr><td>3. Done or in progress?</td><td>"TÜV Rheinland is inspecting NVIDIA IGX Thor, Halos OS and Holoscan Sensor Bridge": a readiness check, not yet a certificate. (<a href="https://blogs.nvidia.com/blog/physical-ai-halos-safety/">NVIDIA</a>, September 2026)</td></tr>
+    <tr><td>4. Fine print</td><td>The Outside-In Safety Blueprint: "No claims are made on compliance with any Functional Safety and Cybersecurity standards". NVIDIA's GR00T N1.6 model "is not tested or intended for use in mission critical applications that require functional safety". (<a href="https://github.com/NVIDIA/halos-outside-in-safety/blob/develop/SAFETY_NOTICE.md">notice</a>, <a href="https://huggingface.co/nvidia/GR00T-N1.6-3B/blob/main/SAFETY_and_SECURITY.md">model card</a>)</td></tr>
+    <tr><td>5. Who owns the rest?</td><td>Deployment near people "requires your own independent, certified safety system and a complete safety assessment". The robot-arm standards ISO 10218 and ISO/TS 15066 do not appear in the Halos sources reviewed for this course.</td></tr>
+  </tbody>
+</table>
+</div>
+<p>None of this makes Halos bad engineering. Its design follows the doer/checker pattern from Lesson 1. The point is that the evidence supports a smaller claim than "certified safe physical AI", and your client needs to know exactly which claim.</p>
+
+<h2>Practice: evidence or claim?</h2>
+
+<div class="widget" data-widget="sorter" data-title="How much can you rely on it?">
+<script type="application/json">
+{"buckets": [
+  {"id": "EV", "short": "Evidence", "label": "Usable evidence, if you check the document"},
+  {"id": "CK", "short": "Check first", "label": "A claim to check before relying on it"},
+  {"id": "RF", "short": "Red flag", "label": "A red flag: it asks you to rely on the AI or weakens L4"}
+ ],
+ "missDefault": "Ask the five questions: who checked it, against what, done or in progress, what the fine print says, and who owns the rest.",
+ "items": [
+  {"text": "A certificate from an independent test body: IEC 61508 SIL 2 for the robot's stop function, with a certificate number and scope.",
+   "answer": "EV",
+   "why": "Third party, a named standard, a level and a function. Still read the scope and the conditions of use.",
+   "miss": {"CK": "You should read it, but this is the kind of claim you can rely on once checked."}},
+  {"text": "\"Certified\" by the vendor's own inspection lab after a documentation review.",
+   "answer": "CK",
+   "why": "A second-party review of documents is useful input, but it is not independent certification.",
+   "miss": {"EV": "Ask who checked it. A lab that is part of the vendor is not a third party.",
+            "RF": "It does not ask you to rely on the AI. It is just weaker than it sounds."}},
+  {"text": "\"Our camera AI detects people with 98% accuracy, so you do not need a safety scanner.\"",
+   "answer": "RF",
+   "why": "It asks you to replace a safety-rated function with AI detection. AI detection is not a safety function.",
+   "miss": {"CK": "There is nothing to check that would make this acceptable. Keep the scanner."}},
+  {"text": "\"A third-party body is inspecting our platform for certification readiness.\"",
+   "answer": "CK",
+   "why": "In progress is not done. Ask for the date and the scope of the planned certificate.",
+   "miss": {"EV": "A readiness inspection is not a certificate."}},
+  {"text": "\"Safe by design: no pinch points,\" with no test method or data.",
+   "answer": "CK",
+   "why": "Ask for the test method and the measured values (for example, contact forces by body region).",
+   "miss": {"EV": "Without a method and data, this is marketing.",
+            "RF": "It may be true. Ask for the data before relying on it."}},
+  {"text": "The model card says the model is not intended for safety-critical use.",
+   "answer": "EV",
+   "why": "This is reliable evidence about the model's limits. Plan the safety functions without it.",
+   "miss": {"RF": "Honest limits are good news. They tell you where the AI must not be relied on."}},
+  {"text": "\"Our robot complies with ISO 10218-1,\" offered as proof that your cell is safe.",
+   "answer": "CK",
+   "why": "Part 1 covers the robot. The cell (the application) is covered by part 2, plus your risk assessment. The integrator still owns that.",
+   "miss": {"EV": "It may be true for the robot, but it says nothing about the cell."}},
+  {"text": "\"We can change the safety controller's settings from our cloud at any time.\"",
+   "answer": "RF",
+   "why": "This puts entry point E8 behind E7. Safety settings must need a local, authorized, logged change.",
+   "miss": {"CK": "This is not a missing document. It is a design that weakens the last line of defense."}}
+ ]}
+</script>
+</div>
+
+<h2>Check yourself</h2>
+
+<div class="widget" data-widget="quiz" data-title="Three questions">
+<script type="application/json">
+{"questions": [
+  {"prompt": "NVIDIA's AI Systems Inspection Lab is accredited as what kind of inspection body?",
+   "options": ["A fully independent third-party certification body",
+               "A second-party body within NVIDIA itself",
+               "A government regulator for robot safety",
+               "An ISO committee that writes standards"],
+   "answer": 1,
+   "why": ["ANAB's scope calls it a \"TYPE C (SECOND PARTY) BODY\", so it is not independent.",
+           "It is part of NVIDIA, and its method is review of documentation.",
+           "ANAB is an accreditation body; the lab itself is part of NVIDIA, not a regulator.",
+           "It inspects documentation; it does not write standards."]},
+  {"prompt": "Which statement about conventional robots and physical AI is right?",
+   "options": ["Physical AI removes the need for fences and safety functions",
+               "The conventional robot rules no longer apply to AI-driven robots",
+               "Learned policies only fail when a hardware part breaks down",
+               "Same moving energy as before, but new causes of failure"],
+   "answer": 3,
+   "why": ["Safety functions are still \"necessary\". AI adds work; it removes none.",
+           "In Japan, the industrial-robot rules apply to an AI-driven arm in the same way.",
+           "A learned policy can be wrong with nothing broken.",
+           "The hazard is the same moving arm. What changes is why it might move wrongly: data, unusual input, language, attacks."]},
+  {"prompt": "What does NVIDIA's model card for GR00T N1.6 say about functional safety?",
+   "options": ["It is certified to IEC 61508 SIL 3 already",
+               "It fully replaces the need for a safety controller",
+               "It is not tested or intended for functional-safety use",
+               "It is safe whenever it runs on IGX Thor"],
+   "answer": 2,
+   "why": ["The model has no such certificate.",
+           "No AI model replaces a safety controller.",
+           "The card says it \"is not tested or intended for use in mission critical applications that require functional safety\".",
+           "The computer it runs on does not change what the model is intended for."]}
+ ]}
+</script>
+</div>
+
+<div class="widget recall" id="recall-l7" data-widget="recall" data-title="From memory">
+  <p class="recall-prompt">A client's manager asks: "We already run conventional robots safely. What is really different with physical AI?" Answer in three sentences.</p>
+  <div class="recall-answer">
+    <p>1. The hazard is the same moving arm, so everything you do today still applies: risk assessment, fences or safety functions, and Japan's robot rules.</p>
+    <p>2. What changes is where behavior comes from: it is learned from data, it can be wrong with nothing broken, it can be steered through the camera view or language, and it changes when the model is retrained.</p>
+    <p>3. So we add work, not remove it: statistical testing under written conditions, protection of data and models, controls on the new connections, and re-validation after every retraining, while the certified safety layer stays independent of the AI.</p>
+  </div>
+</div>
+
+<h2>Summary: the whole course on one page</h2>
+<p>The <a href="../reference/extension-vs-new.html">Extension vs New</a> reference collects the summary tables from every lesson, organized by your seven themes. Use it to plan a client assessment or a proposal.</p>
+
+<h2>Read the primary source</h2>
+
+<div class="source">
+  <p class="title"><a href="https://developer.nvidia.com/blog/inside-nvidia-halos-for-robotics-a-full-stack-functional-safety-system-for-physical-ai/">NVIDIA, "Inside NVIDIA Halos for Robotics" (22 June 2026)</a></p>
+  <p>Read it with the five questions open, then read page 1 of the <a href="https://search.anab.org/public/organization_files/NVIDIA-Corporation-Cert-and-Scope-File-06-06-2025_1749243349.pdf">ANAB scope</a> and the blueprint's <a href="https://github.com/NVIDIA/halos-outside-in-safety/blob/develop/SAFETY_NOTICE.md">safety notice</a>. About 30 minutes.</p>
+  <p>Why this one: it is one of the sources you found yourself, and the clearest description of a vendor's full safety stack. Reading it next to the accreditation scope and the fine print is the best practice there is for reading vendor claims.</p>
+</div>
+
+<div class="ask">
+  <p><strong>Ask your teacher.</strong> Questions are part of the lesson. Ask Claude anything that is unclear. For example:</p>
+  <p>"What is the difference between accreditation and certification?" · "How do I read a certificate's scope?" · "Which questions should go into an RFP for a physical AI vendor?"</p>
+</div>
+
+<h2>Next</h2>
+<p><strong><a href="0008-capstone-assess-a-client-cell.html">Lesson 8: Capstone.</a></strong> Put everything together in a short assessment of a fictional client cell.</p>
+
+</main>
+
+<nav class="pager" aria-label="Lesson navigation">
+  <a href="0006-from-poc-to-production.html">← Lesson 6</a>
+  <a href="0008-capstone-assess-a-client-cell.html">Lesson 8 →</a>
+</nav>
+
+<footer class="foot">
+  <p>Physical AI Safety &amp; Security · Lesson 7 · Written 16 October 2026. Sources were checked on that date; check dates before you rely on them with a client. A learning aid, not legal advice.</p>
+</footer>
+
+</div></div>
+</body>
+</html>
