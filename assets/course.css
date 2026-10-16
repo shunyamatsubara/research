@@ -1,0 +1,604 @@
+/* Weakest Link — shared course stylesheet. Every lesson and reference page links this file.
+   Layout: one reading column (about 65 characters) with a right margin for numbered notes on
+   wide screens; on phones the notes fold into the text. Checklists are set like cockpit
+   procedures: CHALLENGE ........ RESPONSE.
+   Fonts (load in each page head):
+   https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&display=swap */
+
+:root {
+  --paper: #F6F7F5;
+  --surface: #FFFFFF;
+  --ink: #1B2128;
+  --graphite: #59646E;
+  --rule: #D5DBDF;
+  --signal: #9A5C00;
+  --signal-wash: #FBEFD3;
+  --link: #1D5FA6;
+  --good: #23704A;
+  --good-wash: #E2F1E7;
+  --bad: #A8322A;
+  --bad-wash: #FAE4E1;
+
+  --font-text: "Literata", Georgia, Cambria, "Times New Roman", serif;
+  --font-label: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --step--2: 0.78rem;
+  --step--1: 0.9rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.3rem;
+  --step-2: 1.65rem;
+  --step-3: 2.3rem;
+
+  --measure: 40rem;
+  --note-width: 15rem;
+  --note-gap: 2.5rem;
+  --radius: 5px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12161A;
+    --surface: #1A1F25;
+    --ink: #E4E8EB;
+    --graphite: #9BA6B0;
+    --rule: #2D353D;
+    --signal: #E3A646;
+    --signal-wash: #36290F;
+    --link: #8AB8F0;
+    --good: #6FCB97;
+    --good-wash: #14301F;
+    --bad: #F2948B;
+    --bad-wash: #3B1916;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #12161A;
+  --surface: #1A1F25;
+  --ink: #E4E8EB;
+  --graphite: #9BA6B0;
+  --rule: #2D353D;
+  --signal: #E3A646;
+  --signal-wash: #36290F;
+  --link: #8AB8F0;
+  --good: #6FCB97;
+  --good-wash: #14301F;
+  --bad: #F2948B;
+  --bad-wash: #3B1916;
+  color-scheme: dark;
+}
+
+/* ---------- Base ---------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: var(--step-0);
+  line-height: 1.62;
+  font-optical-sizing: auto;
+  counter-reset: note;
+}
+
+.page {
+  max-width: calc(var(--measure) + 32px);
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 2.25rem 5rem;
+}
+
+p, ul, ol { margin: 0 0 1rem; }
+ul, ol { padding-left: 1.3rem; }
+li + li { margin-top: 0.3rem; }
+strong { font-weight: 650; }
+em { font-style: italic; }
+
+a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 0.16em; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+h1, h2, h3 { text-wrap: balance; }
+
+h1 {
+  font-weight: 600;
+  font-size: var(--step-3);
+  line-height: 1.12;
+  letter-spacing: -0.012em;
+  margin: 0.4rem 0 1rem;
+}
+
+h2 {
+  font-weight: 600;
+  font-size: var(--step-2);
+  line-height: 1.2;
+  margin: 3.25rem 0 0.9rem;
+}
+
+h3 {
+  font-weight: 600;
+  font-size: var(--step-1);
+  line-height: 1.3;
+  margin: 2rem 0 0.6rem;
+}
+
+/* Small uppercase label that says what kind of section follows (Idea, Practice, Use it...). */
+.kicker {
+  display: block;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: var(--step--2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--signal);
+  margin-bottom: 0.35rem;
+}
+
+.lede { font-size: var(--step-1); line-height: 1.5; color: var(--ink); }
+.muted { color: var(--graphite); }
+.small { font-size: var(--step--1); }
+
+hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }
+
+/* ---------- Top bar and footer navigation ---------- */
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+  color: var(--graphite);
+  margin-bottom: 1.75rem;
+}
+.crumbs a { color: var(--graphite); }
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+  color: var(--graphite);
+  margin: 0 0 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.nav-foot {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1rem;
+  border-top: 1px solid var(--rule);
+  margin-top: 3.5rem;
+  padding-top: 1.25rem;
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+}
+.nav-foot span { display: block; color: var(--graphite); text-transform: uppercase; letter-spacing: 0.08em; font-size: var(--step--2); }
+
+/* ---------- Numbered margin notes (Tufte-style) ---------- */
+/* Markup: text<span class="ref"></span><span class="note">Source…</span> inside a paragraph. */
+
+.ref { counter-increment: note; }
+.ref::after {
+  content: counter(note);
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 0.68em;
+  line-height: 0;
+  vertical-align: super;
+  color: var(--signal);
+  margin-left: 0.08em;
+}
+
+.note {
+  display: block;
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--graphite);
+  margin: 0.4rem 0 0.9rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--rule);
+}
+.note::before {
+  content: counter(note) "\00a0 ";
+  font-family: var(--font-label);
+  font-weight: 600;
+  color: var(--signal);
+}
+
+@media (min-width: 70rem) {
+  .page {
+    max-width: calc(var(--measure) + var(--note-width) + var(--note-gap) + 32px);
+    padding-right: calc(var(--note-width) + var(--note-gap) + max(16px, env(safe-area-inset-right, 0px)));
+  }
+  .note {
+    float: right;
+    clear: right;
+    width: var(--note-width);
+    margin: 0.3rem calc(-1 * (var(--note-width) + var(--note-gap))) 1rem 0;
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* ---------- Boxes (used sparingly) ---------- */
+
+.goal {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+  margin: 1.5rem 0 2rem;
+}
+.goal p:last-child, .goal ul:last-child { margin-bottom: 0; }
+
+.callout {
+  background: var(--signal-wash);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+  margin: 1.5rem 0;
+}
+.callout p:last-child { margin-bottom: 0; }
+
+blockquote {
+  margin: 1.5rem 0;
+  padding: 0 0 0 1.1rem;
+  border-left: 3px solid var(--signal);
+  font-style: italic;
+  font-size: var(--step-1);
+  line-height: 1.45;
+}
+blockquote footer { font-style: normal; font-family: var(--font-label); font-size: var(--step--1); color: var(--graphite); margin-top: 0.5rem; }
+
+/* ---------- The chain diagram ---------- */
+/* <ol class="chain"><li class="link"><span class="link-name">Question</span><span class="link-check">…</span></li>…</ol> */
+
+.chain {
+  position: relative;
+  list-style: none;
+  padding: 0;
+  margin: 1.75rem 0 2.25rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+.chain::before {
+  content: "";
+  position: absolute;
+  left: 1.25rem;
+  right: 1.25rem;
+  top: 1.05rem;
+  height: 2px;
+  background: var(--ink);
+}
+.chain .link { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0.55rem; min-width: 0; margin: 0; }
+.link-name {
+  display: inline-block;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  padding: 0.2rem 0.95rem;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: var(--step--1);
+  line-height: 1.4;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.link-check { font-size: var(--step--1); line-height: 1.45; color: var(--graphite); }
+
+@media (max-width: 40rem) {
+  .chain { grid-template-columns: minmax(0, 1fr); gap: 0.85rem; }
+  .chain::before { left: 4.1rem; right: auto; top: 0.6rem; bottom: 0.6rem; width: 2px; height: auto; }
+  .chain .link { display: grid; grid-template-columns: 8.2rem minmax(0, 1fr); align-items: center; gap: 0.75rem; }
+  .link-name { text-align: center; }
+}
+
+/* ---------- Tables ---------- */
+
+.table-wrap { overflow-x: auto; margin: 1.25rem 0 1.75rem; }
+table { border-collapse: collapse; width: 100%; font-size: var(--step--1); line-height: 1.45; }
+th {
+  font-family: var(--font-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: var(--step--2);
+  text-align: left;
+  color: var(--graphite);
+  border-bottom: 1.5px solid var(--ink);
+  padding: 0.45rem 0.75rem 0.45rem 0;
+}
+td { border-bottom: 1px solid var(--rule); padding: 0.6rem 0.75rem 0.6rem 0; vertical-align: top; }
+td:first-child { font-family: var(--font-label); font-weight: 600; white-space: nowrap; }
+
+/* ---------- Retrieval practice: recall first, then reveal ---------- */
+
+details.recall {
+  border: 1.5px dashed var(--signal);
+  background: var(--signal-wash);
+  border-radius: var(--radius);
+  padding: 0.85rem 1.1rem;
+  margin: 1.5rem 0;
+}
+details.recall summary {
+  cursor: pointer;
+  font-family: var(--font-label);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+details.recall[open] summary { margin-bottom: 0.6rem; }
+details.recall p:last-child, details.recall ol:last-child { margin-bottom: 0; }
+
+/* ---------- Quiz (assets/quiz.js) ---------- */
+
+.quiz { display: grid; gap: 1.1rem; margin: 1.5rem 0; }
+.q {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem 1.05rem;
+  min-width: 0;
+}
+.q-num {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: var(--step--2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  margin: 0 0 0.35rem;
+  font-variant-numeric: tabular-nums;
+}
+.q-text { margin: 0 0 0.85rem; }
+.q-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; }
+@media (max-width: 36rem) { .q-options { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.opt {
+  font-family: var(--font-label);
+  font-weight: 500;
+  font-size: var(--step--1);
+  line-height: 1.25;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.6rem 0.7rem;
+  text-align: center;
+  cursor: pointer;
+}
+.opt:hover { border-color: var(--ink); }
+.q.is-done .opt { cursor: default; }
+.q.is-done .opt:hover { border-color: var(--rule); }
+.opt.is-right { border-color: var(--good); background: var(--good-wash); color: var(--ink); }
+.opt.is-right::before { content: "\2713\00a0"; color: var(--good); font-weight: 600; }
+.opt.is-wrong { border-color: var(--bad); background: var(--bad-wash); color: var(--ink); }
+.opt.is-wrong::before { content: "\2717\00a0"; color: var(--bad); font-weight: 600; }
+.q-why { margin: 0.85rem 0 0; font-size: var(--step--1); line-height: 1.55; }
+.q-verdict {
+  display: inline-block;
+  font-family: var(--font-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--step--2);
+  margin-right: 0.4rem;
+}
+.q-verdict.is-right { color: var(--good); }
+.q-verdict.is-wrong { color: var(--bad); }
+.quiz-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+  border-top: 1px solid var(--rule);
+  padding-top: 0.85rem;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  padding: 0.75rem 1.05rem;
+  border-radius: 4px;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+}
+.btn:hover { background: var(--graphite); border-color: var(--graphite); }
+.btn.quiet { background: transparent; color: var(--ink); }
+.btn.quiet:hover { background: var(--surface); border-color: var(--ink); }
+
+/* ---------- AI rally prompt builder (assets/rally.js) ---------- */
+
+.rally {
+  display: grid;
+  gap: 0.7rem;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.15rem 1.2rem;
+  margin: 1.5rem 0;
+}
+.rally label, .field-label {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: var(--step--2);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.rally input, .rally textarea {
+  font-family: var(--font-text);
+  font-size: var(--step-0);
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.55rem 0.7rem;
+  width: 100%;
+}
+.rally textarea { min-height: 6rem; resize: vertical; }
+.rally input::placeholder, .rally textarea::placeholder { color: var(--graphite); opacity: 0.85; }
+.rally-out-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-top: 0.5rem; }
+.tag {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: var(--step--2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--signal);
+  background: var(--signal-wash);
+  border-radius: 3px;
+  padding: 0.15rem 0.45rem;
+}
+.rally-out {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.8rem 0.9rem;
+  width: 100%;
+  min-height: 18rem;
+  resize: vertical;
+}
+.rally-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+.rally-status { font-family: var(--font-label); font-size: var(--step--1); color: var(--graphite); margin: 0; }
+
+/* ---------- Cockpit-style checklist card ---------- */
+/* .checklist > .checklist-head + .check-row (.check-link, .check-line > .check-challenge + .check-leader, .check-response) */
+
+.checklist {
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  margin: 1.5rem 0;
+}
+.checklist-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.5rem 0.9rem;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: var(--step--1);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.check-row {
+  display: grid;
+  grid-template-columns: 6.8rem minmax(0, 1fr) auto;
+  column-gap: 0.75rem;
+  align-items: end;
+  padding: 0.65rem 0.9rem;
+  border-top: 1px solid var(--rule);
+}
+.check-row:first-of-type { border-top: 0; }
+.check-link {
+  align-self: start;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: var(--step--2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--signal);
+  padding-top: 0.2rem;
+}
+.check-line { display: flex; align-items: flex-end; gap: 0.45rem; min-width: 0; }
+.check-challenge { flex: 0 1 auto; min-width: 0; font-size: var(--step-0); line-height: 1.4; }
+.check-leader { flex: 1 1 1.5rem; min-width: 1.5rem; border-bottom: 2px dotted var(--graphite); margin-bottom: 0.38em; }
+.check-response {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: var(--step--1);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding-bottom: 0.08em;
+}
+.check-hint { grid-column: 2 / -1; font-size: var(--step--1); color: var(--graphite); margin-top: 0.25rem; line-height: 1.45; }
+.checklist-foot { border-top: 2px solid var(--ink); padding: 0.6rem 0.9rem; font-size: var(--step--1); color: var(--graphite); }
+
+@media (max-width: 34rem) {
+  .check-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .check-link { grid-column: 1 / -1; padding-top: 0; margin-bottom: 0.15rem; }
+  .check-line { grid-column: 1; }
+  .check-response { grid-column: 2; }
+  .check-hint { grid-column: 1 / -1; }
+}
+
+/* ---------- Lists of lessons / references (course home) ---------- */
+
+.toc { list-style: none; padding: 0; margin: 1rem 0 2rem; border-top: 1px solid var(--rule); }
+.toc li { margin: 0; border-bottom: 1px solid var(--rule); }
+.toc a, .toc .planned {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: baseline;
+  padding: 0.85rem 0;
+  text-decoration: none;
+  color: var(--ink);
+}
+.toc a:hover .toc-title { text-decoration: underline; text-underline-offset: 0.16em; }
+.toc-num { font-family: var(--font-label); font-weight: 600; font-size: var(--step--1); color: var(--signal); letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+.toc-title { font-weight: 600; }
+.toc-sub { display: block; font-size: var(--step--1); color: var(--graphite); font-weight: 400; }
+.toc-time { font-family: var(--font-label); font-size: var(--step--1); color: var(--graphite); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.toc .planned { color: var(--graphite); }
+.toc .planned .toc-num { color: var(--graphite); }
+
+@media (max-width: 30rem) {
+  .toc a, .toc .planned { grid-template-columns: 3.4rem minmax(0, 1fr); }
+  .toc-time { grid-column: 2; }
+}
+
+/* ---------- Motion and print ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
+
+@media print {
+  :root { --paper: #FFFFFF; --surface: #FFFFFF; --ink: #000000; --graphite: #333333; --rule: #BBBBBB; --signal: #6B4000; --signal-wash: #F4F4F4; --link: #000000; color-scheme: light; }
+  body { font-size: 11pt; }
+  .page { max-width: none; padding: 0; }
+  .note { float: none; width: auto; margin: 0.3rem 0 0.6rem; padding-left: 0.6rem; border-left: 1px solid var(--rule); }
+  .no-print, .rally, .quiz, details.recall, .nav-foot, .crumbs { display: none !important; }
+  a { text-decoration: none; }
+  .checklist, .check-row { break-inside: avoid; }
+}

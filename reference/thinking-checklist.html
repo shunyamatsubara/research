@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Thinking Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main class="page">
+
+  <nav class="crumbs" aria-label="Course">
+    <a href="../index.html">Weakest Link: course home</a>
+    <a href="../lessons/0001-four-links-of-thinking.html">Lesson 1: The four links</a>
+  </nav>
+
+  <span class="kicker">Reference</span>
+  <h1>My thinking checklist</h1>
+  <p class="meta"><span>Version 0.1</span><span>From Lesson 1</span><span>Grows by one step each lesson</span></p>
+
+  <p>Think and write first. Then <strong>pause</strong> and run the checklist before you share a text or make a decision. Fix the weakest link first: making a strong link stronger adds nothing.</p>
+
+  <section class="checklist" aria-label="Thinking checklist, version 0.1">
+    <div class="checklist-head"><span>Before you share or decide</span><span>v0.1</span></div>
+    <div class="check-row">
+      <span class="check-link">Question</span>
+      <span class="check-line"><span class="check-challenge">The question in one sentence, and why it matters</span><span class="check-leader" aria-hidden="true"></span></span>
+      <span class="check-response">Written</span>
+    </div>
+    <div class="check-row">
+      <span class="check-link">Ground</span>
+      <span class="check-line"><span class="check-challenge">What it stands on: checked facts vs. untested assumptions</span><span class="check-leader" aria-hidden="true"></span></span>
+      <span class="check-response">Listed</span>
+    </div>
+    <div class="check-row">
+      <span class="check-link">Reasoning</span>
+      <span class="check-line"><span class="check-challenge">Another explanation for the same facts</span><span class="check-leader" aria-hidden="true"></span></span>
+      <span class="check-response">At least one</span>
+    </div>
+    <div class="check-row">
+      <span class="check-link">So-what</span>
+      <span class="check-line"><span class="check-challenge">What this changes, and what would change my mind</span><span class="check-leader" aria-hidden="true"></span></span>
+      <span class="check-response">Written</span>
+    </div>
+    <div class="checklist-foot">Weakest link found? Fix that one first, then run the list again.</div>
+  </section>
+
+  <h2><span class="kicker">The four links</span>What each check protects</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Link</th><th>It fails when…</th><th>Check question</th></tr></thead>
+      <tbody>
+        <tr><td>Question</td><td>the question is vague, or its answer could not change anything</td><td>Am I answering a question that matters?</td></tr>
+        <tr><td>Ground</td><td>the conclusion stands on something false or unchecked</td><td>What do I stand on, and do I know it is true?</td></tr>
+        <tr><td>Reasoning</td><td>a step does not follow, or another explanation fits the same facts</td><td>Does the conclusion follow? What else could explain it?</td></tr>
+        <tr><td>So-what</td><td>the conclusion changes nothing, or nothing could change it</td><td>What does this change? What would change my mind?</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2><span class="kicker">Use it with AI</span>Build a rally prompt</h2>
+  <p>Write your own conclusion first, then copy the prompt into your AI chat. Play three rounds.</p>
+
+  <form class="rally" id="rally-ref" data-rally>
+    <label for="rally-ref-topic">What are you learning or writing about?</label>
+    <input id="rally-ref-topic" data-field="topic" type="text" autocomplete="off"
+      placeholder="Example: whether our team should try a robot foundation model for pick-and-place">
+    <label for="rally-ref-draft">Your current conclusion, in 1–3 sentences</label>
+    <textarea id="rally-ref-draft" data-field="draft"
+      placeholder="Example: We should start a pilot now, because these models learn new tasks from few demonstrations and our competitors are already using them."></textarea>
+    <script type="text/plain" data-rally-template>
+You are my thinking partner. Check my thinking. Do not agree with me just to be kind.
+
+Topic: {{topic}}
+My current conclusion: {{draft}}
+
+Check it against the four links of a chain of thinking:
+1. Question: Is it clear what question this answers, and does that question matter?
+2. Ground: What facts and assumptions does it stand on? Which are checked, and which are untested?
+3. Reasoning: Does the conclusion really follow? What else could explain the same facts?
+4. So-what: What does this change? What would change my mind?
+
+Rules:
+- Find the ONE weakest link. Quote the words from my conclusion that show it.
+- Ask me ONE question that helps me fix it. Do not write the fix for me.
+- No praise and no summary of my text.
+- After I answer, check my revised conclusion again and pick the next weakest link.
+- After three rounds, stop. Tell me which link was weakest overall and what improved.
+    </script>
+    <div class="rally-out-head">
+      <span class="field-label">Your prompt</span>
+      <span class="tag" data-rally-example>Example: write your own above</span>
+    </div>
+    <textarea class="rally-out" id="rally-ref-out" data-rally-out readonly aria-label="Your prompt, ready to copy"></textarea>
+    <div class="rally-actions">
+      <button type="button" class="btn" data-rally-copy>Copy prompt</button>
+      <p class="rally-status" data-rally-status role="status"></p>
+    </div>
+  </form>
+
+  <h2><span class="kicker">Two layers</span>What good thinking is made of</h2>
+  <p>Paul and Elder separate the <strong>standards</strong> a piece of thinking should meet from the <strong>traits</strong> of a good thinker.<span class="ref"></span><span class="note">Foundation for Critical Thinking: <a href="https://www.criticalthinking.org/pages/universal-intellectual-standards/527">Universal Intellectual Standards</a>; <a href="https://www.criticalthinking.org/pages/valuable-intellectual-traits/528">Valuable Intellectual Traits</a>.</span> A checklist can test standards directly. Traits show up only as behaviors, so the checklist asks for the behavior.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Layer</th><th>Items</th><th>How to check</th></tr></thead>
+      <tbody>
+        <tr><td>Standards</td><td>clarity, accuracy, precision, relevance, depth, breadth, logic, significance, fairness</td><td>Read the draft and test each one</td></tr>
+        <tr><td>Traits</td><td>intellectual humility, courage, empathy, autonomy, integrity, perseverance, confidence in reason, fair-mindedness</td><td>Look for the behavior, e.g. "I wrote what would change my mind"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2><span class="kicker">Sources</span>Where each check comes from</h2>
+  <ul class="small">
+    <li><strong>The chain as a whole:</strong> an argument is sound only if its steps are valid and all its starting points are true. <a href="https://iep.utm.edu/val-snd/">"Validity and Soundness"</a>, <cite>Internet Encyclopedia of Philosophy</cite>.</li>
+    <li><strong>The elements inside the links:</strong> Paul &amp; Elder, <a href="https://www.criticalthinking.org/files/Concepts_Tools.pdf"><cite>The Miniature Guide to Critical Thinking: Concepts and Tools</cite></a>.</li>
+    <li><strong>Question:</strong> George Pólya, <a href="https://press.princeton.edu/books/paperback/9780691164076/how-to-solve-it"><cite>How to Solve It</cite></a> (1945): "What is the unknown?"</li>
+    <li><strong>Why you need a check at all:</strong> Richard Feynman, <a href="https://calteches.library.caltech.edu/51/2/CargoCult.htm">"Cargo Cult Science"</a> (1974): "you must not fool yourself—and you are the easiest person to fool."</li>
+    <li><strong>Think before you ask the AI:</strong> Lee et al., <a href="https://www.microsoft.com/en-us/research/publication/the-impact-of-generative-ai-on-critical-thinking-self-reported-reductions-in-cognitive-effort-and-confidence-effects-from-a-survey-of-knowledge-workers/">"The Impact of Generative AI on Critical Thinking"</a> (CHI 2025).</li>
+    <li><strong>Ask the AI for critique, not approval:</strong> Sharma et al., <a href="https://arxiv.org/abs/2310.13548">"Towards Understanding Sycophancy in Language Models"</a> (2023).</li>
+  </ul>
+
+  <h2><span class="kicker">History</span>Versions</h2>
+  <ul class="small">
+    <li><strong>v0.1</strong> (Lesson 1, 2026-10-16): four checks, one per link, plus the first AI rally prompt.</li>
+  </ul>
+
+  <nav class="nav-foot" aria-label="Navigation">
+    <a href="../index.html"><span>Back</span>Course home</a>
+    <a href="../lessons/0001-four-links-of-thinking.html"><span>Lesson</span>1. The four links of thinking</a>
+  </nav>
+
+</main>
+<script src="../assets/rally.js"></script>
+</body>
+</html>

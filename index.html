@@ -1,0 +1,69 @@
+<title>Weakest Link</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="A short course for building a checklist that tests your own thinking, and for sharpening ideas in a back-and-forth with AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&display=swap">
+<link rel="stylesheet" href="assets/course.css">
+<style>
+  /* Course home only: the opening chain sits above the title like a masthead. */
+  .masthead { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin: 0.5rem 0 1.25rem; }
+  .masthead .link-name { font-size: var(--step--2); padding: 0.12rem 0.7rem; }
+  .masthead .bar { width: 1.1rem; height: 2px; background: var(--ink); }
+  .masthead .link-name.weak { border-style: dashed; color: var(--signal); border-color: var(--signal); }
+  .loop { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: 0.75rem; list-style: none; padding: 0; margin: 1rem 0 2rem; counter-reset: loop; }
+  .loop li { margin: 0; border-top: 2px solid var(--ink); padding-top: 0.55rem; font-size: var(--step--1); line-height: 1.45; counter-increment: loop; }
+  .loop li::before { content: counter(loop) "."; display: block; font-family: var(--font-label); font-weight: 600; color: var(--signal); }
+  .loop strong { display: block; font-family: var(--font-label); font-weight: 600; letter-spacing: 0.02em; }
+</style>
+
+<main class="page">
+  <div class="masthead" aria-hidden="true">
+    <span class="link-name">Question</span><span class="bar"></span>
+    <span class="link-name weak">Ground</span><span class="bar"></span>
+    <span class="link-name">Reasoning</span><span class="bar"></span>
+    <span class="link-name">So-what</span>
+  </div>
+
+  <span class="kicker">A short course in checking your own thinking</span>
+  <h1>Weakest Link</h1>
+  <p class="lede">A chain of thinking is only as strong as its weakest link. In this course you build your own checklist for finding that link, and a way to fix it in a back-and-forth with AI.</p>
+
+  <h2>Why this course</h2>
+  <p>You learn new fields fast and you write to explain and argue. The problems you named: too much input, hidden assumptions found too late, and analysis that ends without a clear "so what". Each lesson fixes one of these with one small skill, and adds one line to your checklist.</p>
+  <p class="muted small">Full mission: <code>MISSION.md</code> in your course folder.</p>
+
+  <h2>Lessons</h2>
+  <ol class="toc">
+    <li>
+      <a href="lessons/0001-four-links-of-thinking.html">
+        <span class="toc-num">01</span>
+        <span><span class="toc-title">The four links of thinking</span><span class="toc-sub">A map of where thinking breaks, eight practice cases, and your first AI rally.</span></span>
+        <span class="toc-time">12 min</span>
+      </a>
+    </li>
+    <li><div class="planned"><span class="toc-num">02</span><span><span class="toc-title">The question as a filter</span><span class="toc-sub">Planned. A sharp question lets you drop most of the input.</span></span><span class="toc-time">next</span></div></li>
+    <li><div class="planned"><span class="toc-num">03</span><span><span class="toc-title">Hidden assumptions and first principles</span><span class="toc-sub">Planned. Find what your conclusion stands on.</span></span><span class="toc-time"></span></div></li>
+    <li><div class="planned"><span class="toc-num">04</span><span><span class="toc-title">The so-what</span><span class="toc-sub">Planned. End every analysis with what it changes.</span></span><span class="toc-time"></span></div></li>
+  </ol>
+  <p class="muted small">The plan changes with your progress. Later lessons cover rival explanations, where to spend your brainpower, how to design a checklist, and the full AI rally.</p>
+
+  <h2>Reference</h2>
+  <ol class="toc">
+    <li>
+      <a href="reference/thinking-checklist.html">
+        <span class="toc-num">REF</span>
+        <span><span class="toc-title">My thinking checklist</span><span class="toc-sub">Version 0.1: one check per link, the AI rally prompt, and where each check comes from.</span></span>
+        <span class="toc-time">v0.1</span>
+      </a>
+    </li>
+  </ol>
+
+  <h2>How each lesson works</h2>
+  <ol class="loop">
+    <li><strong>Learn one idea</strong>Short, with sources for every claim.</li>
+    <li><strong>Practice</strong>Cases with instant feedback.</li>
+    <li><strong>Use it</strong>On your own work, in a rally with AI.</li>
+    <li><strong>Report back</strong>Tell your teacher what happened. The next lesson builds on it.</li>
+  </ol>
+</main>
