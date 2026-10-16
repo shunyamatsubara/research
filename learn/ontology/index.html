@@ -1,0 +1,112 @@
+<title>Ontology for Agent Decisions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap">
+<link rel="stylesheet" href="assets/course.css">
+<style>
+  /* course home only */
+  .path { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; counter-reset: lesson; }
+  .path li { display: grid; grid-template-columns: 2.4rem 1fr auto; gap: 0.2rem 0.8rem; align-items: baseline; padding: 0.85rem 0; border-top: 1px solid var(--rule); margin: 0; }
+  .path li:first-child { border-top: 0; }
+  .path .n { font: 600 0.9rem/1 var(--f-mono); color: var(--ink-2); }
+  .path .t { font-weight: 600; min-width: 0; }
+  .path .d { grid-column: 2 / 4; font-size: 0.93rem; color: var(--ink-2); }
+  .path .st { font: 600 0.74rem/1 var(--f-label); letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap; }
+  .path .st.done { color: var(--ok); }
+  .path li.planned .t { font-weight: 400; color: var(--ink-2); }
+  .two { display: grid; gap: 1.6rem; grid-template-columns: 1fr; }
+  @media (min-width: 720px) { .two { grid-template-columns: 1fr 1fr; } }
+  .two > div { min-width: 0; }
+  .plain { list-style: none; padding: 0; }
+  .plain li + li { margin-top: 0.7rem; }
+  .plain .small { display: block; }
+</style>
+
+<main class="page">
+  <div class="col">
+    <p class="eyebrow">Course home</p>
+    <h1>Ontology for Agent Decisions</h1>
+    <p class="lede">A short course for judging tools that say an “ontology” lets AI agents decide reliably from messy input. Running example: health-insurance claim review.</p>
+
+    <h2>Your mission</h2>
+    <p>Vendors, Palantir first, say an ontology makes agent decisions reliable, even deterministic. You want to tell real engineering from marketing, so you can advise on or choose such a tool. By the end you should be able to:</p>
+    <ul>
+      <li>draw from memory where determinism lives in an “agent + ontology” system, and where it does not;</li>
+      <li>explain how a Palantir-style ontology (objects, links, actions) differs from a semantic-web ontology (OWL classes and reasoning);</li>
+      <li>score a vendor demo or docs page with a short list of sharp questions;</li>
+      <li>build a tiny claim reviewer in Python: a model reads, the facts are checked, a rule table decides.</li>
+    </ul>
+
+    <h2>Lessons</h2>
+    <ol class="path">
+      <li data-lesson="0001">
+        <span class="n">01</span>
+        <a class="t" href="lessons/0001-where-determinism-lives.html">Where determinism lives</a>
+        <span class="st">12 min</span>
+        <span class="d">The read step, the decide step, and the ontology as the contract between them. Includes a claim simulator.</span>
+      </li>
+      <li class="planned">
+        <span class="n">02</span><span class="t">What an ontology adds beyond a schema</span><span class="st">Planned</span>
+        <span class="d">Is-a inheritance, constraints, and why a rule written once can cover many cases.</span>
+      </li>
+      <li class="planned">
+        <span class="n">03</span><span class="t">Two meanings of “ontology”</span><span class="st">Planned</span>
+        <span class="d">Palantir’s objects, links and actions next to OWL’s classes and reasoning. Open world and closed world.</span>
+      </li>
+      <li class="planned">
+        <span class="n">04</span><span class="t">Checking the read step</span><span class="st">Planned</span>
+        <span class="d">Validation before deciding, “unknown” as an answer, and when a person must look.</span>
+      </li>
+      <li class="planned">
+        <span class="n">05</span><span class="t">Python lab: a tiny claim reviewer</span><span class="st">Planned</span>
+        <span class="d">Build the whole pipeline yourself and break each part on purpose.</span>
+      </li>
+      <li class="planned">
+        <span class="n">06</span><span class="t">The vendor scorecard</span><span class="st">Planned</span>
+        <span class="d">Judge a real product page with the questions you built along the way.</span>
+      </li>
+    </ol>
+    <p class="small">The plan changes as you learn. Later lessons depend on what you find easy or hard.</p>
+  </div>
+
+  <div class="col">
+    <div class="two">
+      <div>
+        <h3>Reference</h3>
+        <ul class="plain">
+          <li><a href="reference/decision-pipeline.html">Decision pipeline card</a><span class="small">The three parts, what each one promises, and the first questions to ask a vendor. One page, prints well.</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3>How to use this course</h3>
+        <ul>
+          <li>One lesson at a time. Each takes about 10 to 15 minutes.</li>
+          <li>Answer practice questions from memory before you look back. The effort is what makes it stick.</li>
+          <li>Bring questions, and your written answers, to the chat with your teacher.</li>
+          <li>Each new lesson opens with a few questions from earlier ones.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Key sources</h3>
+    <ul class="plain">
+      <li><a href="https://protege.stanford.edu/publications/ontology_development/ontology101.pdf">Noy &amp; McGuinness, <em>Ontology Development 101</em></a> (Stanford, 2001)<span class="small">The best first guide to classes, properties, instances and is-a.</span></li>
+      <li><a href="https://www.anthropic.com/engineering/building-effective-agents">Anthropic, “Building effective agents”</a> (2024)<span class="small">Workflows with fixed code paths versus agents that direct themselves.</span></li>
+      <li><a href="https://www.palantir.com/docs/foundry/ontology/overview/">Palantir, Ontology overview</a> (official docs)<span class="small">How Palantir defines its ontology: objects, links, actions.</span></li>
+      <li><a href="https://www.omg.org/spec/DMN/1.6">OMG, Decision Model and Notation 1.6</a> (2026)<span class="small">The standard for decision tables and how rows are matched.</span></li>
+      <li><a href="https://www.w3.org/TR/owl2-primer/">W3C, OWL 2 Primer</a><span class="small">The semantic-web meaning of ontology, and the open-world assumption.</span></li>
+    </ul>
+  </div>
+</main>
+
+<script src="assets/learn.js"></script>
+<script>
+  document.querySelectorAll(".path li[data-lesson]").forEach(function (li) {
+    if (Learn.isDone(li.getAttribute("data-lesson"))) {
+      var st = li.querySelector(".st");
+      st.textContent = "Done";
+      st.classList.add("done");
+    }
+  });
+</script>

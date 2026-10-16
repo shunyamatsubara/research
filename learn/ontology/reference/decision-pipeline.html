@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Decision Pipeline Card</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  /* reference card: denser than a lesson, built to print on one page */
+  .card-page { max-width: 62rem; }
+  .card-page .col { max-width: none; }
+  .rules { display: grid; gap: 0.8rem; grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .rules { grid-template-columns: 1fr 1fr; } }
+  .rules p { min-width: 0; border-top: 1px solid var(--rule); padding-top: 0.6rem; font-size: 0.97rem; }
+  .ref-table td:first-child { white-space: nowrap; }
+  .ref-table td { font-size: 0.9rem; }
+  .src { font-size: 0.82rem; color: var(--ink-2); }
+  .src li + li { margin-top: 0.2rem; }
+  @media print {
+    .topbar, .no-print { display: none; }
+    body { background: #fff; color: #000; font-size: 10.5pt; }
+    .page { padding: 0; max-width: none; }
+    [data-figure="pipeline"] svg { min-width: 0; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<main class="page card-page">
+  <nav class="topbar" aria-label="Course">
+    <a href="../index.html">← Course home</a>
+    <a href="../lessons/0001-where-determinism-lives.html">Lesson 1: Where determinism lives</a>
+  </nav>
+
+  <div class="col">
+    <p class="eyebrow">Reference · from Lesson 1</p>
+    <h1>Decision pipeline card</h1>
+    <p class="thesis">A language model reads. Rules decide. The ontology is the contract between them.</p>
+  </div>
+
+  <figure>
+    <div class="scroll-x" data-figure="pipeline"></div>
+  </figure>
+
+  <div class="col">
+    <div class="scroll-x">
+      <table class="ref-table">
+        <thead>
+          <tr><th>Part</th><th>Turns</th><th>Repeats exactly?</th><th>Typical failure</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="k-read">Read</span></td>
+            <td>messy input → typed facts</td>
+            <td>No. The same input can give different facts, even at temperature 0.</td>
+            <td>Wrong value. Wrong class picked from the ontology. A value filled in that the input never said.</td>
+          </tr>
+          <tr>
+            <td><span class="k-onto">Ontology</span></td>
+            <td>defines kinds of things, their fields, is-a links</td>
+            <td>It is fixed, versioned data, not a process.</td>
+            <td>A missing class. A wrong is-a link. Classes too broad to tell cases apart.</td>
+          </tr>
+          <tr>
+            <td><span class="k-decide">Decide</span></td>
+            <td>typed facts → decision + trace</td>
+            <td>Yes, for the same facts and the same rule version.</td>
+            <td>A gap (no row matches) or an overlap (two rows match). An old rule version still running.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Questions to ask a vendor</h2>
+    <ol>
+      <li>For one claim, show me which steps run as fixed code and which run through the language model.</li>
+      <li>Are your rules run as code, or are they text that the model reads and applies?</li>
+      <li>Run the same 200 claims five times. What share of the decisions are identical?</li>
+      <li>How do you measure reading errors, and what happens when the model is unsure?</li>
+      <li>Can you replay a past decision with that day’s rules and show which rule fired?</li>
+      <li>Who owns the ontology, and how are changes reviewed and versioned?</li>
+    </ol>
+    <p class="small">This list grows in later lessons into the full vendor scorecard.</p>
+
+    <h2>Rules of thumb</h2>
+    <div class="rules">
+      <p><strong>Deterministic given the facts, not given the input.</strong> A claim of “deterministic” almost always covers only the decide step.</p>
+      <p><strong>Right shape is not right values.</strong> Structured outputs guarantee the fields and types, not that “red flag = no” is true.</p>
+      <p><strong>Write a rule once, high in the tree.</strong> A rule about <span class="fact">AdvancedImaging</span> reaches every subclass through is-a, such as <span class="fact">MRI_Knee</span>.</p>
+      <p><strong>The rules see only what the reader picked.</strong> If the reader picks a class that is too general, the right rule never runs, and nothing complains.</p>
+      <p><strong>A good rule table is complete and has no overlaps.</strong> Every possible set of facts matches exactly one row. DMN calls this the “Unique” hit policy, and it can be checked by machine.</p>
+      <p><strong>Even vendors say so.</strong> Palantir’s docs: deterministic functions “complement the non-deterministic reasoning of LLMs”. A “rule” that a model reads during reasoning is not a deterministic rule.</p>
+      <p><strong>Unclear input stays unclear.</strong> If the note does not say it, no rule can know it. Route it to a person or ask for more information.</p>
+    </div>
+
+    <h2>Sources</h2>
+    <ul class="src">
+      <li>Gruber (1993), the classic definition of ontology: <a href="https://tomgruber.org/writing/ontolingua-kaj-1993.pdf">tomgruber.org</a></li>
+      <li>Noy &amp; McGuinness, <em>Ontology Development 101</em>, is-a and inheritance: <a href="https://protege.stanford.edu/publications/ontology_development/ontology101.pdf">protege.stanford.edu</a></li>
+      <li>OMG DMN 1.6, decision tables and hit policies (§8.1, §8.2.11): <a href="https://www.omg.org/spec/DMN/1.6">omg.org</a></li>
+      <li>Anthropic, structured outputs: <a href="https://platform.claude.com/docs/en/build-with-claude/structured-outputs">platform.claude.com</a></li>
+      <li>Palantir, Ontology overview: <a href="https://www.palantir.com/docs/foundry/ontology/overview/">palantir.com</a></li>
+      <li>Anthropic glossary, temperature 0 is not fully deterministic: <a href="https://platform.claude.com/docs/en/about-claude/glossary">platform.claude.com</a></li>
+      <li>Thinking Machines Lab, “Defeating Nondeterminism in LLM Inference” (2025): <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/">thinkingmachines.ai</a></li>
+      <li>Palantir, “Why create an Ontology?”: <a href="https://www.palantir.com/docs/foundry/ontology/why-ontology">palantir.com</a></li>
+      <li>Microsoft Fabric IQ, ontology overview (rules as natural-language statements; preview): <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/overview">learn.microsoft.com</a></li>
+    </ul>
+  </div>
+</main>
+<script src="../assets/figures.js"></script>
+<script>Figures.mountAll();</script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+/* Ontology course — shared stylesheet.
+   Layout: one reading column (~40rem) with a right margin for sidenotes on wide
+   screens, Tufte-style; sidenotes drop inline under their sentence on narrow screens.
+   Color encodes the three parts of a decision system and is used the same way in
+   every lesson: amber = reading step (probabilistic), green = ontology (the shared
+   contract of typed facts), blue = deciding step (deterministic). */
+
+:root {
+  --paper: #f4f7f6;
+  --paper-2: #e8eeec;
+  --card: #fbfcfc;
+  --ink: #1a2321;
+  --ink-2: #4b5956;
+  --rule: #cdd7d4;
+
+  --decide: #1d4f8f;      /* deciding step, links */
+  --read: #9a5800;        /* reading step */
+  --onto: #276b52;        /* ontology, typed facts */
+  --ok: #276b52;
+  --bad: #a1332b;
+
+  --decide-bg: #e3ebf6;
+  --read-bg: #f8ecd9;
+  --onto-bg: #dfeee7;
+  --bad-bg: #f6e3e0;
+
+  --f-body: "Literata", Georgia, "Times New Roman", serif;
+  --f-label: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  --measure: 40rem;
+  --note-w: 15rem;
+  --note-gap: 2.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111816; --paper-2: #18211f; --card: #151d1b;
+    --ink: #e2e9e7; --ink-2: #a2b0ac; --rule: #2d3a37;
+    --decide: #8fb5ee; --read: #e3a352; --onto: #79c6a4; --ok: #79c6a4; --bad: #ef8f85;
+    --decide-bg: #17233a; --read-bg: #2b2215; --onto-bg: #142a20; --bad-bg: #351a1a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111816; --paper-2: #18211f; --card: #151d1b;
+  --ink: #e2e9e7; --ink-2: #a2b0ac; --rule: #2d3a37;
+  --decide: #8fb5ee; --read: #e3a352; --onto: #79c6a4; --ok: #79c6a4; --bad: #ef8f85;
+  --decide-bg: #17233a; --read-bg: #2b2215; --onto-bg: #142a20; --bad-bg: #351a1a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 1.0625rem/1.65 var(--f-body);
+  font-optical-sizing: auto;
+}
+
+/* ---------- page frame ---------- */
+.page {
+  max-width: calc(var(--measure) + var(--note-w) + var(--note-gap) + 2rem);
+  margin: 0 auto;
+  padding-block: 2.5rem 4rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.col { max-width: var(--measure); }
+.col > * + * { margin-top: 1.1rem; }
+
+@media (min-width: 1040px) {
+  .page { padding-right: calc(var(--note-w) + var(--note-gap) + 16px); }
+  .wide { margin-right: calc(-1 * (var(--note-w) + var(--note-gap))); clear: both; }
+}
+
+/* ---------- type ---------- */
+h1, h2, h3 { font-family: var(--f-body); text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: clamp(2rem, 1.4rem + 2.4vw, 2.75rem); font-weight: 600; letter-spacing: -0.015em; }
+h2 { font-size: 1.5rem; font-weight: 600; margin-top: 3rem !important; }
+h3 { font-size: 1.15rem; font-weight: 600; margin-top: 2rem !important; }
+p { margin: 0; }
+a { color: var(--decide); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--decide); outline-offset: 2px; border-radius: 2px; }
+strong { font-weight: 650; }
+code, .mono { font-family: var(--f-mono); font-size: 0.86em; }
+ul, ol { margin: 0; padding-left: 1.3rem; }
+li + li { margin-top: 0.35rem; }
+
+.eyebrow {
+  font: 500 0.78rem/1.3 var(--f-label);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.lede { font-size: 1.22rem; line-height: 1.55; color: var(--ink-2); }
+.small { font-size: 0.9rem; color: var(--ink-2); }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+
+/* the one idea of a lesson */
+.thesis {
+  font-size: 1.28rem;
+  line-height: 1.5;
+  font-style: italic;
+  border-left: 3px solid var(--decide);
+  padding: 0.2rem 0 0.2rem 1.1rem;
+}
+
+/* ---------- sidenotes (citations) ---------- */
+.ref {
+  font: 600 0.72rem/1 var(--f-label);
+  vertical-align: super;
+  color: var(--decide);
+  padding-left: 0.1em;
+}
+.sn {
+  display: block;
+  font: 400 0.84rem/1.5 var(--f-body);
+  color: var(--ink-2);
+  border-left: 2px solid var(--rule);
+  padding-left: 0.7rem;
+  margin: 0.5rem 0 0.9rem;
+}
+.sn b { font: 600 0.72rem/1 var(--f-label); color: var(--decide); margin-right: 0.3em; }
+@media (min-width: 1040px) {
+  .sn {
+    float: right;
+    clear: right;
+    width: var(--note-w);
+    margin: 0.25rem calc(-1 * (var(--note-w) + var(--note-gap))) 1rem 0;
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+
+/* ---------- the three parts (color = meaning) ---------- */
+.k-read, .k-onto, .k-decide {
+  font: 600 0.8rem/1 var(--f-label);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.22em 0.5em;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.k-read { color: var(--read); background: var(--read-bg); }
+.k-onto { color: var(--onto); background: var(--onto-bg); }
+.k-decide { color: var(--decide); background: var(--decide-bg); }
+
+.fact {
+  font-family: var(--f-mono);
+  font-size: 0.82em;
+  color: var(--onto);
+  background: var(--onto-bg);
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+/* ---------- figures ---------- */
+figure { margin: 2rem 0; }
+figure svg { display: block; width: 100%; height: auto; }
+figcaption { font: 400 0.86rem/1.5 var(--f-body); color: var(--ink-2); margin-top: 0.6rem; }
+.scroll-x { overflow-x: auto; }
+
+/* ---------- tables (decision tables, reference tables) ---------- */
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--rule); }
+th { font: 600 0.74rem/1.3 var(--f-label); letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-2); }
+td { font-variant-numeric: tabular-nums; }
+
+/* ---------- interactive panels ---------- */
+.panel {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 1.1rem 1.2rem;
+  margin: 1.6rem 0;
+}
+.panel > .eyebrow { margin-bottom: 0.6rem; display: block; }
+.btn {
+  font: 600 0.92rem/1 var(--f-label);
+  letter-spacing: 0.02em;
+  color: var(--paper);
+  background: var(--ink);
+  border: 0;
+  border-radius: 4px;
+  padding: 0.62rem 0.95rem;
+  cursor: pointer;
+}
+.btn:hover { opacity: 0.88; }
+.btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--rule); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+/* quiz */
+.quiz-q { padding: 1.1rem 0; border-top: 1px solid var(--rule); }
+.quiz-q:first-of-type { border-top: 0; padding-top: 0.2rem; }
+.quiz-q > p { font-weight: 600; margin-bottom: 0.7rem; }
+.opts { display: grid; gap: 0.45rem; }
+.opt {
+  text-align: left;
+  font: 400 0.98rem/1.45 var(--f-body);
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.6rem 0.8rem;
+  cursor: pointer;
+}
+.opt:hover:not(:disabled) { border-color: var(--ink-2); }
+.opt:disabled { cursor: default; }
+.opt.right { border-color: var(--ok); background: var(--onto-bg); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.why { font-size: 0.93rem; color: var(--ink-2); margin-top: 0.6rem; }
+.why .verdict { font: 600 0.8rem/1 var(--f-label); letter-spacing: 0.06em; text-transform: uppercase; margin-right: 0.4em; }
+.verdict.ok { color: var(--ok); }
+.verdict.no { color: var(--bad); }
+.score { font: 600 0.9rem/1.4 var(--f-label); color: var(--ink-2); margin-top: 0.8rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+
+/* sorter */
+.sort-item { padding: 0.9rem 0; border-top: 1px solid var(--rule); }
+.sort-item:first-of-type { border-top: 0; padding-top: 0.2rem; }
+.sort-item blockquote { margin: 0 0 0.6rem; font-style: italic; }
+.bins { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.bin { font: 600 0.82rem/1 var(--f-label); letter-spacing: 0.05em; text-transform: uppercase; padding: 0.5rem 0.7rem; border-radius: 4px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); cursor: pointer; }
+.bin:disabled { cursor: default; opacity: 0.55; }
+.bin.right { opacity: 1; border-color: var(--ok); background: var(--onto-bg); color: var(--ok); }
+.bin.wrong { opacity: 1; border-color: var(--bad); background: var(--bad-bg); color: var(--bad); }
+
+/* free recall */
+.recall textarea {
+  width: 100%;
+  min-height: 6.5rem;
+  font: 400 1rem/1.5 var(--f-body);
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.7rem 0.8rem;
+  resize: vertical;
+}
+.recall .row { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.7rem; }
+.recall .model { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--rule); }
+.recall .checks { list-style: none; padding: 0; margin-top: 0.6rem; }
+.recall .checks label { display: flex; gap: 0.55rem; align-items: baseline; cursor: pointer; }
+
+/* ---------- boxes at the end of a lesson ---------- */
+.source-box, .ask-box {
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1.5rem 0;
+}
+.source-box { background: var(--decide-bg); }
+.ask-box { background: var(--paper-2); }
+.source-box .eyebrow, .ask-box .eyebrow { display: block; margin-bottom: 0.4rem; }
+
+/* ---------- lesson navigation ---------- */
+.lesson-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.6rem;
+  justify-content: space-between;
+  border-top: 1px solid var(--rule);
+  margin-top: 3rem;
+  padding-top: 1rem;
+  font: 500 0.92rem/1.4 var(--f-label);
+}
+.lesson-nav .muted { color: var(--ink-2); }
+.topbar { font: 500 0.88rem/1.4 var(--f-label); margin-bottom: 2.2rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+.topbar a { text-decoration: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { animation: fade 0.25s ease-out; }
+  @keyframes fade { from { opacity: 0.2; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+}
+
+/* ---------- claim decision simulator (assets/claim-sim.js) ---------- */
+.sim { margin-block: 2rem; }  /* margin-block only, so .wide keeps its side margin */
+.sim-grid { display: grid; gap: 0.9rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) {
+  .sim-grid { grid-template-columns: 1fr 1fr; }
+  .sim-grid > .sim-card:nth-child(3) { grid-column: 1 / -1; }
+}
+.sim-card {
+  min-width: 0;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.sim-card .row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.sim-note {
+  font: 400 0.95rem/1.55 var(--f-mono);
+  background: var(--paper);
+  border-left: 3px solid var(--read);
+  padding: 0.7rem 0.8rem;
+  border-radius: 0 4px 4px 0;
+}
+.sim-says { min-height: 2.6em; }
+.sim-facts { display: grid; gap: 0.75rem; }
+.sim-field { display: grid; gap: 0.25rem; }
+.sim-field label { font: 500 0.82rem/1.3 var(--f-label); color: var(--ink-2); }
+.sim-field select, .sim-field input {
+  font: 500 0.92rem/1.2 var(--f-mono);
+  color: var(--onto);
+  background: var(--onto-bg);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 0.45rem 0.5rem;
+  max-width: 100%;
+}
+.sim-chain { font-size: 0.74rem; color: var(--ink-2); margin: 0; overflow-wrap: anywhere; }
+table.dt { font-size: 0.84rem; }
+table.dt td, table.dt th { padding: 0.4rem 0.45rem; }
+table.dt tr.hit td { background: var(--decide-bg); color: var(--decide); font-weight: 600; }
+.stamp {
+  align-self: flex-start;
+  font: 700 0.95rem/1 var(--f-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--decide);
+  border: 2px solid var(--decide);
+  border-radius: 4px;
+  padding: 0.5rem 0.7rem;
+}
+.sim-log { margin-top: 1rem; }
+.sim-log table { font-size: 0.84rem; }
+.sim-verdict { margin-top: 0.7rem; }
+
+/* ---------- figures (assets/figures.js) ---------- */
+.pipe text { font-family: var(--f-label); fill: var(--ink); }
+.pipe .t-sm { font-size: 12px; fill: var(--ink-2); }
+.pipe .t-md { font-size: 14px; font-weight: 600; }
+.pipe .t-cap { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; }
+.pipe .mono { font-family: var(--f-mono); font-size: 11.5px; fill: var(--onto); }
+.pipe .box-in { fill: var(--paper-2); stroke: var(--rule); }
+.pipe .box-read { fill: var(--read-bg); stroke: var(--read); }
+.pipe .box-onto { fill: var(--onto-bg); stroke: var(--onto); }
+.pipe .box-decide { fill: var(--decide-bg); stroke: var(--decide); }
+.pipe .box-out { fill: var(--card); stroke: var(--decide); stroke-width: 2; }
+.pipe .arrow { stroke: var(--ink-2); stroke-width: 1.5; fill: none; }
+.pipe .tie { stroke: var(--onto); stroke-width: 1.2; stroke-dasharray: 3 3; fill: none; }
+.pipe .c-read { fill: var(--read); }
+.pipe .c-onto { fill: var(--onto); }
+.pipe .c-decide { fill: var(--decide); }
+.pipe .head { fill: var(--ink-2); }
+[data-figure="pipeline"] svg { min-width: 640px; }

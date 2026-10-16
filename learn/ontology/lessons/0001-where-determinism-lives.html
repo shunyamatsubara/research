@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Where Determinism Lives</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap">
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main class="page">
+  <nav class="topbar" aria-label="Course">
+    <a href="../index.html">← Course home</a>
+    <a href="../reference/decision-pipeline.html">Reference: Decision pipeline card</a>
+  </nav>
+
+  <div class="col">
+    <p class="eyebrow">Lesson 1 · about 12 minutes</p>
+    <h1>Where determinism lives</h1>
+    <p class="lede">When a vendor says its AI agent makes deterministic decisions from messy documents, the claim is usually true for one half of the system and not for the other. This lesson teaches you to see the two halves.</p>
+
+    <p><strong>Why this matters for your mission.</strong> In every demo of an “ontology + agent” product, something messy goes in (a scanned form, a doctor’s note, an email) and a decision comes out. Your first question as a judge is always the same: <em>which part makes the decision, and can that part give a different answer next time?</em></p>
+
+    <h2>Two halves and a contract</h2>
+  </div>
+
+  <figure class="wide pipe-wrap">
+    <div class="scroll-x" data-figure="pipeline"></div>
+    <figcaption>The decision pipeline. Colors mean the same thing in every lesson: <span class="k-read">read</span> is probabilistic, <span class="k-onto">ontology</span> is the shared contract, <span class="k-decide">decide</span> is deterministic.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p class="thesis">A language model reads. Rules decide. The ontology is the contract between them.</p>
+
+    <p>The <span class="k-read">read</span> step turns unstructured input into typed facts, such as <span class="fact">procedure: MRI_Knee</span>. A language model is very good at this, but it is not deterministic. Even with the temperature setting at 0, the same input can come back with a different output.<span class="ref">1</span><span class="sn"><b>1</b>Anthropic’s docs: “Even with temperature set to 0, the results will not be fully deterministic and identical inputs may produce different outputs across API calls.” <a href="https://platform.claude.com/docs/en/about-claude/glossary">Anthropic glossary</a>. In one test, 1,000 runs of the same prompt at temperature 0 gave 80 different completions. <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/">Thinking Machines Lab, 2025</a></span></p>
+
+    <p>The <span class="k-decide">decide</span> step takes typed facts and applies fixed rules, for example a decision table. This is ordinary code. With the same facts and the same rule version, it gives the same answer every time, and it can show which rule produced the answer.<span class="ref">2</span><span class="sn"><b>2</b>The industry standard for rule tables, OMG DMN, defines a decision table as “a tabular representation of a set of related input and output expressions, organized into rules indicating which output entry applies to a specific set of input entries.” <a href="https://www.omg.org/spec/DMN/1.6">OMG DMN 1.6, §8.1</a></span></p>
+
+    <p>The <span class="k-onto">ontology</span> sits in the middle. It says which kinds of things exist (Procedure, Diagnosis, Member), what fields they have, and how the kinds relate, such as <span class="fact">MRI_Knee is-a AdvancedImaging</span>. It is a contract: the reader may only produce these kinds of facts, and the rules may only talk about these kinds of facts.<span class="ref">3</span><span class="sn"><b>3</b>The classic definition: “An ontology is an explicit specification of a conceptualization.” <a href="https://tomgruber.org/writing/ontolingua-kaj-1993.pdf">Gruber, 1993</a>. Palantir says its Ontology holds “semantic elements (objects, properties, links) and kinetic elements (actions, functions, dynamic security)”. <a href="https://www.palantir.com/docs/foundry/ontology/overview/">Palantir docs</a></span></p>
+
+    <p>Put together: <strong>the decision is deterministic given the facts. It is not deterministic given the input.</strong> When a vendor says “deterministic”, they almost always mean the second half. Ask how they control the first. Palantir’s own docs agree: deterministic functions “complement the non-deterministic reasoning of LLMs”.<span class="ref">4</span><span class="sn"><b>4</b><a href="https://www.palantir.com/docs/foundry/ontology/why-ontology">Palantir docs, “Why create an Ontology?”</a></span></p>
+
+    <h2>Try it: one note, many decisions</h2>
+    <p>The simulator uses a simplified rule for approving a knee MRI. I made it up for this lesson, in the style of real coverage rules.<span class="ref">5</span><span class="sn"><b>5</b>Real rules have the same shape. A Medicare billing article lists the diagnosis codes that “support the medical necessity of CPT code 82306”, a vitamin D blood test; every code not on the list fails. <a href="https://www.cms.gov/medicare-coverage-database/view/article.aspx?articleid=57718">CMS Coverage Database, Article A57718</a>. Japan publishes the same kind of table: its check master lists the disease names that make that test valid. <a href="https://www.hpdx.or.jp/shinryohoshu/ssk_cc/index.html">DX審査支払機構, コンピュータチェックに関する公開</a></span> Press <strong>Run the reader</strong> five or six times and watch the run log. Then change a fact by hand.</p>
+  </div>
+
+  <div id="sim"></div>
+
+  <div class="col">
+    <h3>What to notice</h3>
+    <ol>
+      <li><strong>Same facts, same decision.</strong> Every time the facts matched, the decision matched. That is the deterministic half doing its job.</li>
+      <li><strong>Same note, different decisions.</strong> The note is unclear: a fall and a swollen knee may or may not count as a red flag. The reader settled that question differently on different runs. No rule table can remove unclearness that lives in the input.</li>
+      <li><strong>A silent wrong link.</strong> In one reading, the reader linked “MRI, right knee” to the general class <span class="fact">Imaging</span> instead of <span class="fact">MRI_Knee</span>. The rules for advanced imaging then never looked at the claim, and row R4 approved it. Choosing the wrong class in the ontology is also a reading error, and nothing in the table can see it.</li>
+      <li><strong>The table never says “deny”.</strong> It only approves or sends the claim to a person. Real systems are moving the same way. Since 2025, California law says a denial based on medical necessity “must be reviewed and decided by a licensed physician”.<span class="ref">6</span><span class="sn"><b>6</b>California SB 1120, the “Physicians Make Decisions Act”, in effect from 1 January 2025. <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to">Senator Becker’s office</a></span> Japan’s claim-review body says its computer checks are not applied mechanically as the final judgment.<span class="ref">7</span><span class="sn"><b>7</b>「コンピュータチェックは、診療内容の適否について、画一的あるいは一律的に適用するものではない。」 <a href="https://www.hpdx.or.jp/shinryohoshu/ssk_cc/index.html">DX審査支払機構</a> (the former 支払基金, renamed on 1 October 2026)</span> Rules can be deterministic and still not be allowed the last word.</li>
+    </ol>
+
+    <h2>How is-a lets one rule cover many cases</h2>
+    <p>You already know the chair example: <span class="fact">chair is-a furniture is-a object</span>. The same idea does real work in a decision system. Rows R1 to R3 never mention MRI. They talk about <span class="fact">AdvancedImaging</span>. The ontology says <span class="fact">MRI_Knee is-a AdvancedImaging</span>, so the rows apply to it. If you add <span class="fact">CT_Knee is-a AdvancedImaging</span> tomorrow, the same rows cover knee CT claims with no new rule.<span class="ref">8</span><span class="sn"><b>8</b>“A class A is a subclass of B if every instance of A is also an instance of B”, and “all subclasses of a class inherit the slot of that class.” <a href="https://protege.stanford.edu/publications/ontology_development/ontology101.pdf">Noy &amp; McGuinness, <em>Ontology Development 101</em></a>. The link must be written down: it “cannot be derived from the labels”. <a href="https://www.w3.org/TR/owl2-primer/">W3C OWL 2 Primer, §4.2</a></span></p>
+    <p>This is the main gift an ontology gives the deciding step: <strong>write a rule once, at the general level, and it reaches every more specific kind.</strong> It also shows the main risk: the rules only ever see the class the reader picked. Lesson 2 looks at what an ontology adds beyond a plain data schema.</p>
+
+    <h2>Practice</h2>
+    <h3>Sort the vendor sentences</h3>
+    <p>Each sentence below could come from a sales deck. Which part of the pipeline is it really about?</p>
+  </div>
+
+  <div class="col"><div class="panel" id="sorter"></div></div>
+
+  <div class="col">
+    <h3>Check yourself</h3>
+    <p>Answer from memory. Try not to scroll up.</p>
+  </div>
+  <div class="col"><div class="panel" id="quiz"></div></div>
+
+  <div class="col">
+    <h3>Say it in your own words</h3>
+  </div>
+  <div class="col"><div class="panel" id="recall"></div></div>
+
+  <div class="col">
+    <div class="source-box">
+      <span class="eyebrow">Primary source to read next</span>
+      <p><a href="https://www.anthropic.com/engineering/building-effective-agents"><strong>“Building effective agents”</strong></a>, Anthropic, December 2024. About 20 minutes. It separates <em>workflows</em> (“LLMs and tools are orchestrated through predefined code paths”) from <em>agents</em> (the model directs its own steps). Read the first two sections and the part on prompt chaining with a “gate”. As you read, ask: in a vendor’s product, which parts are predefined code paths? That is where determinism can live.</p><p class="small">If you have ten more minutes: read <a href="https://www.palantir.com/docs/foundry/ontology/overview/">Palantir’s Ontology overview</a> and sort what it describes into read, ontology and decide.</p>
+    </div>
+
+    <div class="ask-box">
+      <span class="eyebrow">Ask your teacher</span>
+      <p>Anything unclear? Ask me in the chat. You can also paste your answer from <em>Say it in your own words</em> and I will give you feedback on it. Questions worth asking now: “Can the reading step ever be made deterministic?” or “Where does Palantir put the rules?”</p>
+    </div>
+
+    <p><button class="btn ghost" type="button" id="mark-done">Mark this lesson as done</button> <span class="small" id="done-note" aria-live="polite"></span></p>
+
+    <nav class="lesson-nav" aria-label="Lessons">
+      <a href="../index.html">← Course home</a>
+      <a href="../reference/decision-pipeline.html">Reference: Decision pipeline card</a>
+      <span class="muted">Next: Lesson 2, what an ontology adds beyond a schema (coming next)</span>
+    </nav>
+  </div>
+</main>
+
+<script src="../assets/learn.js"></script>
+<script src="../assets/claim-sim.js"></script>
+<script src="../assets/figures.js"></script>
+<script>
+(function () {
+  Figures.mountAll();
+  var ADV = "AdvancedImaging";
+
+  ClaimSim.mount(document.getElementById("sim"), {
+    id: "l1",
+    note: "Patient fell on ice 10 days ago. Right knee swollen and painful. Can bear weight, with difficulty. No physical therapy yet.<br><br>Request: MRI, right knee.",
+    ontology: { parent: {
+      MRI_Knee: ADV, CT_Knee: ADV, AdvancedImaging: "Imaging",
+      XRay_Knee: "Imaging", Imaging: "Procedure"
+    } },
+    fields: [
+      { key: "procedure", short: "procedure", label: "Procedure (a class in the ontology)", kind: "class", options: ["MRI_Knee", "CT_Knee", "XRay_Knee", "Imaging"] },
+      { key: "redFlag", short: "red_flag", label: "Red flag: fracture or torn ligament suspected", kind: "bool" },
+      { key: "weeks", short: "therapy_weeks", label: "Weeks of physical therapy already done", kind: "number", min: 0, max: 30 }
+    ],
+    readings: [
+      { weight: 2, facts: { procedure: "MRI_Knee", redFlag: true, weeks: 0 },
+        says: "This reading: “fell on ice… swollen… bears weight with difficulty” means <strong>red flag = yes</strong>." },
+      { weight: 2, facts: { procedure: "MRI_Knee", redFlag: false, weeks: 0 },
+        says: "This reading: the note never says a fracture or tear is suspected, so <strong>red flag = no</strong>." },
+      { weight: 1, facts: { procedure: "Imaging", redFlag: false, weeks: 0 },
+        says: "This reading linked “MRI, right knee” to the general class <strong>Imaging</strong>, not to MRI_Knee." }
+    ],
+    columns: ["Procedure", "Red flag", "Therapy ≥ 6 weeks"],
+    rules: [
+      { id: "R1", cells: ["is-a " + ADV, "yes", "any"], decision: "Approve",
+        when: function (f, o) { return o.isA(f.procedure, ADV) && f.redFlag; } },
+      { id: "R2", cells: ["is-a " + ADV, "no", "yes"], decision: "Approve",
+        when: function (f, o) { return o.isA(f.procedure, ADV) && !f.redFlag && f.weeks >= 6; } },
+      { id: "R3", cells: ["is-a " + ADV, "no", "no"], decision: "Send to a nurse reviewer",
+        when: function (f, o) { return o.isA(f.procedure, ADV) && !f.redFlag && f.weeks < 6; } },
+      { id: "R4", cells: ["anything else", "any", "any"], decision: "Approve",
+        when: function (f, o) { return !o.isA(f.procedure, ADV); } }
+    ],
+    explain: function (f, o, rule) {
+      var adv = o.isA(f.procedure, ADV);
+      var parts = [
+        "<span class=\"fact\">" + f.procedure + "</span> " + (adv ? "is-a " + ADV : "is not under " + ADV + " (its chain: " + o.chain(f.procedure).join(" → ") + ")")
+      ];
+      if (adv) parts.push("red flag = " + (f.redFlag ? "yes" : "no"));
+      if (adv && !f.redFlag) parts.push("therapy = " + f.weeks + " weeks (" + (f.weeks >= 6 ? "6 or more" : "less than 6") + ")");
+      return "Row <strong>" + rule.id + "</strong> matched because " + parts.join("; ") + ".";
+    }
+  });
+
+  Learn.mountSorter(document.getElementById("sorter"), {
+    id: "l1-sort",
+    bins: [{ key: "read", label: "Read step" }, { key: "onto", label: "Ontology" }, { key: "decide", label: "Decide step" }],
+    items: [
+      { text: "Our agent reads 40,000 faxes a day and pulls out the diagnosis and the requested procedure.", bin: "read",
+        why: "Pulling facts out of faxes is reading. A language model does it, so it can vary from run to run." },
+      { text: "Each approval cites the exact row of the policy table that produced it.", bin: "decide",
+        why: "A trace back to a rule row is a property of the deciding step." },
+      { text: "Member, Claim, Procedure and Provider are defined object types with fixed properties and links.", bin: "onto",
+        why: "Defining the kinds of things, their fields and their links is the contract both steps share." },
+      { text: "The model understands clinical context the way an experienced nurse does.", bin: "read",
+        why: "“Understands” is a claim about how well the input is read. It says nothing about whether the decision repeats." },
+      { text: "A knee CT is a kind of advanced imaging, so knee CT claims follow the advanced-imaging rules.", bin: "onto",
+        why: "This is an is-a link. It lives in the ontology, and the rules use it." },
+      { text: "Every model output is guaranteed to match our JSON schema.", bin: "read",
+        why: "This fixes the <em>shape</em> of what the reader returns, not whether the values are true. It is still the reading step. Anthropic’s docs say structured outputs “guarantee schema-compliant responses through constrained decoding” (<a href='https://platform.claude.com/docs/en/build-with-claude/structured-outputs'>source</a>). Schema-compliant means the right shape." },
+      { text: "A rule is a natural-language statement of business logic linked to ontology concepts, which agents can use during reasoning.", bin: "read",
+        why: "A trick one. It is called a rule and it sits in the ontology, but a language model reads it and applies it “during reasoning”. So it behaves like the read step and can be applied differently from run to run. A deterministic rule is run as code. The wording is adapted from <a href='https://learn.microsoft.com/en-us/fabric/iq/ontology/overview'>Microsoft Fabric IQ’s docs</a>." },
+      { text: "A claim decided in March can be replayed with the March rule version and gives the same result.", bin: "decide",
+        why: "Replaying with a fixed rule version is what a deterministic deciding step makes possible." }
+    ]
+  });
+
+  Learn.mountQuiz(document.getElementById("quiz"), {
+    id: "l1-quiz",
+    questions: [
+      { q: "A vendor says: “Our agent is deterministic.” In a system with a read step and a decide step, which part can that claim honestly cover?",
+        options: ["The model that turns a note into facts", "The prompt that tells the model its job", "The rules that turn facts into a decision", "The whole path, from note to final decision"],
+        answer: 2,
+        why: "Only fixed rules applied to fixed facts repeat exactly. The whole path is only as repeatable as the reading." },
+      { q: "The same note goes through the system twice and gets two different decisions. The rules did not change. Where did the difference most likely start?",
+        options: ["In the facts the reader produced", "In the order rows are checked", "In the list of ontology classes", "In the database that stores results"],
+        answer: 0,
+        why: "Fixed rules give the same decision for the same facts. So the facts were different, and facts come from the read step." },
+      { q: "The team sets the language model’s temperature to 0. Is the read step now deterministic?",
+        options: ["Yes, zero temperature always repeats the output", "Yes, if the prompt also never changes", "Only when structured outputs are switched on", "No, outputs can still differ between runs"],
+        answer: 3,
+        why: "Provider docs say it plainly: even at temperature 0, “identical inputs may produce different outputs across API calls” (<a href='https://platform.claude.com/docs/en/about-claude/glossary'>Anthropic</a>). Small differences in how the server groups requests are enough to change the result (<a href='https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/'>Thinking Machines Lab</a>)." },
+      { q: "Rows R1 to R3 talk about AdvancedImaging and never mention MRI. Why do they still apply to a claim for MRI_Knee?",
+        options: ["The language model picks matching rules", "The ontology says MRI_Knee is-a AdvancedImaging", "The table lists every imaging code", "The rules search notes for MRI"],
+        answer: 1,
+        why: "The rule is written for the general class. The is-a link carries it down to every more specific class, like chair is-a object." },
+      { q: "A vendor guarantees that every model output matches their JSON schema. What does that guarantee give you?",
+        options: ["The same decision comes out every run", "Every extracted value is correct and complete", "Right shape, but values may be wrong", "The ontology covers every case it meets"],
+        answer: 2,
+        why: "A schema fixes fields and types. It cannot check whether “red flag = no” is true for this note. Structured outputs <a href=\"https://platform.claude.com/docs/en/build-with-claude/structured-outputs\">guarantee schema compliance</a>, nothing more." }
+    ]
+  });
+
+  Learn.mountRecall(document.getElementById("recall"), {
+    id: "l1-recall",
+    prompt: "A client asks: <em>“If we put an ontology under our AI agent, will its decisions be deterministic?”</em> Without scrolling up, write the two or three sentences you would say.",
+    model: "Partly. The rules that decide can be fully deterministic: the same facts and the same rule version always give the same decision, and you can see which rule fired. But a language model reads the messy input into those facts, and it can produce different facts from the same input. So the ontology makes deciding repeatable and auditable. It does not make reading reliable, so the reading step needs its own checks.",
+    checks: [
+      "I said the decide step (rules) is deterministic once the facts are fixed.",
+      "I said the read step (language model) can give different facts from the same input.",
+      "I said the ontology is the shared definition that both steps use.",
+      "I said the read step needs its own checks."
+    ]
+  });
+
+  var btn = document.getElementById("mark-done"), note = document.getElementById("done-note");
+  function showDone() { if (Learn.isDone("0001")) { btn.disabled = true; note.textContent = "Done. It shows on the course home."; } }
+  btn.addEventListener("click", function () { Learn.markDone("0001"); showDone(); });
+  showDone();
+})();
+</script>
+</body>
+</html>
