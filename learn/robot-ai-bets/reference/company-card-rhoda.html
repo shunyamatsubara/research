@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rhoda AI Card</title>
+<meta name="description" content="One-page company card for Rhoda AI: approach, data, hypotheses, evidence, open questions. Checked 17 October 2026.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="sheet">
+<main class="page">
+
+<p class="kicker">Robot AI bets · Reference · Company card · checked 17 Oct 2026</p>
+<h1>Rhoda AI</h1>
+<p class="subtitle">Direct Video Action: imagine the next moment as video, then read the motion off it</p>
+
+<div class="grid-2">
+
+<div class="card">
+  <h3>Snapshot</h3>
+  <ul>
+    <li><strong>Where:</strong> Palo Alto, California; European entity in Germany.</li>
+    <li><strong>Out of stealth:</strong> 10 Mar 2026, $450M round, $1.7B valuation; led by Premji Invest. <a href="https://www.rhoda.ai/news/press-release">[press]</a></li>
+    <li><strong>People:</strong> Jagdeep Singh (CEO; QuantumScape co-founder) · Eric Ryan Chan (chief scientist; generative 3D/video, ex-World Labs) · Changan Chen (chief research officer) · Gordon Wetzstein (advisor, Stanford). <a href="https://www.rhoda.ai/team">[team]</a></li>
+    <li><strong>Model / method:</strong> FutureVision / Direct Video Action (DVA).</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>Place on the approach map</h3>
+  <p><strong>Q1 — knowledge source:</strong> web video (“hundreds of millions of videos”, no actions).</p>
+  <p><strong>Q2 — predicts at run time:</strong> the future, as a short fully generated video clip; a separate inverse dynamics model then gives actions.</p>
+  <p><strong>Family:</strong> world action model, “inverse dynamics” design — with 1X, UniPi, mimic-video. <a href="approach-map.html">Approach map →</a></p>
+</div>
+
+<div class="card">
+  <h3>The loop</h3>
+  <ol>
+    <li>Input: hundreds of frames of robot video + joint state (incl. torques) + optional conditioning.</li>
+    <li>Causal video model imagines a short future clip (full denoising, latent space, low resolution).</li>
+    <li>Small inverse dynamics model (IDM) → end-effector action chunk.</li>
+    <li>Robot executes while the next prediction runs (“Leapfrog Inference”); every few hundred ms.</li>
+  </ol>
+  <p><a href="https://www.rhoda.ai/research/direct-video-action">[DVA post]</a></p>
+</div>
+
+<div class="card">
+  <h3>Data</h3>
+  <ul>
+    <li><strong>Pretrain:</strong> web video from scratch, no actions.</li>
+    <li><strong>Per task:</strong> 10–20 h robot data incl. corrections (decanting 11 h, container breakdown 17 h).</li>
+    <li><strong>Per robot type:</strong> ~10 h for the IDM; random motions acceptable.</li>
+    <li><strong>On site:</strong> “roughly three hours of additional factory data” (podcast).</li>
+    <li><strong>RL:</strong> “Not yet” (Apr 2026). <a href="https://thedataexchange.media/changan-chen-rhoda-ai/">[interview]</a></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>Hypotheses</h3>
+  <ol>
+    <li><strong>H1</strong> Web video holds the physics robots need. <span class="tag stated">stated</span></li>
+    <li><strong>H2</strong> Video first, then actions, is easier than actions directly. <span class="tag stated">stated</span></li>
+    <li><strong>H3</strong> Full video generation is fast and cheap enough for factory control. <span class="tag inferred">inferred</span></li>
+    <li><strong>H4</strong> Robot data per task stays at 10–20 h. <span class="tag stated">stated</span></li>
+    <li><strong>H5</strong> Scale (model + web video) keeps paying. <span class="tag stated">stated</span></li>
+    <li><strong>Business:</strong> own heavy wheeled robot (25 kg rated) sold as a service; license the model later.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h3>What would break each one</h3>
+  <ol>
+    <li><strong>H1</strong> A VLA or from-scratch model matches DVA on the same task and data.</li>
+    <li><strong>H2</strong> Models that skip video generation at run time do as well (Fast-WAM claims this).</li>
+    <li><strong>H3</strong> Too slow for disturbances, or GPU cost per robot breaks the economics.</li>
+    <li><strong>H4</strong> New parts, layouts or lighting need fresh large data collection.</li>
+    <li><strong>H5</strong> Gains plateau, or improve speed only, never correctness on new tasks.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h3>Evidence they show</h3>
+  <ul>
+    <li>Uncut runs: decanting 1.5 h; container breakdown 160 min without intervention.</li>
+    <li>“Under two minutes per cycle … exceeding customer KPIs.”</li>
+    <li>Scaling study, one task: model size XS 3.7% → S 65.0% → M 75.3% → L 84.7% success at full speed; video quality ranks checkpoints like robot success; size “mainly affects time to completion”. <a href="https://www.rhoda.ai/research/scaling-web-video-pretraining">[scaling]</a></li>
+    <li>Touch: tactile “videos” as extra input/output (Oct 2026); no success rate given. <a href="https://www.rhoda.ai/research/giving-robots-a-sense-of-touch">[touch]</a></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>Not public (as of 17 Oct 2026)</h3>
+  <ul>
+    <li>Parameter count (only “hundreds of millions to tens of billions”), latency, control rate, inference hardware.</li>
+    <li>Multi-week production success rates and intervention rates.</li>
+    <li>Any comparison with a VLA or another world action model.</li>
+    <li>Named customers. A job post targets field deployment by Q4 2026 with a Wolfsburg ramp. <a href="https://jobs.ashbyhq.com/rhoda-ai/c20aae07-aaf9-4ed8-bbae-f9888d5b02c5">[job]</a></li>
+    <li>Whether any deployed policy takes language; multi-task models.</li>
+  </ul>
+</div>
+
+</div>
+
+<h2>Due-diligence questions</h2>
+<ol>
+  <li>What is the end-to-end latency, replanning rate and low-level control rate? Which GPU runs inference, and is it on the robot?</li>
+  <li>Over multi-week production runs: success rate, mean time between interventions, throughput? How is the reliability target defined and measured?</li>
+  <li>What is the full cost of a new task: data hours, operators, correction rounds, IDM data, on-site adaptation, calendar time?</li>
+  <li>What happens with a new part, layout or lighting? Retraining cadence and cost?</li>
+  <li>One model per task, or a multi-task or language-conditioned model? How mature is learning from a single demonstration?</li>
+  <li>Which hardware is in the pilots — third-party arms or Rhoda's own platform? Safety certification status (e.g., ISO 10218, ISO 13849), service and spare parts?</li>
+  <li>Robot-as-a-service terms: price, uptime guarantees, liability; path to licensing on our own hardware?</li>
+  <li>Who owns deployment data, and is it used to train shared models?</li>
+  <li>Safety case for a generative policy: how do you detect situations it was not trained for, and what is the fallback?</li>
+  <li>Any comparison with a strong VLA on the same task and the same data — ideally run by a third party?</li>
+</ol>
+
+<p class="soft" style="font-size:0.8rem">Sources: Rhoda's own pages (press release, DVA post, scaling post, touch post, team, home page, job posts), interviews (The Data Exchange, RoboPapers, Automated podcast), and press (SiliconANGLE, The Robot Report). All performance figures are Rhoda's own and not independently checked. Lessons: <a href="../lessons/0001-rhodas-bet.html">1 · Rhoda's bet</a> · <a href="../lessons/0002-the-contenders.html">2 · The contenders</a>.</p>
+
+</main>
+</body>
+</html>

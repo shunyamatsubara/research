@@ -22,3 +22,14 @@
 2. The contenders map: where DVA sits against VLA, world-action models, human video, real-data scaling, simulation, modular pipelines.
 3. Evidence check: which results would confirm or break each hypothesis; head-to-head numbers.
 4. Due-diligence kit: questions for a vendor/partner meeting; apply to a client use case.
+
+## Terminology used in lessons (promote to a glossary once the learner uses them correctly)
+- **Direct Video Action (DVA)** — Rhoda's method; **FutureVision** — Rhoda's model.
+- **Inverse dynamics model (IDM)** — infers the action that moves the robot from one frame to the next.
+- **World action model (WAM)** — NVIDIA's term for models that predict the future world (video/features) and actions. Three designs: inverse dynamics / joint / representation-only.
+- **Approach map** — the two questions: Q1 knowledge source, Q2 what is predicted at run time.
+- Rhoda generates video in a compressed latent space at low resolution; say "full video generation", not "pixels".
+
+## Status (2026-10-17)
+- Lessons 1–2 written; reference sheets: company card (Rhoda), approach map.
+- Next session: check quiz/recall results first (ask the learner how the recall went), then Lesson 3 (evidence check).

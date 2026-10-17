@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rhoda's Bet</title>
+<meta name="description" content="Lesson 1: how Rhoda AI's Direct Video Action loop works, and the hypotheses the company is betting on.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<main class="page">
+
+<p class="kicker">Robot AI bets · Lesson 1 of 4 · about 15 minutes</p>
+<h1>Rhoda's bet</h1>
+<p class="subtitle">Robots that imagine the next moment as video, then act</p>
+
+<div class="box win">
+  <p class="box-title">Your win for this lesson</p>
+  <p>You can explain Rhoda's <strong>Direct Video Action</strong> loop to a client in two minutes, and you can name the <strong>five hypotheses</strong> it depends on — each with the result that would break it.</p>
+</div>
+
+<p class="lede">Rhoda AI came out of stealth on 10 March 2026 with $450M of funding at a $1.7B valuation <a href="https://www.rhoda.ai/news/press-release">[1]</a><a href="https://siliconangle.com/2026/03/10/rhoda-ai-raises-450m-build-foundational-robotics-models-learn-internet-videos/">[2]</a>. The CEO is Jagdeep Singh, co-founder of the battery company QuantumScape. The research leaders come from <em>generative video and 3D models</em>, not from robot hardware: chief scientist Eric Ryan Chan (Stanford PhD, formerly at World Labs), chief research officer Changan Chen (Stanford postdoc), and advisor Gordon Wetzstein (Stanford) <a href="https://www.rhoda.ai/team">[3]</a>. That background explains the bet.</p>
+
+<h2>The bet in one sentence</h2>
+
+<p class="claim">A model that has watched enough web video already knows how the physical world moves. Teach it what <em>your</em> robot looks like doing a task, let it imagine the next moment as video, and a small second model can read the robot's motion off that imagined video.</p>
+
+<p>Rhoda calls the model <strong>FutureVision</strong> and the method <strong>Direct Video Action (DVA)</strong>. In Singh's words, the goal is “models that understand how the world moves — not just what it looks like or how it's described in language” <a href="https://www.rhoda.ai/news/press-release">[1]</a>.</p>
+
+<h2>How the loop works</h2>
+
+<p>You have used a VLA, so start from there. The figure puts the two side by side.</p>
+
+<figure class="wide">
+<div class="fig-scroll">
+<svg class="fig" viewBox="0 0 760 330" role="img" aria-labelledby="loop-title loop-desc">
+  <title id="loop-title">A VLA pipeline compared with Rhoda's Direct Video Action loop</title>
+  <desc id="loop-desc">Top row: a VLA takes a few camera frames and text, runs a vision-language model, then an action expert, and outputs an action chunk. Bottom row: Rhoda's DVA takes hundreds of frames of robot video, a causal video model imagines a short future clip, a small inverse dynamics model turns the clip into an end-effector action chunk, the robot executes it, and new frames loop back while the next prediction is already running.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" class="fill-soft"/>
+    </marker>
+    <marker id="arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" class="fill-accent"/>
+    </marker>
+  </defs>
+
+  <!-- Row 1: VLA -->
+  <text x="10" y="20" font-size="12" font-weight="600" class="soft">VLA — what you have used</text>
+  <rect class="box-shape" x="10" y="32" width="130" height="56" rx="6"/>
+  <text x="75" y="55" text-anchor="middle" font-size="12" font-weight="600">Camera images</text>
+  <text x="75" y="72" text-anchor="middle" font-size="10" class="soft">a few frames + text</text>
+
+  <rect class="box-shape" x="170" y="32" width="150" height="56" rx="6"/>
+  <text x="245" y="55" text-anchor="middle" font-size="12" font-weight="600">Vision-language model</text>
+  <text x="245" y="72" text-anchor="middle" font-size="10" class="soft">pretrained: web images + text</text>
+
+  <rect class="box-shape" x="350" y="32" width="120" height="56" rx="6"/>
+  <text x="410" y="64" text-anchor="middle" font-size="12" font-weight="600">Action expert</text>
+
+  <rect class="box-shape" x="500" y="32" width="120" height="56" rx="6"/>
+  <text x="560" y="64" text-anchor="middle" font-size="12" font-weight="600">Action chunk</text>
+
+  <rect class="box-shape" x="650" y="32" width="100" height="56" rx="6"/>
+  <text x="700" y="64" text-anchor="middle" font-size="12" font-weight="600">Robot</text>
+
+  <path class="line" d="M140 60 L168 60" marker-end="url(#arr)"/>
+  <path class="line" d="M320 60 L348 60" marker-end="url(#arr)"/>
+  <path class="line" d="M470 60 L498 60" marker-end="url(#arr)"/>
+  <path class="line" d="M620 60 L648 60" marker-end="url(#arr)"/>
+  <text x="245" y="106" text-anchor="middle" font-size="10.5" font-style="italic" class="soft">physics must be learned from robot data</text>
+
+  <!-- Row 2: DVA -->
+  <text x="10" y="150" font-size="12" font-weight="600" class="fill-accent">Rhoda's Direct Video Action (DVA)</text>
+  <rect class="box-shape" x="10" y="162" width="130" height="64" rx="6"/>
+  <text x="75" y="185" text-anchor="middle" font-size="12" font-weight="600">Robot video history</text>
+  <text x="75" y="201" text-anchor="middle" font-size="10" class="soft">hundreds of frames</text>
+  <text x="75" y="214" text-anchor="middle" font-size="10" class="soft">+ joint state, torques</text>
+
+  <rect class="key-shape" x="170" y="162" width="150" height="64" rx="6"/>
+  <text x="245" y="185" text-anchor="middle" font-size="12" font-weight="600">Causal video model</text>
+  <text x="245" y="201" text-anchor="middle" font-size="10">pretrained from scratch</text>
+  <text x="245" y="214" text-anchor="middle" font-size="10">on web video, no actions</text>
+
+  <!-- imagined future: stack of frames -->
+  <rect class="box-shape" x="366" y="160" width="84" height="54" rx="3" fill-opacity="0.6"/>
+  <rect class="box-shape" x="360" y="166" width="84" height="54" rx="3" fill-opacity="0.8"/>
+  <rect class="key-shape" x="354" y="172" width="84" height="54" rx="3"/>
+  <text x="396" y="195" text-anchor="middle" font-size="11" font-weight="600">Imagined</text>
+  <text x="396" y="209" text-anchor="middle" font-size="11" font-weight="600">future clip</text>
+  <text x="410" y="240" text-anchor="middle" font-size="10" class="soft">a short look ahead</text>
+
+  <rect class="box-shape" x="500" y="162" width="120" height="64" rx="6"/>
+  <text x="560" y="182" text-anchor="middle" font-size="12" font-weight="600">Inverse dynamics</text>
+  <text x="560" y="197" text-anchor="middle" font-size="12" font-weight="600">model (IDM)</text>
+  <text x="560" y="213" text-anchor="middle" font-size="10" class="soft">~10 h per robot type</text>
+
+  <rect class="box-shape" x="650" y="162" width="100" height="64" rx="6"/>
+  <text x="700" y="188" text-anchor="middle" font-size="12" font-weight="600">Robot</text>
+  <text x="700" y="204" text-anchor="middle" font-size="10" class="soft">executes the</text>
+  <text x="700" y="217" text-anchor="middle" font-size="10" class="soft">action chunk</text>
+
+  <path class="line-accent" d="M140 194 L168 194" marker-end="url(#arr-a)"/>
+  <path class="line-accent" d="M320 194 L350 194" marker-end="url(#arr-a)"/>
+  <path class="line-accent" d="M450 194 L498 194" marker-end="url(#arr-a)"/>
+  <path class="line-accent" d="M620 194 L648 194" marker-end="url(#arr-a)"/>
+  <text x="474" y="186" text-anchor="middle" font-size="9.5" class="soft">frames</text>
+  <text x="634" y="186" text-anchor="middle" font-size="9.5" class="soft">EE</text>
+
+  <!-- loop back -->
+  <path class="line-accent dash" d="M700 226 L700 272 L75 272 L75 228" marker-end="url(#arr-a)"/>
+  <text x="388" y="290" text-anchor="middle" font-size="10.5">new camera frames feed the next prediction, which already started while the robot moves</text>
+  <text x="388" y="305" text-anchor="middle" font-size="10.5" class="soft">(“Leapfrog Inference”; the loop repeats “multiple times per second”)</text>
+  <text x="245" y="244" text-anchor="middle" font-size="10.5" font-style="italic" class="fill-accent">physics comes from web video</text>
+</svg>
+</div>
+<figcaption>Top: a VLA predicts actions directly. Bottom: Rhoda's DVA first imagines the next moment as video, then a small separate model turns the imagined video into end-effector (EE) motion. Based on Rhoda's research post <a href="https://www.rhoda.ai/research/direct-video-action">[4]</a>.</figcaption>
+</figure>
+
+<p>Step by step, as Rhoda describes it <a href="https://www.rhoda.ai/research/direct-video-action">[4]</a>:</p>
+
+<ol>
+  <li><strong>Input.</strong> “Captured video from the robot, proprioception, and other conditioning signals (e.g. language).” The model keeps “hundreds of frames of visual context”. Rhoda reports that with only 8 frames, the model “loses track of its progress”.</li>
+  <li><strong>Imagine.</strong> A causal video model predicts “a short period into the future, visually” — just “long enough to cover the next prediction's latency”. It runs the full generation process every time (“full video denoising”), in a compressed latent space at low resolution <a href="https://robopapers.substack.com/p/ep79-rhoda-ai-causal-video-models">[5]</a>.</li>
+  <li><strong>Read the motion.</strong> A small, separate <strong>inverse dynamics model (IDM)</strong> answers one question: <em>what motion takes the robot from this frame to that frame?</em> It outputs end-effector motion. It needs about 10 hours of data per robot type, and “even random motions can be used”.</li>
+  <li><strong>Act and repeat.</strong> The robot executes the action chunk while the next prediction is already running (“Leapfrog Inference”). The cycle runs “every few hundred milliseconds” <a href="https://www.rhoda.ai/news/press-release">[1]</a>.</li>
+</ol>
+
+<p class="note">A view from motion planning: the imagined clip works like a <em>visual reference trajectory</em>, and the IDM like a controller that tracks it. Eric Chan describes the IDM as “essentially doing a … point tracking problem” <a href="https://robopapers.substack.com/p/ep79-rhoda-ai-causal-video-models">[5]</a>.</p>
+
+<p><strong>Training</strong> has three parts. (1) Pretrain the video model from scratch on “hundreds of millions of videos” from the web, with no action labels <a href="https://www.rhoda.ai/news/press-release">[1]</a>. (2) Post-train it with the <em>same</em> video-prediction objective on <strong>10–20 hours of robot data per task</strong>, which includes teleoperation and correction (intervention) data <a href="https://www.rhoda.ai/research/direct-video-action">[4]</a><a href="https://thedataexchange.media/changan-chen-rhoda-ai/">[6]</a>. (3) Train the IDM separately, once per robot type.</p>
+
+<h2>What they show as evidence</h2>
+
+<ul>
+  <li><strong>Two customer tasks.</strong> Bearing decanting (11 h of robot data; a 1.5-hour uncut run) and container breakdown (17 h of data; 160 minutes “without intervention”) <a href="https://www.rhoda.ai/research/direct-video-action">[4]</a>. The press release claims “under two minutes per cycle without human intervention, exceeding customer KPIs” <a href="https://www.rhoda.ai/news/press-release">[1]</a>.</li>
+  <li><strong>A scaling study</strong> (September 2026) on one task: unpacking bearings, 14 steps, counted as a success only if done with no help in under 100 s <a href="https://www.rhoda.ai/research/scaling-web-video-pretraining">[7]</a>.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Video model size</th><th>XS</th><th>S</th><th>M</th><th>L</th></tr></thead>
+<tbody>
+<tr><td>Success at full speed</td><td>3.7%</td><td>65.0%</td><td>75.3%</td><td><strong>84.7%</strong></td></tr>
+<tr><td>Trials</td><td>27</td><td>103</td><td>259</td><td>111</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Two more findings from the same study: more pretraining compute helped (57.8% → 75.3% for the M model) but the curve was flat between 0.37× and 1× compute; and a measure of <em>video quality</em> on held-out web clips ranked all seven checkpoints in the same order as robot success. Rhoda also notes that model size “mainly affects time to completion, not correctness” <a href="https://www.rhoda.ai/research/scaling-web-video-pretraining">[7]</a>.</p>
+
+<p class="note">Read the limits Rhoda itself states: one task, one robot, one training run per condition, and the size sweep is not compute-matched. There is no VLA baseline and no independent test <a href="https://www.rhoda.ai/research/scaling-web-video-pretraining">[7]</a><a href="https://www.therobotreport.com/rhoda-ai-exits-stealth-with-450m-to-train-robots-from-video/">[8]</a>.</p>
+
+<h2>The five hypotheses under the bet</h2>
+
+<p>A bet is a set of hypotheses that must all be true at once. <span class="tag stated">stated</span> means Rhoda says it; <span class="tag inferred">inferred</span> means the bet needs it but Rhoda has not said so or shown it.</p>
+
+<div class="table-wrap wide">
+<table>
+<thead><tr><th>#</th><th>Hypothesis</th><th>Evidence so far</th><th>What would break it</th></tr></thead>
+<tbody>
+<tr><td>H1</td>
+<td><strong>Web video contains the physics robots need</strong>, and it transfers to control. <span class="tag stated">stated</span><br><span class="soft">VLAs' “entire understanding of physics comes from a relatively small robot teleoperation data set” — Singh <a href="https://www.humanoidsdaily.com/news/rhoda-ai-hits-1-7b-valuation-unveils-direct-video-action-model-to-bridge-the-real-world-gap">[9]</a></span></td>
+<td>Own scaling study: bigger, longer-pretrained models and better video quality → better robot success.</td>
+<td>A VLA or a from-scratch model matching DVA on the same task and the same robot data.</td></tr>
+<tr><td>H2</td>
+<td><strong>Predicting video first, then actions, is easier</strong> than predicting actions directly. <span class="tag stated">stated</span><br><span class="soft">Video-to-action is “a much more constrained problem” <a href="https://www.rhoda.ai/research/direct-video-action">[4]</a>; the video is a “visual chain of thought” <a href="https://robopapers.substack.com/p/ep79-rhoda-ai-causal-video-models">[5]</a>.</span></td>
+<td>The video-model family beats VLAs on several benchmarks (see <a href="0002-the-contenders.html">lesson 2</a>), but not with Rhoda's model.</td>
+<td>Models that skip video generation at run time doing just as well. Fast-WAM already claims this <a href="https://arxiv.org/abs/2603.16666">[10]</a>.</td></tr>
+<tr><td>H3</td>
+<td><strong>Full video generation is fast and cheap enough</strong> for closed-loop control in a factory. <span class="tag inferred">inferred</span></td>
+<td>Cycle time under two minutes on one task. Latency, control rate and GPU type are not published.</td>
+<td>Reaction too slow for disturbances, or a large GPU needed per robot so the unit economics fail.</td></tr>
+<tr><td>H4</td>
+<td><strong>Robot data per task stays small</strong>: 10–20 h per task, ~10 h per robot type for the IDM. <span class="tag stated">stated</span></td>
+<td>Two tasks at 11 h and 17 h. A podcast mentions “roughly three hours of additional factory data” on site <a href="https://podcasts.apple.com/us/podcast/jagdeep-singh-teaching-robots-from-internet-video-at/id1837762221?i=1000796288418">[11]</a>.</td>
+<td>Real sites needing much more: new parts, layouts or lighting forcing fresh data collection each time.</td></tr>
+<tr><td>H5</td>
+<td><strong>Scale pays</strong>: more model and more web video keep making robots better, so the funding buys progress. <span class="tag stated">stated</span></td>
+<td>Size: 3.7% → 84.7%. But compute gains were flat from 0.37× to 1× at full data.</td>
+<td>Plateaus on more tasks, or gains only in speed, never in correctness on new tasks.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>The business bet</strong> sits on top. Rhoda plans to sell <em>robots as a service</em> on its own heavy-duty wheeled platform (“25kg rated, 40kg peak”) and to license FutureVision “over time” <a href="https://www.rhoda.ai/">[12]</a><a href="https://thedataexchange.media/changan-chen-rhoda-ai/">[6]</a>. Today it uses off-the-shelf arms. A job post targets “first industrial deployments in the field by Q4-2026”, with a ramp in Wolfsburg, Germany; no customer is named <a href="https://jobs.ashbyhq.com/rhoda-ai/c20aae07-aaf9-4ed8-bbae-f9888d5b02c5">[13]</a>. <span class="tag inferred">inferred</span> For now, every result is a single-task specialist trained per task; “generalist” is the goal, not the current state.</p>
+
+<div class="box">
+  <p class="box-title">Not public yet — ask in any vendor meeting</p>
+  <ul>
+    <li>End-to-end latency, replanning rate, low-level control rate, and the GPU that runs it (on the robot or off).</li>
+    <li>Success rate and interventions over weeks of production, not single uncut demos.</li>
+    <li>Total data cost of a new task: hours, operators, correction rounds, IDM data, on-site adaptation.</li>
+    <li>Any comparison with a strong VLA on the same task and the same data.</li>
+  </ul>
+</div>
+
+<hr>
+
+<p class="practice-head">Practice · retrieval, no scrolling up</p>
+
+<div class="quiz" data-id="l1-q1" data-answer="2">
+  <p class="q">1. In Rhoda's loop, which part turns the imagined video into robot motion?</p>
+  <ol class="choices">
+    <li>The causal video model</li>
+    <li>A small inverse-dynamics model</li>
+    <li>A vision-language action head</li>
+    <li>A classical motion planner</li>
+  </ol>
+  <div class="explain" hidden>A small, separate inverse dynamics model (IDM) reads end-effector motion from the imagined frames. It is trained once per robot type, on about 10 hours of data, and random motions are acceptable.</div>
+</div>
+
+<div class="quiz" data-id="l1-q2" data-answer="4">
+  <p class="q">2. What does Rhoda pretrain its video model on?</p>
+  <ol class="choices">
+    <li>Teleoperated robot demonstration data</li>
+    <li>Simulated robot trajectory data</li>
+    <li>Web images with captions</li>
+    <li>General web video only</li>
+  </ol>
+  <div class="explain" hidden>“Hundreds of millions of videos” from the web, with no action labels, trained from scratch. Robot data comes later, in post-training (10–20 h per task). Web images with captions is how a VLA's backbone starts.</div>
+</div>
+
+<div class="quiz" data-id="l1-q3" data-answer="3">
+  <p class="q">3. How much robot data per task does Rhoda say its industrial tasks need?</p>
+  <ol class="choices">
+    <li>About 1 hour</li>
+    <li>About 350 hours</li>
+    <li>About 10–20 hours</li>
+    <li>Several thousand hours</li>
+  </ol>
+  <div class="explain" hidden>10–20 hours per task (11 h for decanting, 17 h for container breakdown), plus about 10 h per robot type for the IDM. About 1 hour is Generalist's claim for GEN-1; 350 h is what π0.5-DROID was fine-tuned on.</div>
+</div>
+
+<div class="quiz" data-id="l1-q4" data-answer="1">
+  <p class="q">4. Which result would most directly weaken H2, “predicting video first is easier than predicting actions directly”?</p>
+  <ol class="choices">
+    <li>A model that skips video generation matches it</li>
+    <li>Rhoda raises another large funding round next year</li>
+    <li>A bigger Rhoda model scores higher on decanting</li>
+    <li>A VLA fails after the phone orientation changes</li>
+  </ol>
+  <div class="explain" hidden>If a model that never generates video at run time gets the same results, the imagined video is not doing the work H2 says it does — and the most expensive step in the loop becomes optional. Option 3 supports H5; option 4 is Singh's argument against VLAs.</div>
+</div>
+
+<div class="quiz" data-id="l1-q5" data-answer="2">
+  <p class="q">5. In Rhoda's own scaling study, what did a bigger model mainly improve?</p>
+  <ol class="choices">
+    <li>Success on brand-new unseen tasks</li>
+    <li>Speed of finishing the task</li>
+    <li>Following spoken language instructions accurately</li>
+    <li>Safety around nearby human workers</li>
+  </ol>
+  <div class="explain" hidden>Rhoda: model size “mainly affects time to completion, not correctness”. The study used one task, so it says nothing about new tasks. This matters for H5: scale bought speed on a known task.</div>
+</div>
+
+<p class="score" data-quiz-score></p>
+
+<div class="recall" data-id="l1-r1">
+  <p class="prompt">A client asks: “What does Rhoda actually do differently?” Explain the DVA loop in 3–4 sentences, as you would in the meeting.</p>
+  <div class="model-answer" hidden>
+    <p><em>One good answer:</em> Most robot models today (VLAs) start from a model trained on web images and text, and learn physics only from robot demonstrations. Rhoda instead pretrains a video model on hundreds of millions of web videos, so it learns how things move. At run time the model imagines the next fraction of a second as video, a small second model converts that imagined video into arm motion, and the loop repeats several times per second. Rhoda says this needs only 10–20 hours of robot data per task — but speed, long-run reliability and comparisons with other models are not public yet.</p>
+  </div>
+</div>
+
+<div class="recall" data-id="l1-r2">
+  <p class="prompt">Name three of the five hypotheses, and for each one, a result that would break it.</p>
+  <div class="model-answer" hidden>
+    <p><strong>H1</strong> Web video holds the physics → broken if a VLA or from-scratch model matches DVA on the same task and data. <strong>H2</strong> Video first is easier → broken if models that skip video generation do as well. <strong>H3</strong> Fast and cheap enough → broken if reaction is too slow or the GPU cost per robot kills the economics. <strong>H4</strong> Small data per task → broken if each new site or part needs fresh large data collection. <strong>H5</strong> Scale pays → broken if gains plateau or only improve speed, never correctness on new tasks.</p>
+  </div>
+</div>
+
+<hr>
+
+<div class="box source-box">
+  <p class="box-title">Primary source to read next</p>
+  <p><a href="https://www.rhoda.ai/research/direct-video-action">Rhoda AI, “Causal Video Models Are Data-Efficient Robot Policy Learners”</a> (10 March 2026). Rhoda's own technical description of DVA. Read the method and “Leapfrog Inference” parts, and watch one long uncut video. Then read the <a href="https://www.rhoda.ai/research/scaling-web-video-pretraining">scaling study</a> (10 September 2026) and note which limits Rhoda states itself. It is a company source, so check every claim against the table above.</p>
+</div>
+
+<div class="box ask-box">
+  <p class="box-title">Ask your teacher</p>
+  <p>Anything unclear? Ask me in the chat. Good follow-ups: “How is an inverse dynamics model trained?”, “Why does long context matter for factory tasks?”, or “What would a fair pilot test between Rhoda and a VLA vendor look like?”</p>
+</div>
+
+<p class="practice-head">Reference</p>
+<p>Everything in this lesson on one printable page: <a href="../reference/company-card-rhoda.html">Rhoda AI company card</a>. The map of rival approaches: <a href="../reference/approach-map.html">Approach map</a>.</p>
+
+<h3>Sources</h3>
+<ol class="sources">
+  <li><a href="https://www.rhoda.ai/news/press-release">Rhoda AI press release (10 Mar 2026)</a></li>
+  <li><a href="https://siliconangle.com/2026/03/10/rhoda-ai-raises-450m-build-foundational-robotics-models-learn-internet-videos/">SiliconANGLE (10 Mar 2026)</a></li>
+  <li><a href="https://www.rhoda.ai/team">Rhoda AI team page (read 17 Oct 2026)</a></li>
+  <li><a href="https://www.rhoda.ai/research/direct-video-action">Rhoda AI, “Causal Video Models Are Data-Efficient Robot Policy Learners” (10 Mar 2026)</a></li>
+  <li><a href="https://robopapers.substack.com/p/ep79-rhoda-ai-causal-video-models">RoboPapers Ep. 79 with Eric Chan (6 May 2026; auto-transcript)</a></li>
+  <li><a href="https://thedataexchange.media/changan-chen-rhoda-ai/">The Data Exchange, interview with Changan Chen (23 Apr 2026)</a></li>
+  <li><a href="https://www.rhoda.ai/research/scaling-web-video-pretraining">Rhoda AI, scaling web video pretraining (10 Sep 2026)</a></li>
+  <li><a href="https://www.therobotreport.com/rhoda-ai-exits-stealth-with-450m-to-train-robots-from-video/">The Robot Report (12 Mar 2026)</a></li>
+  <li><a href="https://www.humanoidsdaily.com/news/rhoda-ai-hits-1-7b-valuation-unveils-direct-video-action-model-to-bridge-the-real-world-gap">Humanoids Daily (Mar 2026)</a></li>
+  <li><a href="https://arxiv.org/abs/2603.16666">Fast-WAM, arXiv 2603.16666 (Mar 2026)</a></li>
+  <li><a href="https://podcasts.apple.com/us/podcast/jagdeep-singh-teaching-robots-from-internet-video-at/id1837762221?i=1000796288418">Automated podcast Ep. 63 with Jagdeep Singh, episode description (14 Oct 2026)</a></li>
+  <li><a href="https://www.rhoda.ai/">Rhoda AI home page (read 17 Oct 2026)</a></li>
+  <li><a href="https://jobs.ashbyhq.com/rhoda-ai/c20aae07-aaf9-4ed8-bbae-f9888d5b02c5">Rhoda AI job post, Munich (posted 22 Jun 2026)</a></li>
+</ol>
+
+<nav class="nav">
+  <span>Robot AI bets · start</span>
+  <a href="0002-the-contenders.html">Lesson 2: The contenders →</a>
+</nav>
+
+</main>
+<script src="../assets/practice.js"></script>
+</body>
+</html>

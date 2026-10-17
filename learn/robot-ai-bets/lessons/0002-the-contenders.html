@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Contenders</title>
+<meta name="description" content="Lesson 2: seven ways to give a robot general skill, and the bottleneck each one bets on.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<main class="page">
+
+<p class="kicker"><a href="0001-rhodas-bet.html">Robot AI bets</a> · Lesson 2 of 4 · about 15 minutes</p>
+<h1>The contenders</h1>
+<p class="subtitle">Seven ways to give a robot general skill, and the bottleneck each one bets on</p>
+
+<div class="box win">
+  <p class="box-title">Your win for this lesson</p>
+  <p>You can place any robot-AI company on one map by asking <strong>two questions</strong>, and you can say which bottleneck its approach assumes. That is the first thing to do when a client forwards you a new announcement.</p>
+</div>
+
+<p class="lede">In <a href="0001-rhodas-bet.html">lesson 1</a> you saw Rhoda's bet: learn how the world moves from web video, imagine the next moments as video, then read actions off the imagined video. Rhoda is not alone, and it is not the only serious idea. Every company in this field is trying to solve the same problem: <strong>robot data is scarce and expensive</strong>, so the missing knowledge has to come from somewhere else.</p>
+
+<h2>Two questions that sort every company</h2>
+
+<ol>
+  <li><strong>Where does the general knowledge come from?</strong> This is the main pretraining data: web text and images, web video, human video and wearables, or simulation.</li>
+  <li><strong>What does the model predict when it runs?</strong> Actions directly, the future (as video or as features) and then actions, or parts such as points and grasps that a classical planner turns into motion.</li>
+</ol>
+
+<p>There is also a third fact that almost every family shares: <strong>they all finish with some real robot data</strong>. The bets differ on how much robot data is needed, and on what replaces the rest.</p>
+
+<figure class="wide">
+<div class="fig-scroll">
+<svg class="fig" viewBox="0 0 760 440" role="img" aria-labelledby="map-title map-desc">
+  <title id="map-title">Approach map of robot foundation models</title>
+  <desc id="map-desc">A grid. Columns are the main source of general knowledge: web text and images, web video, human video and wearables, simulation. Rows are what the model predicts at run time: actions directly, the future then actions, parts then a planner. Rhoda's DVA sits in the web video column, future row. A bottom band shows that almost every family finishes with robot data.</desc>
+
+  <!-- column headers -->
+  <text x="234" y="24" text-anchor="middle" font-size="12" font-weight="600">Web text + images</text>
+  <text x="382" y="24" text-anchor="middle" font-size="12" font-weight="600">Web video</text>
+  <text x="530" y="24" text-anchor="middle" font-size="12" font-weight="600">Human video + wearables</text>
+  <text x="678" y="24" text-anchor="middle" font-size="12" font-weight="600">Simulation</text>
+  <text x="456" y="42" text-anchor="middle" font-size="10.5" class="soft">← main source of general knowledge (question 1) →</text>
+
+  <!-- row labels -->
+  <text x="10" y="96" font-size="12" font-weight="600">Actions</text>
+  <text x="10" y="111" font-size="12" font-weight="600">directly</text>
+  <text x="10" y="200" font-size="12" font-weight="600">The future,</text>
+  <text x="10" y="215" font-size="12" font-weight="600">then actions</text>
+  <text x="10" y="232" font-size="10.5" class="soft">(“world action</text>
+  <text x="10" y="245" font-size="10.5" class="soft">models”)</text>
+  <text x="10" y="320" font-size="12" font-weight="600">Parts, then</text>
+  <text x="10" y="335" font-size="12" font-weight="600">a planner</text>
+  <text x="10" y="362" font-size="10.5" class="soft">↑ what it predicts</text>
+  <text x="10" y="375" font-size="10.5" class="soft">(question 2)</text>
+
+  <!-- grid lines -->
+  <line class="line" x1="160" y1="56" x2="752" y2="56" stroke-opacity="0.35"/>
+  <line class="line" x1="160" y1="150" x2="752" y2="150" stroke-opacity="0.35"/>
+  <line class="line" x1="160" y1="290" x2="752" y2="290" stroke-opacity="0.35"/>
+  <line class="line" x1="160" y1="372" x2="752" y2="372" stroke-opacity="0.35"/>
+  <line class="line" x1="308" y1="56" x2="308" y2="372" stroke-opacity="0.35"/>
+  <line class="line" x1="456" y1="56" x2="456" y2="372" stroke-opacity="0.35"/>
+  <line class="line" x1="604" y1="56" x2="604" y2="372" stroke-opacity="0.35"/>
+
+  <!-- Row A: actions directly -->
+  <rect class="box-shape" x="164" y="68" width="140" height="70" rx="6"/>
+  <text x="234" y="88" text-anchor="middle" font-size="12" font-weight="600">VLA</text>
+  <text x="234" y="105" text-anchor="middle" font-size="10" class="soft">π0.7 · Gemini Robotics 2</text>
+  <text x="234" y="119" text-anchor="middle" font-size="10" class="soft">GR00T N1.6 · Helix 02</text>
+
+  <rect class="box-shape" x="464" y="68" width="132" height="70" rx="6"/>
+  <text x="530" y="88" text-anchor="middle" font-size="12" font-weight="600">Human-data policies</text>
+  <text x="530" y="105" text-anchor="middle" font-size="10" class="soft">Generalist GEN-1 · Sunday</text>
+  <text x="530" y="119" text-anchor="middle" font-size="10" class="soft">EgoScale · LAPA</text>
+
+  <rect class="box-shape" x="612" y="68" width="132" height="70" rx="6"/>
+  <text x="678" y="88" text-anchor="middle" font-size="12" font-weight="600">Sim-trained policies</text>
+  <text x="678" y="105" text-anchor="middle" font-size="10" class="soft">MolmoBot · DreamGen</text>
+  <text x="678" y="119" text-anchor="middle" font-size="10" class="soft">GR00T N1 synthetic data</text>
+
+  <!-- Row B: future then actions -->
+  <rect class="key-shape" x="312" y="160" width="140" height="38" rx="6"/>
+  <text x="382" y="176" text-anchor="middle" font-size="10.5" font-weight="600">Full video → separate IDM</text>
+  <text x="382" y="191" text-anchor="middle" font-size="10">Rhoda DVA · 1X</text>
+
+  <rect class="box-shape" x="312" y="204" width="140" height="38" rx="6"/>
+  <text x="382" y="220" text-anchor="middle" font-size="11" font-weight="600">Video + actions jointly</text>
+  <text x="382" y="235" text-anchor="middle" font-size="10" class="soft">DreamZero · Cosmos Policy</text>
+
+  <rect class="box-shape" x="312" y="248" width="140" height="34" rx="6"/>
+  <text x="382" y="262" text-anchor="middle" font-size="11" font-weight="600">Features, no pixels</text>
+  <text x="382" y="276" text-anchor="middle" font-size="10" class="soft">Meta V-JEPA 2</text>
+
+  <rect class="box-shape dash" x="164" y="186" width="140" height="56" rx="6" fill-opacity="0.4"/>
+  <text x="234" y="206" text-anchor="middle" font-size="11" font-weight="600">Hybrids</text>
+  <text x="234" y="221" text-anchor="middle" font-size="10" class="soft">π0.7 subgoal images</text>
+  <text x="234" y="234" text-anchor="middle" font-size="10" class="soft">Veo-Act</text>
+  <path class="line dash" d="M234 140 L234 184"/>
+  <path class="line dash" d="M304 214 L310 214"/>
+
+  <!-- Row C: parts then planner -->
+  <rect class="box-shape" x="164" y="300" width="140" height="62" rx="6"/>
+  <text x="234" y="319" text-anchor="middle" font-size="12" font-weight="600">Modular pipelines</text>
+  <text x="234" y="335" text-anchor="middle" font-size="9.5" class="soft">TiPToP · Gemini Robotics-ER</text>
+  <text x="234" y="349" text-anchor="middle" font-size="10" class="soft">your VLM + motion planner</text>
+
+  <!-- bottom band: robot data -->
+  <rect x="160" y="384" width="592" height="46" rx="6" fill="none" class="line-2"/>
+  <text x="456" y="403" text-anchor="middle" font-size="11.5" font-weight="600" class="fill-2">Almost every family finishes with real robot data</text>
+  <text x="456" y="420" text-anchor="middle" font-size="10" class="soft">~1 h per task (GEN-1) · 10–20 h per task (Rhoda) · 350 h (π0.5-DROID) · thousands of h (GR00T N1.6) · modular: 0 h</text>
+</svg>
+</div>
+<figcaption>The approach map. Columns answer question 1, rows answer question 2. Rhoda (highlighted) sits in the web-video column: it fully generates a short future video, then a separate inverse dynamics model (IDM) reads actions from it. Dashed: hybrids that mix a VLA with imagined images. Robot-data hours are each company's own figures; sources below.</figcaption>
+</figure>
+
+<h2>Each family bets on a different bottleneck</h2>
+
+<p>A useful way to read any approach: <em>what does this company think is the real bottleneck?</em> Their architecture is the answer to that belief.</p>
+
+<div class="table-wrap wide">
+<table>
+<thead>
+<tr><th>Family</th><th>The bet: “the bottleneck is…”</th><th>Key numbers (company's own)</th><th>Main open risk</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>VLA</strong><br>Physical Intelligence, Google DeepMind, NVIDIA, Figure</td>
+<td>…meaning and generality. Start from a vision-language model; learn physics from large, varied robot data.</td>
+<td>GR00T N1.6: Cosmos-2B VLM + action head, several thousand hours of new teleoperation <a href="https://research.nvidia.com/labs/gear/gr00t-n1_6/">[1]</a></td>
+<td>Physics must come from scarce robot data.</td></tr>
+<tr class="focus"><td><strong>World action models</strong> (video)<br>Rhoda, NVIDIA DreamZero, 1X, mimic</td>
+<td>…knowing how the world moves. Video models already know it; fine-tune one and read actions off the predicted future.</td>
+<td>DreamZero: 14B video model, ~500 h teleoperation, 7 Hz on two GB200 GPUs <a href="https://arxiv.org/abs/2602.15922">[2]</a></td>
+<td>Generating video is slow and costs a lot of compute.</td></tr>
+<tr><td><strong>Latent world models</strong><br>Meta FAIR</td>
+<td>…the same, but pixels waste effort on detail nobody can predict. Predict abstract features instead.</td>
+<td>V-JEPA 2: >1M h web video; robot version post-trained on &lt;62 h of unlabeled robot video <a href="https://arxiv.org/abs/2506.09985">[3]</a></td>
+<td>Planning is slow (about 16 s per action) and needs a goal image.</td></tr>
+<tr><td><strong>Human-data policies</strong><br>Generalist, Sunday, research labs</td>
+<td>…the amount of real contact data. Collect it from people (wearables, gloves, egocentric video), which is far cheaper than robots.</td>
+<td>GEN-1: >500k h from wearables, no robot data in pretraining, ~1 h of robot data per task <a href="https://generalistai.com/blog/gen-1">[4]</a></td>
+<td>Human bodies differ from robot bodies; expensive data operations; results self-reported.</td></tr>
+<tr><td><strong>Sim-trained policies</strong><br>NVIDIA, Ai2</td>
+<td>…the cost of labeled data. Generate unlimited labeled data in simulation.</td>
+<td>MolmoBot: 1.8M simulated trajectories, 79.2% real-world pick-and-place zero-shot vs π0.5 39.2% <a href="https://arxiv.org/abs/2603.16861">[5]</a></td>
+<td>The gap between simulation and reality, especially for contact.</td></tr>
+<tr><td><strong>Modular pipelines</strong><br>TiPToP, Gemini Robotics-ER as planner</td>
+<td>…reliability and debugging. Do not learn what you can compute; use foundation models only to see and decide.</td>
+<td>TiPToP: no robot training data; beat π0.5-DROID (fine-tuned on 350 h) 98 vs 55 of 165 trials <a href="https://arxiv.org/abs/2603.09971">[6]</a></td>
+<td>Contact and grasp failures; mostly open-loop execution.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="note">Generalist states the opposite of Rhoda's bet in plain words: its April 2026 essay calls video pretraining another “crutch” and trains about 99% of its parameters from scratch <a href="https://generalistai.com/blog/beyond-world-models">[7]</a>. Two well-funded companies, two opposite beliefs about video.</p>
+
+<p>Notice what the table says about your own work: in TiPToP's paper, <strong>grasping caused 31 of the 55 failures</strong> <a href="https://arxiv.org/html/2603.09971">[6]</a>. That is the same reason your pick-and-place design hands the final grasp to a learned policy.</p>
+
+<h2>Rhoda's closest rivals: other world action models</h2>
+
+<p>NVIDIA's survey of this family sorts “world action models” (WAMs) into three designs by <em>how the actions come out</em> <a href="https://developer.nvidia.com/blog/pretrained-to-imagine-fine-tuned-to-act-the-rise-of-world-action-models/">[8]</a>:</p>
+
+<ol>
+  <li><strong>Inverse dynamics:</strong> generate the future video, then a separate model infers the action that leads there. <em>UniPi, VPP, mimic-video, LingBot-VA, Rhoda's DVA.</em></li>
+  <li><strong>Joint prediction:</strong> one model outputs video and actions together. <em>GR-1, DreamZero, Cosmos Policy.</em></li>
+  <li><strong>Representation-only:</strong> trained with video, but generates no video when it runs. <em>Fast-WAM.</em></li>
+</ol>
+
+<p>Within design 1, Rhoda's choices are: <strong>full video generation at every step</strong> (Rhoda claims to be the first to run “full video denoising during real-time closed-loop robot control”; some rivals only partly generate the future, or skip it), a <strong>small separate inverse dynamics model</strong>, a <strong>causal model with a long memory</strong> (“hundreds of frames”), and <strong>pretraining from scratch on web video</strong> <a href="https://www.rhoda.ai/research/direct-video-action">[9]</a>. Like most rivals, it generates in a compressed latent space at low resolution, not in raw camera pixels <a href="https://robopapers.substack.com/p/ep79-rhoda-ai-causal-video-models">[16]</a>.</p>
+
+<p>The structural look-alike is the <strong>1X World Model</strong>: a 14B video model plus a separate inverse dynamics model. But 1X reports it takes about 11 seconds to generate 5 seconds of video, so it plans in chunks instead of reacting <a href="https://www.1x.tech/discover/world-model-self-learning">[10]</a>. And <strong>Fast-WAM</strong> challenges the core of design 1: it reached similar success at 190 ms per step, against 810 ms for its own imagine-then-act version <a href="https://arxiv.org/abs/2603.16666">[11]</a>. Its claim: <em>training</em> with video helps, but <em>generating</em> video at run time may not be needed. If that holds, the most expensive part of Rhoda's loop is optional.</p>
+
+<p class="note">Rhoda has published no latency number. It says only that the loop runs “multiple times per second” <a href="https://www.rhoda.ai/research/direct-video-action">[9]</a>. This is the first number to ask for in a vendor meeting.</p>
+
+<h2>What the head-to-head evidence says (October 2026)</h2>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Comparison</th><th>Result</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Cosmos Policy (joint WAM) vs π0.5, LIBERO</td><td>98.5 vs 96.9</td><td><a href="https://arxiv.org/abs/2601.16163">[12]</a></td></tr>
+<tr><td>DreamZero vs π0.5, unseen tasks on DROID-Franka (success)</td><td>22.5% vs 7.5%</td><td><a href="https://arxiv.org/abs/2602.15922">[2]</a></td></tr>
+<tr><td>π0.5 vs best WAM, LIBERO-Plus robustness</td><td><strong>85.7</strong> vs 82.2 (VLA wins)</td><td><a href="https://arxiv.org/abs/2603.22078">[13]</a></td></tr>
+<tr><td>Time per inference, same study</td><td>π0.5 63 ms; five WAMs 190–1,175 ms</td><td><a href="https://arxiv.org/abs/2603.22078">[13]</a></td></tr>
+<tr><td>Modular TiPToP (0 h robot data) vs π0.5-DROID (350 h)</td><td>98 vs 55 of 165 trials</td><td><a href="https://arxiv.org/abs/2603.09971">[6]</a></td></tr>
+<tr class="focus"><td>Rhoda DVA vs any VLA or WAM</td><td><strong>Not published</strong></td><td><a href="https://www.therobotreport.com/rhoda-ai-exits-stealth-with-450m-to-train-robots-from-video/">[14]</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Three things to take away:</p>
+<ul>
+  <li><strong>Video-backbone models often win on benchmarks and unseen tasks</strong>, usually with less robot data. This supports the family Rhoda belongs to — but not Rhoda itself, which has no published comparison.</li>
+  <li><strong>VLAs are still several times faster</strong> and sometimes more robust. NVIDIA's survey puts full-video WAMs at a “3–4x slowdown” and says they “trade robot-data efficiency for compute cost” <a href="https://developer.nvidia.com/blog/pretrained-to-imagine-fine-tuned-to-act-the-rise-of-world-action-models/">[8]</a>.</li>
+  <li><strong>The lines are blurring.</strong> π0.7 can condition on subgoal images from a “lightweight world model” <a href="https://www.pi.website/blog/pi07">[15]</a>; NVIDIA's next GR00T (N2) is a WAM built on DreamZero <a href="https://developer.nvidia.com/blog/pretrained-to-imagine-fine-tuned-to-act-the-rise-of-world-action-models/">[8]</a>; the same survey expects “WAM+VLA hybrids” to win. So a company's label tells you little. Ask the two questions instead.</li>
+</ul>
+
+<hr>
+
+<p class="practice-head">Practice · retrieval, no scrolling up</p>
+
+<div class="quiz" data-id="l2-q1" data-answer="3">
+  <p class="q">1. A startup pretrains on 500,000 hours of data from cheap wearables worn by people, with no robot data in pretraining, then uses about one hour of robot data per task. Which family?</p>
+  <ol class="choices">
+    <li>Video world-action models</li>
+    <li>Modular planning pipelines</li>
+    <li>Human-data trained policies</li>
+    <li>VLA action-head models</li>
+  </ol>
+  <div class="explain" hidden>This is Generalist's GEN-1. The bet: real contact data is the bottleneck, and people wearing sensors are the cheapest way to collect it. Question 1 answers “human video + wearables”; question 2 answers “actions directly”.</div>
+</div>
+
+<div class="quiz" data-id="l2-q2" data-answer="1">
+  <p class="q">2. A model is trained to predict future video, but when it runs it skips generating video and outputs actions in about 190 ms. Which family?</p>
+  <ol class="choices">
+    <li>Video world-action models</li>
+    <li>Sim-data trained policies</li>
+    <li>Latent world-feature models</li>
+    <li>Human-data trained policies</li>
+  </ol>
+  <div class="explain" hidden>This is Fast-WAM, the “representation-only” design of world action models. It uses video as a training signal only. It matters for Rhoda because it suggests the expensive generation step may not be needed at run time.</div>
+</div>
+
+<div class="quiz" data-id="l2-q3" data-answer="4">
+  <p class="q">3. A model predicts future feature vectors, not pixels. It samples many candidate actions and keeps the one whose predicted features come closest to a goal image. Which family?</p>
+  <ol class="choices">
+    <li>VLA action-head models</li>
+    <li>Modular planning pipelines</li>
+    <li>Video world-action models</li>
+    <li>Latent world-feature models</li>
+  </ol>
+  <div class="explain" hidden>This is Meta's V-JEPA 2-AC. It shares Rhoda's belief that web video teaches physics, but rejects the idea of predicting pixels. The cost: about 16 seconds of planning per action, and it needs a goal image.</div>
+</div>
+
+<div class="quiz" data-id="l2-q4" data-answer="2">
+  <p class="q">4. A system uses a vision-language model to point at objects, a grasp network to propose grasps, and a GPU task-and-motion planner. It needs no robot training data. Which family?</p>
+  <ol class="choices">
+    <li>Video world-action models</li>
+    <li>Modular planning pipelines</li>
+    <li>Human-data trained policies</li>
+    <li>Sim-data trained policies</li>
+  </ol>
+  <div class="explain" hidden>This is TiPToP. It beat π0.5-DROID (fine-tuned on 350 h) on 98 vs 55 of 165 trials. Most of its failures came from grasping, the weak spot of modular systems.</div>
+</div>
+
+<div class="quiz" data-id="l2-q5" data-answer="3">
+  <p class="q">5. Which belief is the <em>opposite</em> of Rhoda's core bet?</p>
+  <ol class="choices">
+    <li>Robot teleoperation data is scarce and costly</li>
+    <li>Models should predict the future before acting</li>
+    <li>Web video pretraining is only a crutch</li>
+    <li>Closed-loop control beats any open-loop video plan</li>
+  </ol>
+  <div class="explain" hidden>Generalist's essay calls video pretraining another “crutch” and trains almost everything from scratch on real interaction data. Rhoda would agree with the first, second and fourth options.</div>
+</div>
+
+<div class="quiz" data-id="l2-q6" data-answer="1">
+  <p class="q">6. A client says: “Video models beat VLAs now, so Rhoda must be ahead.” What is the strongest correction?</p>
+  <ol class="choices">
+    <li>The family wins some tests, but Rhoda published none</li>
+    <li>Video models lose every single benchmark to VLA models</li>
+    <li>Benchmarks never matter at all for factory robot deployment</li>
+    <li>Rhoda's model is a VLA, so those results differ</li>
+  </ol>
+  <div class="explain" hidden>Cosmos Policy, DreamZero and others beat π0.5 on several tests, but VLAs still win some robustness tests and are much faster. Rhoda has published no comparison with any VLA or other world action model. And Rhoda's model is a world action model, not a VLA.</div>
+</div>
+
+<p class="score" data-quiz-score></p>
+
+<div class="recall" data-id="l2-r1">
+  <p class="prompt">A client asks: “Rhoda says internet video is the key. Generalist says video is a crutch. Which one should we bet on?” Write your answer in 3–4 sentences.</p>
+  <div class="model-answer" hidden>
+    <p><em>One good answer:</em> Both agree that robot teleoperation data is the bottleneck; they disagree on what should replace it. Rhoda bets on web video for physics and still needs about 10–20 hours of robot data per task; Generalist bets on 500k+ hours of real contact data from wearables and claims about 1 hour per task. Neither claim has been checked by a third party, and Rhoda has published no speed numbers or baselines. So do not bet on a belief: run a pilot on your own task and compare success rate at full speed, recovery from errors, cycle time, and the robot-data hours each new task needs — and design the cell so the policy can be swapped later.</p>
+  </div>
+</div>
+
+<div class="recall" data-id="l2-r2">
+  <p class="prompt">Name the three ways a world action model can produce actions, and put Rhoda in one of them.</p>
+  <div class="model-answer" hidden>
+    <p>(1) <strong>Inverse dynamics:</strong> generate future video, then a separate model infers the actions — <em>Rhoda's DVA is here</em>, with 1X and UniPi. (2) <strong>Joint:</strong> one model predicts video and actions together — DreamZero, Cosmos Policy. (3) <strong>Representation-only:</strong> trained with video but generates none at run time — Fast-WAM.</p>
+  </div>
+</div>
+
+<hr>
+
+<div class="box source-box">
+  <p class="box-title">Primary source to read next</p>
+  <p><a href="https://developer.nvidia.com/blog/pretrained-to-imagine-fine-tuned-to-act-the-rise-of-world-action-models/">Moritz Reuss, “Pretrained to Imagine, Fine-Tuned to Act: The Rise of World Action Models”</a>, NVIDIA Technical Blog, 15 June 2026. The best single survey of Rhoda's family: the three designs, speed and compute costs, and where DVA fits. It is written by NVIDIA, which builds its own world action models, so read its conclusions with that in mind. Read the sections on design types and on cost; skip the rest on a first pass.</p>
+</div>
+
+<div class="box ask-box">
+  <p class="box-title">Ask your teacher</p>
+  <p>Anything unclear? Ask me in the chat. Good follow-ups: “Where would <em>[company name]</em> sit on the map?”, “Why is generating pixels so expensive?”, or “Which family fits a client who needs bin picking next quarter?”</p>
+</div>
+
+<p class="practice-head">Reference</p>
+<p>The map and table above, compressed for quick use: <a href="../reference/approach-map.html">Approach map (reference sheet)</a>. Rhoda's own card: <a href="../reference/company-card-rhoda.html">Rhoda AI company card</a>.</p>
+
+<h3>Sources</h3>
+<ol class="sources">
+  <li><a href="https://research.nvidia.com/labs/gear/gr00t-n1_6/">NVIDIA GEAR, GR00T N1.6 (Dec 2025)</a></li>
+  <li><a href="https://arxiv.org/abs/2602.15922">DreamZero, arXiv 2602.15922 (Feb 2026)</a></li>
+  <li><a href="https://arxiv.org/abs/2506.09985">V-JEPA 2, Meta FAIR, arXiv 2506.09985 (Jun 2025)</a></li>
+  <li><a href="https://generalistai.com/blog/gen-1">Generalist AI, GEN-1 (Apr 2026)</a></li>
+  <li><a href="https://arxiv.org/abs/2603.16861">MolmoBot, arXiv 2603.16861 (Mar 2026)</a></li>
+  <li><a href="https://arxiv.org/abs/2603.09971">TiPToP, arXiv 2603.09971 (Mar 2026, revised Jul 2026)</a></li>
+  <li><a href="https://generalistai.com/blog/beyond-world-models">Generalist AI, “Going Beyond World Models &amp; VLAs” (Apr 2026)</a></li>
+  <li><a href="https://developer.nvidia.com/blog/pretrained-to-imagine-fine-tuned-to-act-the-rise-of-world-action-models/">NVIDIA Technical Blog, “The Rise of World Action Models” (Jun 2026)</a></li>
+  <li><a href="https://www.rhoda.ai/research/direct-video-action">Rhoda AI, “Causal Video Models Are Data-Efficient Robot Policy Learners” (Mar 2026)</a></li>
+  <li><a href="https://www.1x.tech/discover/world-model-self-learning">1X, World Model (Jan 2026)</a></li>
+  <li><a href="https://arxiv.org/abs/2603.16666">Fast-WAM, arXiv 2603.16666 (Mar 2026)</a></li>
+  <li><a href="https://arxiv.org/abs/2601.16163">Cosmos Policy, arXiv 2601.16163 (Jan 2026)</a></li>
+  <li><a href="https://arxiv.org/abs/2603.22078">“Do World Action Models Generalize Better than VLAs?”, arXiv 2603.22078 (v5, Jul 2026)</a></li>
+  <li><a href="https://www.therobotreport.com/rhoda-ai-exits-stealth-with-450m-to-train-robots-from-video/">The Robot Report on Rhoda (Mar 2026)</a></li>
+  <li><a href="https://www.pi.website/blog/pi07">Physical Intelligence, π0.7 (Apr 2026)</a></li>
+  <li><a href="https://robopapers.substack.com/p/ep79-rhoda-ai-causal-video-models">RoboPapers Ep. 79 with Rhoda's Eric Chan (May 2026)</a></li>
+</ol>
+
+<nav class="nav">
+  <a href="0001-rhodas-bet.html">← Lesson 1: Rhoda's bet</a>
+  <span>Next session: Lesson 3 — Evidence check</span>
+</nav>
+
+</main>
+<script src="../assets/practice.js"></script>
+</body>
+</html>

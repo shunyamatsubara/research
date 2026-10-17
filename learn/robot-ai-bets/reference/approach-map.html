@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Approach Map</title>
+<meta name="description" content="Reference sheet: the families of robot foundation-model approaches, the bottleneck each bets on, and how to place a new company. Checked 17 October 2026.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="sheet">
+<main class="page">
+
+<p class="kicker">Robot AI bets · Reference · checked 17 Oct 2026</p>
+<h1>Approach map</h1>
+<p class="subtitle">Place any robot-AI company with two questions</p>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>Q1 · Where does the general knowledge come from?</h3>
+    <p>Web text + images · web video · human video and wearables · simulation. <br><span class="soft">(Almost everyone also finishes with some real robot data.)</span></p>
+  </div>
+  <div class="card">
+    <h3>Q2 · What does the model predict when it runs?</h3>
+    <p>Actions directly · the future (video or features), then actions · parts (points, grasps, plans) for a classical planner.</p>
+  </div>
+</div>
+
+<h2>The families</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Family</th><th>Bottleneck it bets on</th><th>Main data</th><th>Predicts</th><th>Actions come from</th><th>Strength</th><th>Open risk</th><th>Examples</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>VLA</strong></td><td>Meaning and generality</td><td>Web image-text, then 100s–1000s h robot data</td><td>Action chunks</td><td>Action head on VLM features</td><td>Mature, fast, follows language</td><td>Physics from scarce robot data</td><td>Physical Intelligence (π0.7), DeepMind (Gemini Robotics 2), NVIDIA (GR00T N1.6), Figure (Helix 02)</td></tr>
+<tr class="focus"><td><strong>World action model</strong> (video)</td><td>Knowing how the world moves</td><td>Web or robot video, then robot demos</td><td>Future video (± actions)</td><td>IDM, joint decoding, or no video at run time</td><td>Less robot data; wins several benchmarks</td><td>3–4× slower than VLAs; compute cost; imagined futures can be wrong</td><td>Rhoda (DVA), NVIDIA (DreamZero → GR00T N2, Cosmos Policy), 1X, mimic, AgiBot</td></tr>
+<tr><td><strong>Latent world model</strong></td><td>Same, but pixels waste effort</td><td>Web video + small robot video</td><td>Future features</td><td>Search over candidate actions toward a goal</td><td>Cheaper than pixels</td><td>Slow planning (~16 s per action); needs goal image</td><td>Meta FAIR (V-JEPA 2), AMI Labs</td></tr>
+<tr><td><strong>Human-data policy</strong></td><td>Amount of real contact data</td><td>Wearables, gloves, egocentric video</td><td>Actions (or latent actions)</td><td>Native action model; small robot data maps it</td><td>Cheapest data that scales</td><td>Body mismatch; costly data operations; self-reported</td><td>Generalist (GEN-1), Sunday (ACT-1), EgoScale, LAPA</td></tr>
+<tr><td><strong>Sim-trained policy</strong></td><td>Cost of labeled data</td><td>Physics sim; generated trajectories</td><td>Actions</td><td>Policy trained on synthetic (+ real) data</td><td>Unlimited labels; zero-shot pick-and-place</td><td>Sim-to-real gap, especially contact</td><td>NVIDIA (GR00T N1 synthetic, DreamGen), Ai2 (MolmoBot)</td></tr>
+<tr><td><strong>Modular pipeline</strong></td><td>Reliability and debugging</td><td>Pretrained VLM, segmentation, grasp nets</td><td>Detections, points, grasps, plans</td><td>Motion / task-and-motion planner</td><td>No robot data; traceable failures</td><td>Grasp and contact failures; open loop</td><td>TiPToP, Gemini Robotics-ER as planner</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>Three designs of world action model</h3>
+    <ol>
+      <li><strong>Inverse dynamics:</strong> generate future video, then a separate model infers actions — Rhoda DVA, 1X, UniPi, mimic-video, LingBot-VA.</li>
+      <li><strong>Joint:</strong> video and actions from one model — DreamZero, Cosmos Policy, GR-1/GR-2.</li>
+      <li><strong>Representation-only:</strong> trained with video, generates none at run time — Fast-WAM.</li>
+    </ol>
+    <p class="soft">Source: <a href="https://developer.nvidia.com/blog/pretrained-to-imagine-fine-tuned-to-act-the-rise-of-world-action-models/">NVIDIA Technical Blog, Jun 2026</a></p>
+  </div>
+  <div class="card">
+    <h3>Head-to-head numbers worth remembering</h3>
+    <ul>
+      <li>Cosmos Policy vs π0.5, LIBERO: 98.5 vs 96.9. <a href="https://arxiv.org/abs/2601.16163">[1]</a></li>
+      <li>DreamZero vs π0.5, unseen DROID tasks: 22.5% vs 7.5%. <a href="https://arxiv.org/abs/2602.15922">[2]</a></li>
+      <li>π0.5 beats WAMs on LIBERO-Plus robustness: 85.7 vs 82.2. <a href="https://arxiv.org/abs/2603.22078">[3]</a></li>
+      <li>Inference time: π0.5 63 ms vs WAMs 190–1,175 ms. <a href="https://arxiv.org/abs/2603.22078">[3]</a></li>
+      <li>Modular TiPToP (0 h robot data) vs π0.5-DROID (350 h): 98 vs 55 of 165. <a href="https://arxiv.org/abs/2603.09971">[4]</a></li>
+      <li>Rhoda vs anyone: <strong>not published</strong>.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Quick placement checklist</h2>
+<ol>
+  <li>What is pretrained, on what data, how many hours? → Q1.</li>
+  <li>What comes out of the model at run time: actions, video, features, or points/grasps? → Q2.</li>
+  <li>How many hours of <em>robot</em> data per new task and per new robot type?</li>
+  <li>How fast does it run, on which GPU, on or off the robot?</li>
+  <li>What evidence: own demos, public benchmark, or third-party test?</li>
+</ol>
+
+<p class="soft" style="font-size:0.8rem">Trend to watch: the families are merging (π0.7 uses subgoal images from a “lightweight world model”; NVIDIA's GR00T N2 is a world action model; NVIDIA expects “WAM+VLA hybrids”). Labels mean less every month; the two questions still work. Lessons: <a href="../lessons/0001-rhodas-bet.html">1 · Rhoda's bet</a> · <a href="../lessons/0002-the-contenders.html">2 · The contenders</a>.</p>
+
+</main>
+</body>
+</html>
